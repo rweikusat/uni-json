@@ -1,0 +1,26 @@
+Universal Json
+==============
+
+JSON is a nice, well-defined data format and it's a real shame that
+libraries handling it are so hideously complicated. Further, they (at
+least the C libraries I looked at) all suffer from the same design
+flaws, namely,
+
+	- they implement some scheme for memory management despite
+          they shouldn't
+
+	- they define some sort of data representation for their
+          output despite they shouldn't
+
+This is meant to become a small library for parsing JSON text and
+formatting some complex object as JSON text with a C core which
+delegates anything which requires memory allocation and/ or a data
+representation to "someone else" and which can thus be used together
+with any other programming language which can interoperate with
+compiled C code.
+
+I'm planning to create language bindings for Perl and Python and
+possibly, C++ in this order.
+
+
+
