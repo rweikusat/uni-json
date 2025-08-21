@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2025 Rainer Weikusat
+  Copyright (C) 2025 Rainer Weikusat, rweikusat@talktalk.net
 
-  LICENSE: MIT
+  MIT-licensed.
 */
 #ifndef uni_json_binding_h
 #define uni_json_binding_h
