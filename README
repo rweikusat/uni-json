@@ -21,3 +21,5 @@ compiled C code.
 
 I'm planning to create language bindings for Perl and Python and
 possibly, C++ in this order.
+
+-- Rainer Weikusat, rweikusat@talktalk.net
