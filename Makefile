@@ -21,6 +21,10 @@ ifdef FINAL
 CFLAGS := -O2 $(CFLAGS)
 endif
 
+#**  lib version
+#
+V_MAJ :=	0
+
 #*  targets
 #
 .PHONY: all clean
@@ -28,7 +32,8 @@ endif
 all: bin/uni-json.so
 
 clean:
-	-rm tmp/*.o
+	-rm tmp/*o
+	-rm bin/*
 
 bin/uni-json.so: $(OBJS)
 
@@ -43,4 +48,4 @@ tmp/%.o: src/%.c tmp/%.d
 	$(CC) $(CFLAGS) -c -o $@ -fpic $<
 
 bin/%:
-	$(GCC) -shared -o $@ $^
+	$(GCC) -shared -o $@ -Wl,-soname -Wl,$(notdir $@).$(V_MAJ) $^
