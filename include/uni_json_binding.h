@@ -10,7 +10,8 @@
 #include <stddef.h>
 
 /*  types */
-struct uni_json_binding
+/**  parser */
+struct uni_json_p_binding
 {
     /*  objects */
     void *(*make_object)(void);
