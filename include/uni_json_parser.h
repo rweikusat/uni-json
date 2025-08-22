@@ -9,7 +9,7 @@
 #define uni_json_parser_h
 
 /*  includes */
-#include <stddef.h>
+#include <stdint.h>
 
 /*   types */
 struct uni_json_p_binding;
