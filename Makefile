@@ -2,6 +2,18 @@
 #
 
 #*  definitions
+#**  programs
+#
+GCC :=		gcc
+CC :=		$(GCC) -Iinclude
+
+#**  files
+#
+SRCS :=		$(shell ls src/*.c)
+OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
+DEPS :=		$(OBJS:.o=.d)
+
+#**  CFLAGS
 #
 CFLAGS := -g -W -Wall
 
@@ -18,11 +30,14 @@ all: bin/uni-json.so
 clean:
 	-rm tmp/*.o
 
-bin/uni-json.so: tmp/uni_json_parser.o
+bin/uni-json.so: $(OBJS)
 
-tmp/uni_json_parser.o: src/uni_json_parser.c include/uni_json_parser.h include/uni_json_p_binding.h
+include $(DEPS)
 
 #*  %-rules
 #
-tmp/%.o: src/%.c
-	$(CC) -Iinclude $(CFLAGS) -c -o $@ -fpic $<
+tmp/%.d: src/%.c
+	$(CC) -MM $< | perl -pe 's|$*\.o|$@|' >$@
+
+tmp/%.o: src/%.c tmp/%.d
+	$(CC) $(CFLAGS) -c -o $@ -fpic $<
