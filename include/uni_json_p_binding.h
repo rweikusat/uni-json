@@ -9,7 +9,7 @@
 #define uni_json_binding_h
 
 /*  includes */
-#include <stddef.h>
+#include <stdint.h>
 
 /*  types */
 /**  parser */
@@ -20,7 +20,7 @@ struct uni_json_p_binding
     int (*add_2_object)(void *key, void *value, void *obj);
 
     /*  arrays */
-    void *(make_array)(void);
+    void *(*make_array)(void);
     int (*add_2_array)(void *value, void *ary);
 
     /*  strings */
