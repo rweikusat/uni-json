@@ -15,10 +15,10 @@ DEPS :=		$(OBJS:.o=.d)
 
 #**  CFLAGS
 #
-CFLAGS := -g -W -Wall
+CFLAGS :=	-g -W -Wall
 
 ifdef FINAL
-CFLAGS := -O2 $(CFLAGS)
+CFLAGS :=	-O2 $(CFLAGS)
 endif
 
 #**  lib version
