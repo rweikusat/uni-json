@@ -6,6 +6,7 @@
 #
 GCC :=		gcc
 CC :=		$(GCC) -Iinclude
+LD :=		$(GCC)
 
 #**  files
 #
@@ -48,4 +49,4 @@ tmp/%.o: src/%.c tmp/%.d
 	$(CC) $(CFLAGS) -c -o $@ -fpic $<
 
 bin/%:
-	$(GCC) -shared -o $@ -Wl,-soname -Wl,$(notdir $@).$(V_MAJ) $^
+	$(LD) -shared -o $@ -Wl,-soname -Wl,$(notdir $@).$(V_MAJ) $^
