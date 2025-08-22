@@ -1,0 +1,20 @@
+/*
+  parser implementation
+
+  Copyright (C) 2025 Rainer Weikusat, rweikusat@talktalk.net
+
+  MIT-licensed.
+*/
+
+/*  includes */
+#include <stdio.h>
+
+#include "uni_json_p_binding.h"
+#include "uni_json_parser.h"
+
+/*  routines */
+void *uni_json_parser(uint8_t *data, size_t len, struct uni_json_p_binding *bind)
+{
+    fputs("I won't parse!\n", stderr);
+    return NULL;
+}
