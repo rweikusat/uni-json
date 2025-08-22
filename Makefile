@@ -41,3 +41,6 @@ tmp/%.d: src/%.c
 
 tmp/%.o: src/%.c tmp/%.d
 	$(CC) $(CFLAGS) -c -o $@ -fpic $<
+
+bin/%:
+	$(GCC) -shared -o $@ $^
