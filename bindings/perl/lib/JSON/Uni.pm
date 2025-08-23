@@ -6,6 +6,9 @@
 #*  code
 #
 package JSON::Uni;
+
+use version; our $VERSION = version->declare('v0.1.0');
+
 require DynaLosder;
 our @ISA = 'DynaLoader';
 __PACKAGE__->bootstrap();
