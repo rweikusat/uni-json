@@ -16,7 +16,7 @@
 void *parse(uint8_t *, size_t);
 
 /*  XS code */
-MODULE = UNI_JSON
+MODULE = JSON_Uni
 
 SV *
 parse(data)
