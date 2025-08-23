@@ -5,5 +5,15 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-              NAME            => 'JSON::Uni',
-              VERSION_FROM    => 'lib/JSON/Uni.pm');
+              #** meta
+              #
+              NAME =>		'JSON::Uni',
+              VERSION_FROM =>	'lib/JSON/Uni.pm',
+              AUTHOR =>		['Rainer Weikusat <rweikusat@talktalk.net>'],
+
+              #**  build info
+              #
+              INC =>		'-I../../include',
+              LIBS =>		'-L../../bin -luni-json',
+              OBJECT =>		'parser$(OBJ_EXT)'
+             );
