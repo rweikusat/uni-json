@@ -11,14 +11,14 @@
 #include "EXTERN.h"
 #include "perl.h"
 
-#include <uni_json_p_bindings.h>
+#include <uni_json_p_binding.h>
 #include <uni_json_parser.h>
 
 /*  prototypes */
 static void *make_hv(void);
 
 /*  variables */
-static struct uni_json_p_binding bind = {
+static struct uni_json_p_binding binding = {
     .make_object =	make_hv
 };
 
@@ -31,5 +31,5 @@ static void *make_hv(void)
 
 void *parse(uint8_t *data, size_t len)
 {
-    return uni_json_parse(data, len, &bind);
+    return uni_json_parse(data, len, &binding);
 }
