@@ -14,6 +14,6 @@ WriteMakefile(
               #**  build info
               #
               INC =>		'-I../../include',
-              LIBS =>		'-L../../bin -luni-json',
-              OBJECT =>		'parser$(OBJ_EXT)'
+              LIBS =>		['-L../../bin -luni-json'],
+              OBJECT =>		'parser$(OBJ_EXT) Uni$(OBJ_EXT)'
              );
