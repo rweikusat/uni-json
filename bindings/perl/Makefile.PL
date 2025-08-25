@@ -2,7 +2,18 @@
 # Makefile.PL for uni-json Perl bindings
 #
 
+package MY;
+
+sub const_loadlibs
+{
+    local $_[0]{LD_RUN_PATH};
+    $_[0]->SUPER::const_loadlibs();
+}
+
+package main;
+
 use ExtUtils::MakeMaker;
+
 
 WriteMakefile(
               #** meta
