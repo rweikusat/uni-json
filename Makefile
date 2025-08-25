@@ -30,7 +30,7 @@ V_MAJ :=	0
 #
 .PHONY: all clean
 
-all: bin/uni-json.so
+all: bin/libuni-json.so
 
 clean:
 	-rm tmp/*o
