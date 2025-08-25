@@ -13,7 +13,7 @@ LD :=		$(GCC)
 SRCS :=		$(shell ls src/*.c)
 OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
 DEPS :=		$(OBJS:.o=.d)
-LIB :=		libuni-json
+LIB :=		libuni-json.so
 
 #**  CFLAGS
 #
