@@ -13,6 +13,7 @@ LD :=		$(GCC)
 SRCS :=		$(shell ls src/*.c)
 OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
 DEPS :=		$(OBJS:.o=.d)
+LIB :=		libuni-json
 
 #**  CFLAGS
 #
@@ -30,13 +31,13 @@ V_MAJ :=	0
 #
 .PHONY: all clean
 
-all: bin/libuni-json.so
+all: bin/$(LIB)
 
 clean:
 	-rm tmp/*o
 	-rm bin/*
 
-bin/libuni-json.so: $(OBJS)
+bin/$(LIB): $(OBJS)
 
 include $(DEPS)
 
