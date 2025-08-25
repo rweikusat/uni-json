@@ -13,7 +13,15 @@ LD :=		$(GCC)
 SRCS :=		$(shell ls src/*.c)
 OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
 DEPS :=		$(OBJS:.o=.d)
-LIB :=		libuni-json.so
+
+#**  library
+#
+V_MAJ :=	0
+V_MIN :=	1
+
+L_BASE :=	libuni-json.so
+L_MAJ :=	$(L_BASE).$(V_MAJ)
+LIB :=		$(L_MAJ).$(V_MIN)
 
 #**  CFLAGS
 #
@@ -25,19 +33,21 @@ endif
 
 #**  lib version
 #
-V_MAJ :=	0
 
 #*  targets
 #
 .PHONY: all clean
 
-all: bin/$(LIB)
+all: bin/$(L_MAJ) bin/$(L_BASE)
 
 clean:
 	-rm tmp/*o
 	-rm bin/*
 
 bin/$(LIB): $(OBJS)
+
+bin/$(L_MAJ) bin/$(L_BASE): bin/$(LIB)
+	ln -s $(notdir $^) $@
 
 include $(DEPS)
 
@@ -50,4 +60,4 @@ tmp/%.o: src/%.c tmp/%.d
 	$(CC) $(CFLAGS) -c -o $@ -fpic $<
 
 bin/%:
-	$(LD) -shared -o $@ -Wl,-soname -Wl,$(notdir $@).$(V_MAJ) $^
+	$(LD) -shared -o $@ -Wl,-soname -Wl,$(notdir $(basename $@)) $^
