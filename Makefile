@@ -36,7 +36,7 @@ clean:
 	-rm tmp/*o
 	-rm bin/*
 
-bin/uni-json.so: $(OBJS)
+bin/libuni-json.so: $(OBJS)
 
 include $(DEPS)
 
