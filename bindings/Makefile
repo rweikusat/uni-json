@@ -1,9 +1,7 @@
 # uni-json bindings Makefile
 #
 
-.PHONY: all perl
-
-all: perl
+.PHONY: perl
 
 perl: perl/Makefile
 	make -C perl
