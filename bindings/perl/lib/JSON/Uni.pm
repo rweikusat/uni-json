@@ -9,9 +9,13 @@ package JSON::Uni;
 
 use version; our $VERSION = version->declare('v0.1.0');
 
-require DynaLosder;
+require DynaLoader;
 our @ISA = 'DynaLoader';
 __PACKAGE__->bootstrap();
+
+use Exporter	'import';
+our @EXPORT_OK = 'parse';
+
 
 # Ach ja
 1;
