@@ -1,6 +1,6 @@
 # uni-json test script
 #
 
-use JSON::Uni		'parse';
+use JSON::Uni;
 
-my $x = parse('[1, 2, 3]');
+my $x = JSON::Uni::parse_json('[1, 2, 3]');
