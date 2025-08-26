@@ -4,10 +4,21 @@
 
 package MY;
 
+our $LPATH = '../../bin';
+
 sub const_loadlibs
 {
-    local $_[0]{LD_RUN_PATH};
+    local $_[0]{LD_RUN_PATH};   # don't put $LPATH into binaries
     $_[0]->SUPER::const_loadlibs();
+}
+
+sub test
+{
+    my $sec;
+
+    $sec = $_[0]->SUPER::test();
+    $sec =~ s|(PERL_DL_NONLAZY)|LD_LIBRARY_PATH=$LPATH $1|g;
+    return $sec;
 }
 
 package main;
@@ -25,6 +36,6 @@ WriteMakefile(
               #**  build info
               #
               INC =>		'-I../../include',
-              LIBS =>		['-L../../bin -luni-json'],
+              LIBS =>		["-L$MY::LPATH -luni-json"],
               OBJECT =>		'parser$(OBJ_EXT) Uni$(OBJ_EXT)'
              );
