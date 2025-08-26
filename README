@@ -1,6 +1,15 @@
 Universal Json
 ==============
 
+This is a project in very early stages of development. It contains no
+useful code so far, just a build system that's capable of building the
+main shared library, a better dummy module with Perl language
+bindingins and test.pl script which actually calls a (dummy) function
+in the main shared library in the proper way.
+
+
+Plan
+----
 JSON is a nice, well-defined data format and it's a real shame that
 libraries handling it are so hideously complicated. Further, they (at
 least the C libraries I looked at) all suffer from the same design
@@ -20,6 +29,6 @@ with any other programming language which can interoperate with
 compiled C code.
 
 I'm planning to create language bindings for Perl and Python and
-possibly, C++ in this order.
+possibly, C++, in this order.
 
 -- Rainer Weikusat, rweikusat@talktalk.net
