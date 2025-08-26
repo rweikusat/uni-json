@@ -19,7 +19,7 @@ void *parse(uint8_t *, size_t);
 MODULE = JSON::Uni
 
 SV *
-parse(data)
+parse_json(data)
 	SV * data
 PREINIT:
 	uint8_t *d;
