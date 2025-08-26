@@ -13,9 +13,5 @@ require DynaLoader;
 our @ISA = 'DynaLoader';
 __PACKAGE__->bootstrap();
 
-use Exporter	'import';
-our @EXPORT_OK = 'parse';
-
-
 # Ach ja
 1;
