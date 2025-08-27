@@ -27,7 +27,8 @@ typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
-static void *struct_char(struct pstate *, struct uni_json_p_binding *);
+static void *close_char(struct pstate *, struct uni_json_p_binding *);
+static void *sep_char(struct pstate *, struct uni_json_p_binding *);
 
 static void *parse_false(struct pstate *, struct uni_json_p_binding *);
 static void *parse_null(struct pstate *, struct uni_json_p_binding *);
@@ -44,8 +45,9 @@ static parse_func *tok_map[256] = {
     ['\n'] =		whitespace,
     [' '] =		whitespace,
 
-    [']'] =		struct_char,
-    [','] =		struct_char,
+    [']'] =		close_char,
+
+    [','] =		sep_char,
 
     ['f'] =		parse_false,
     ['n'] =		parse_null,
@@ -120,13 +122,19 @@ static int have_one_of(struct pstate *pstate, uint8_t *set)
 /**  parser routines */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *)
 {
-    /* dummy function used to mark whitespace chars in tok_map */
+    /* dummy routine to make whitespace in tok_map */
     return NULL;
 }
 
-static void *struct_char(struct pstate *, struct uni_json_p_binding *)
+static void *close_char(struct pstate *, struct uni_json_p_binding *)
 {
-    /* dummy function used to mark structural chars which don't start tokens in tok_map */
+    return &no_value;
+}
+
+static void *sep_char(struct pstate *pstate, struct uni_json_p_binding *)
+{
+    pstate->err.code = UJ_E_NO_VAL;
+    pstate->err.pos = pstate->p;
     return NULL;
 }
 
@@ -222,10 +230,8 @@ static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds
 
     p = pstate->p;
     e = pstate->e;
-
     while (p < e && (parse = tok_map[*p], parse == whitespace))
         ++p;
-
     if (p == e) return &no_value;
 
     if (!parse) {
@@ -233,7 +239,6 @@ static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds
         pstate->err.pos = p;
         return NULL;
     }
-    if (parse == struct_char) return &no_value;
 
     pstate->p = p;
     v = parse(pstate, binds);
