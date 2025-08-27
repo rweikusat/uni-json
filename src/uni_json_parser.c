@@ -129,6 +129,7 @@ static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds
 
     while (p < e && (parse = tok_map[*p], parse == whitespace))
         ++p;
+
     if (p == e) {
         pstate->err.code = UJ_E_NO_VAL;
         pstate->err.pos = p;
