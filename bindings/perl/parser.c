@@ -17,18 +17,26 @@
 /*  prototypes */
 static void on_error(unsigned, size_t);
 
+
 static void *make_bool(int);
 static void *make_hv(void);
 static void *make_null(void);
+
+static void *make_av(void);
+static int add_2_av(void *, void *);
+
+static void free_obj(void *);
 
 /*  variables */
 static struct uni_json_p_binding binding = {
     .on_error =		on_error,
 
-    .make_object =	make_hv,
-
     .make_bool =	make_bool,
-    .make_null =	make_null
+    .make_null =	make_null,
+
+    .make_array =	make_av,
+    .free_array =	free_obj,
+    .add_2_array =	add_2_av
 };
 
 /*  routines */
@@ -53,6 +61,25 @@ static void *make_bool(int true_false)
 {
     dTHX;
     return true_false ? &PL_sv_yes : &PL_sv_no;
+}
+
+static void *make_av(void)
+{
+    dTHX;
+    return newAV();
+}
+
+static int add_2_av(void *v, void *ary)
+{
+    dTHX;
+    av_push(ary, v);
+    return 1;
+}
+
+static void free_obj(void *obj)
+{
+    dTHX;
+    SvREFCNT_dec_NN(obj);
 }
 
 void *parse(uint8_t *data, size_t len)
