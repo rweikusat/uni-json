@@ -20,7 +20,7 @@ struct uni_json_p_binding
 
     /*  objects */
     void *(*make_object)(void);
-    void (*free_obj)(void *);
+    void (*free_object)(void *);
     int (*add_2_object)(void *key, void *value, void *obj);
 
     /*  arrays */
