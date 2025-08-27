@@ -172,6 +172,7 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     pstate.e = data + len;
 
     v = parse_value(&pstate, binds);
+
     if (!v) {
         binds->on_error(pstate.err.code, pstate.err.pos - data);
         return NULL;
@@ -180,7 +181,7 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     if (pstate.p != pstate.e) {
         if (pstate.last_free) pstate.last_free(v);
         binds->on_error(UJ_E_GARBAGE, pstate.p - data);
-        return 0;
+        return NULL;
     }
 
     return v;
