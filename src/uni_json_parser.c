@@ -140,8 +140,8 @@ static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds
     p = pstate->p;
     while (p < e && (parse = tok_map[*p], parse == whitespace))
            ++p;
-
     pstate->p = p;
+
     return v;
 }
 
