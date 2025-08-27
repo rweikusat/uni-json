@@ -158,7 +158,7 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     struct pstate pstate;
     void *v;
 
-    if (!len) return NULL;
+    if (!len) return binds->make_null();
 
     pstate.s = pstate.p = data;
     pstate.e = data + len;
