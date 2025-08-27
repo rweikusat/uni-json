@@ -27,7 +27,7 @@ typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
-static void *terminator(struct pstate *, struct uni_json_p_binding *);
+static void *struct_char(struct pstate *, struct uni_json_p_binding *);
 
 static void *parse_false(struct pstate *, struct uni_json_p_binding *);
 static void *parse_null(struct pstate *, struct uni_json_p_binding *);
@@ -44,7 +44,8 @@ static parse_func *tok_map[256] = {
     ['\n'] =		whitespace,
     [' '] =		whitespace,
 
-    [']'] =		terminator,
+    [']'] =		struct_char,
+    [','] =		struct_char,
 
     ['f'] =		parse_false,
     ['n'] =		parse_null,
@@ -89,6 +90,33 @@ static int skip_literal(struct pstate *pstate, uint8_t *want)
     return 0;
 }
 
+static int have_one_of(struct pstate *pstate, uint8_t *set)
+{
+    uint8_t *p;
+    int c, cs;
+
+    p = pstate->p;
+    if (p == pstate->e) {
+        pstate->err.code = UJ_E_EOS;
+        pstate->err.pos = p;
+        return -1;
+    }
+
+    c = *p;
+    while (cs = *set, cs) {
+        if (c == cs) {
+            pstate->p = p + 1;
+            return c;
+        }
+
+        ++set;
+    }
+
+    pstate->err.code = UJ_E_INV_IN;
+    pstate->err.pos = p;
+    return -1;
+}
+
 /**  parser routines */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *)
 {
@@ -96,9 +124,9 @@ static void *whitespace(struct pstate *, struct uni_json_p_binding *)
     return NULL;
 }
 
-static void *terminator(struct pstate *, struct uni_json_p_binding *)
+static void *struct_char(struct pstate *, struct uni_json_p_binding *)
 {
-    /* dummy function used to mark terminator chars in tok_map */
+    /* dummy function used to mark structural chars which don't start tokens in tok_map */
     return NULL;
 }
 
@@ -138,9 +166,7 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
 static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     void *ary, *v;
-    uint8_t *p;
-    unsigned c;
-    int rc;
+    int rc, c;
 
     ary = binds->make_array();
 
@@ -149,20 +175,8 @@ static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds
     if (!v) goto err;
 
     if ((int *)v == &no_value) {
-        p = pstate->p;
-        if (p == pstate->e) {
-            pstate->err.code = UJ_E_EOS;
-            pstate->err.pos = p;
-            goto err;
-            }
-
-        if (*p != ']') {
-            pstate->err.code = UJ_E_INV_IN;
-            pstate->err.pos = pstate->p;
-            goto err;
-        }
-
-        pstate->p = p + 1;
+        c = have_one_of(pstate, "]");
+        if (c == -1) goto err;
     } else
         do {
             rc = binds->add_2_array(v, ary);
@@ -174,21 +188,11 @@ static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds
                 goto err;
             }
 
-            p = pstate->p;
-            if (p == pstate->e) {
-                pstate->err.code = UJ_E_EOS;
-                pstate->err.pos = p;
+            c = have_one_of(pstate, ",]");
+            if (c == -1) {
+                if (pstate->last_free) pstate->last_free(v);
                 goto err;
             }
-
-            c = *p;
-            if (!(c == ',' || c == ']')) {
-                pstate->err.code = UJ_E_INV_IN;
-                pstate->err.pos = p;
-                goto err;
-            }
-
-            pstate->p = p + 1;
 
             if (c == ',') {
                 v = parse_value(pstate, binds);
