@@ -15,14 +15,21 @@
 #include <uni_json_parser.h>
 
 /*  prototypes */
+static void on_error(unsigned, size_t);
 static void *make_hv(void);
 
 /*  variables */
 static struct uni_json_p_binding binding = {
+    .on_error =		on_error,
     .make_object =	make_hv
 };
 
 /*  routines */
+static void on_error(unsigned code, size_t pos)
+{
+    croak_nocontext("%s (%u) at %zu", uni_json_ec_2_msg(code), code, pos);
+}
+
 static void *make_hv(void)
 {
     dTHX;
