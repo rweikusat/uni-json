@@ -15,6 +15,9 @@
 /**  parser */
 struct uni_json_p_binding
 {
+    /*  error handler */
+    void (*on_error)(unsigned code, size_t pos);
+
     /*  objects */
     void *(*make_object)(void);
     int (*add_2_object)(void *key, void *value, void *obj);
