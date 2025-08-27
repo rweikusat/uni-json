@@ -27,6 +27,7 @@ typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
+static void *terminator(struct pstate *, struct uni_json_p_binding *);
 
 static void *parse_false(struct pstate *, struct uni_json_p_binding *);
 static void *parse_null(struct pstate *, struct uni_json_p_binding *);
@@ -43,6 +44,8 @@ static parse_func *tok_map[256] = {
     ['\n'] =		whitespace,
     [' '] =		whitespace,
 
+    [']'] =		terminator,
+
     ['f'] =		parse_false,
     ['n'] =		parse_null,
     ['t'] =		parse_true,
@@ -58,6 +61,8 @@ static char *ec_msg_map[] = {
     [UJ_E_INV_IN] =	"invalid char in object",
     [UJ_E_ADD] =	"failed to add value to object"
 };
+
+static int no_value;
 
 /*  routines */
 /**  helpers */
@@ -88,6 +93,12 @@ static int skip_literal(struct pstate *pstate, uint8_t *want)
 static void *whitespace(struct pstate *, struct uni_json_p_binding *)
 {
     /* dummy function used to mark whitespace chars in tok_map */
+    return NULL;
+}
+
+static void *terminator(struct pstate *, struct uni_json_p_binding *)
+{
+    /* dummy function used to mark terminator chars in tok_map */
     return NULL;
 }
 
@@ -132,38 +143,64 @@ static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds
     int rc;
 
     ary = binds->make_array();
+
     ++pstate->p;
+    v = parse_value(pstate, binds);
+    if (!v) goto err;
 
-    do {
-        v = parse_value(pstate, binds);
-        if (!v) goto err;
-
+    if ((int *)v == &no_value) {
         p = pstate->p;
-
-        rc = binds->add_2_array(v, ary);
-        if (!rc) {
-            if (pstate->last_free) pstate->last_free(v);
-
-            pstate->err.code = UJ_E_ADD;
-            pstate->err.pos = p;
-            goto err;
-        }
-
         if (p == pstate->e) {
             pstate->err.code = UJ_E_EOS;
             pstate->err.pos = p;
             goto err;
-        }
+            }
 
-        c = *p;
-        if (c != ',' && c != ']') {
+        if (*p != ']') {
             pstate->err.code = UJ_E_INV_IN;
-            pstate->err.pos = p;
+            pstate->err.pos = pstate->p;
             goto err;
         }
 
         pstate->p = p + 1;
-    } while (c != ']');
+    } else
+        do {
+            rc = binds->add_2_array(v, ary);
+            if (!rc) {
+                if (pstate->last_free) pstate->last_free(v);
+
+                pstate->err.code = UJ_E_ADD;
+                pstate->err.pos = pstate->p;
+                goto err;
+            }
+
+            p = pstate->p;
+            if (p == pstate->e) {
+                pstate->err.code = UJ_E_EOS;
+                pstate->err.pos = p;
+                goto err;
+            }
+
+            c = *p;
+            if (!(c == ',' || c == ']')) {
+                pstate->err.code = UJ_E_INV_IN;
+                pstate->err.pos = p;
+                goto err;
+            }
+
+            pstate->p = p + 1;
+
+            if (c == ',') {
+                v = parse_value(pstate, binds);
+                if (!v) goto err;
+
+                if ((int *)v == &no_value) {
+                    pstate->err.code = UJ_E_NO_VAL;
+                    pstate->err.pos = pstate->p;
+                    goto err;
+                }
+            }
+        } while (c == ',');
 
     pstate->last_free = binds->free_array;
     return ary;
@@ -185,17 +222,14 @@ static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds
     while (p < e && (parse = tok_map[*p], parse == whitespace))
         ++p;
 
-    if (p == e) {
-        pstate->err.code = UJ_E_NO_VAL;
-        pstate->err.pos = p;
-        return NULL;
-    }
+    if (p == e) return &no_value;
 
     if (!parse) {
         pstate->err.code = UJ_E_INV;
         pstate->err.pos = p;
         return NULL;
     }
+    if (parse == terminator) return &no_value;
 
     pstate->p = p;
     v = parse(pstate, binds);
@@ -222,7 +256,10 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     struct pstate pstate;
     void *v;
 
-    if (!len) return binds->make_null();
+    if (!len) {
+        binds->on_error(UJ_E_NO_VAL, 0);
+        return NULL;
+    }
 
     pstate.s = pstate.p = data;
     pstate.e = data + len;
@@ -231,6 +268,11 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
 
     if (!v) {
         binds->on_error(pstate.err.code, pstate.err.pos - data);
+        return NULL;
+    }
+
+    if ((int *)v == &no_value) {
+        binds->on_error(UJ_E_NO_VAL, 0);
         return NULL;
     }
 
