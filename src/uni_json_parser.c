@@ -233,7 +233,7 @@ static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds
         pstate->err.pos = p;
         return NULL;
     }
-    if (parse == terminator) return &no_value;
+    if (parse == struct_char) return &no_value;
 
     pstate->p = p;
     v = parse(pstate, binds);
