@@ -14,7 +14,8 @@
 /*  constants */
 enum {
     UJ_E_INV,                    /* invalid token start char */
-    UJ_E_NO_VAL                  /* missing value */
+    UJ_E_NO_VAL,                 /* missing value */
+    UJ_E_INV_LIT                 /* invalid literal */
 };
 
 /*   types */
