@@ -11,6 +11,11 @@
 /*  includes */
 #include <stdint.h>
 
+/*  constants */
+enum {
+    UJ_E_INV                    /* invalid token start char */
+};
+
 /*   types */
 struct uni_json_p_binding;
 
