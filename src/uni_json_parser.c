@@ -15,6 +15,7 @@
 /*  types */
 struct pstate {
     uint8_t *s, *p, *e;
+    void (*last_free)(void *);
 
     struct {
         unsigned code;
@@ -48,7 +49,8 @@ static parse_func *tok_map[256] = {
 static char *ec_msg_map[] = {
     [UJ_E_INV] =	"invalid token start char",
     [UJ_E_NO_VAL] =	"missing value",
-    [UJ_E_INV_LIT] =	"invalid literal"
+    [UJ_E_INV_LIT] =	"invalid literal",
+    [UJ_E_GARBAGE] =	"garbage after value"
 };
 
 /*  routines */
@@ -89,6 +91,8 @@ static void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds
 
     rc = skip_literal(pstate, "false");
     if (rc == -1) return NULL;
+
+    pstate->last_free = binds->free_bool;
     return binds->make_bool(0);
 }
 
@@ -98,6 +102,8 @@ static void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds)
 
     rc = skip_literal(pstate, "null");
     if (rc == -1) return NULL;
+
+    pstate->last_free = binds->free_null;
     return binds->make_null();
 }
 
@@ -107,6 +113,8 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
 
     rc = skip_literal(pstate, "true");
     if (rc == -1) return NULL;
+
+    pstate->last_free = binds->free_bool;
     return binds->make_bool(1);
 }
 
@@ -167,6 +175,12 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     if (!v) {
         binds->on_error(pstate.err.code, pstate.err.pos - data);
         return NULL;
+    }
+
+    if (pstate.p != pstate.e) {
+        if (pstate.last_free) pstate.last_free(v);
+        binds->on_error(UJ_E_GARBAGE, pstate.p - data);
+        return 0;
     }
 
     return v;
