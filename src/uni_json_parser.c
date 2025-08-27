@@ -43,6 +43,7 @@ static char *ec_msg_map[] = {
 /**  parser routines */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *)
 {
+    /* dummy function used to mark whitespace chars in tok_map */
     return NULL;
 }
 
