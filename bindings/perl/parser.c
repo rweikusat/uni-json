@@ -16,12 +16,16 @@
 
 /*  prototypes */
 static void on_error(unsigned, size_t);
+
 static void *make_hv(void);
+static void *make_null(void);
 
 /*  variables */
 static struct uni_json_p_binding binding = {
     .on_error =		on_error,
-    .make_object =	make_hv
+
+    .make_object =	make_hv,
+    .make_null =	make_null
 };
 
 /*  routines */
@@ -34,6 +38,12 @@ static void *make_hv(void)
 {
     dTHX;
     return newHV();
+}
+
+static void *make_null(void)
+{
+    dTHX;
+    return &PL_sv_undef;
 }
 
 void *parse(uint8_t *data, size_t len)
