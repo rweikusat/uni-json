@@ -1,7 +1,7 @@
 # uni-json test script
 #
 
-use Test::More tests => 9;
+use Test::More tests => 14;
 
 #**  overall tests
 #
@@ -9,15 +9,22 @@ BEGIN {
     use_ok('JSON::Uni', 'parse_json');
 }
 
-{
-    my $x = parse_json('');
-    ok(!defined($x), 'empty string parses as null');
-}
+eval {
+    parse_json('');
+};
+isnt($@, '', 'empty string errors');
 
 eval {
-    parse_json(' ');
+    parse_json("\t \r\n");
 };
-isnt($@, '', 'non-empty string with no value returns an error');
+isnt($@, '', 'whitespace-only string errors');
+
+for (qw(] } , :)) {
+    eval {
+        parse_json("$_");
+    };
+    isnt($@, '', "sole $_ errors");
+}
 
 #**  literal parsing
 #
@@ -56,4 +63,11 @@ isnt($@, '', 'non-empty string with no value returns an error');
         parse_json('nuller');
     };
     isnt($@, '', 'additional chars in literals error');
+}
+
+#**  arrays
+#
+{
+    my $x = parse_json('[]');
+    ok(ref($x) eq 'ARRAY' && @$x == 0, 'parsing an empty array works');
 }
