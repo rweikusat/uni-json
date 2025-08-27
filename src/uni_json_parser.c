@@ -22,10 +22,10 @@ struct pstate {
     } err;
 };
 
-typedef void *parse_func(struct pstate *);
+typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 /*  prototypes */
-static void *whitespace(struct pstate *);
+static void *whitespace(struct pstate *, struct uni_json_p_binding *);
 
 /*  variables */
 static parse_func *tok_map[256] = {
@@ -40,6 +40,13 @@ static char *ec_msg_map[] = {
 };
 
 /*  routines */
+/**  parser routines */
+static void *whitespace(struct pstate *, struct uni_json_p_binding *)
+{
+    return NULL;
+}
+
+/**  interface */
 char *uni_json_ec_2_msg(unsigned ec)
 {
     if (ec < sizeof(ec_msg_map) / sizeof(*ec_msg_map))
@@ -47,7 +54,7 @@ char *uni_json_ec_2_msg(unsigned ec)
     return NULL;
 }
 
-void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *bind)
+void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds)
 {
     fputs("I won't parse!\n", stderr);
     return NULL;
