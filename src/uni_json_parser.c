@@ -46,8 +46,10 @@ static parse_func *tok_map[256] = {
     [' '] =		whitespace,
 
     [']'] =		close_char,
+    ['}'] =		close_char,
 
     [','] =		sep_char,
+    [':'] =		sep_char,
 
     ['f'] =		parse_false,
     ['n'] =		parse_null,
