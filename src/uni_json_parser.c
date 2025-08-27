@@ -35,6 +35,10 @@ static parse_func *tok_map[256] = {
     [' '] =		whitespace
 };
 
+static char *ec_msg_map[] = {
+    [UJ_E_INV] =	"invalid token start char"
+};
+
 /*  routines */
 void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *bind)
 {
