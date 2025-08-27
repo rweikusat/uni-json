@@ -39,6 +39,7 @@ endif
 .PHONY: all clean
 
 all: bin/$(L_MAJ) bin/$(L_BASE)
+	$(MAKE) -C bindings
 
 clean:
 	-rm tmp/*o
@@ -47,7 +48,7 @@ clean:
 bin/$(LIB): $(OBJS)
 
 bin/$(L_MAJ) bin/$(L_BASE): bin/$(LIB)
-	ln -s $(notdir $^) $@
+	ln -sf $(notdir $^) $@
 
 include $(DEPS)
 
