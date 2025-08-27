@@ -27,6 +27,10 @@ typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
 
+static void *parse_false(struct pstate *, struct uni_json_p_binding *);
+static void *parse_null(struct pstate *, struct uni_json_p_binding *);
+static void *parse_true(struct pstate *, struct uni_json_p_binding *);
+
 static void *parse_value(struct pstate *, struct uni_json_p_binding *);
 
 /*  variables */
@@ -34,20 +38,76 @@ static parse_func *tok_map[256] = {
     ['\t'] =		whitespace,
     ['\r'] =		whitespace,
     ['\n'] =		whitespace,
-    [' '] =		whitespace
+    [' '] =		whitespace,
+
+    ['f'] =		parse_false,
+    ['n'] =		parse_null,
+    ['t'] =		parse_true
 };
 
 static char *ec_msg_map[] = {
     [UJ_E_INV] =	"invalid token start char",
-    [UJ_E_NO_VAL] =	"missing value"
+    [UJ_E_NO_VAL] =	"missing value",
+    [UJ_E_INV_LIT] =	"invalid literal"
 };
 
 /*  routines */
+/**  helpers */
+static int skip_literal(struct pstate *pstate, uint8_t *want)
+{
+    uint8_t *p, *e;
+    unsigned c;
+
+    p = pstate->p;
+    e = pstate->e;
+
+    while ((c = *want, c) && p < e && c == *p) {
+        ++p;
+        ++want;
+    }
+
+    if (c) {
+        pstate->err.code = UJ_E_INV_LIT;
+        pstate->err.pos = pstate->p;
+        return -1;
+    }
+
+    pstate->p = p;
+    return 0;
+}
+
 /**  parser routines */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *)
 {
     /* dummy function used to mark whitespace chars in tok_map */
     return NULL;
+}
+
+static void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds)
+{
+    int rc;
+
+    rc = skip_literal(pstate, "false");
+    if (rc == -1) return NULL;
+    return binds->make_bool(0);
+}
+
+static void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds)
+{
+    int rc;
+
+    rc = skip_literal(pstate, "null");
+    if (rc == -1) return NULL;
+    return binds->make_null();
+}
+
+static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
+{
+    int rc;
+
+    rc = skip_literal(pstate, "true");
+    if (rc == -1) return NULL;
+    return binds->make_bool(1);
 }
 
 static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds)
