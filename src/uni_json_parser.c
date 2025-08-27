@@ -15,7 +15,7 @@
 /*  types */
 struct pstate {
     uint8_t *s, *p, *e;
-    void (*last_free)(void *);
+    int last_type;
 
     struct {
         unsigned code;
@@ -24,6 +24,16 @@ struct pstate {
 };
 
 typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
+
+/*  constants */
+enum {
+    T_NULL,
+    T_BOOL,
+    T_NUM,
+    T_STR,
+    T_ARY,
+    T_OBJ
+};
 
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
@@ -71,6 +81,40 @@ static int no_value;
 
 /*  routines */
 /**  helpers */
+static void free_obj(int type, void *obj, struct uni_json_p_binding *binds)
+{
+    void (**pdtor)(void *);
+    void (*dtor)(void *);
+
+    switch (type) {
+    case T_NULL:
+        pdtor = &binds->free_null;
+        break;
+
+    case T_BOOL:
+        pdtor = &binds->free_bool;
+        break;
+
+    case T_NUM:
+        pdtor = &binds->free_number;
+        break;
+
+    case T_STR:
+        pdtor = &binds->free_string;
+        break;
+
+    case T_ARY:
+        pdtor = &binds->free_array;
+        break;
+
+    case T_OBJ:
+        pdtor = &binds->free_object;
+    }
+
+    dtor = *pdtor;
+    if (dtor) dtor(obj);
+}
+
 static int skip_literal(struct pstate *pstate, uint8_t *want)
 {
     uint8_t *p, *e;
@@ -147,7 +191,7 @@ static void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds
     rc = skip_literal(pstate, "false");
     if (rc == -1) return NULL;
 
-    pstate->last_free = binds->free_bool;
+    pstate->last_type = T_BOOL;
     return binds->make_bool(0);
 }
 
@@ -158,7 +202,7 @@ static void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds)
     rc = skip_literal(pstate, "null");
     if (rc == -1) return NULL;
 
-    pstate->last_free = binds->free_null;
+    pstate->last_type = T_NULL;
     return binds->make_null();
 }
 
@@ -169,7 +213,7 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
     rc = skip_literal(pstate, "true");
     if (rc == -1) return NULL;
 
-    pstate->last_free = binds->free_bool;
+    pstate->last_type = T_BOOL;
     return binds->make_bool(1);
 }
 
@@ -191,7 +235,7 @@ static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds
         do {
             rc = binds->add_2_array(v, ary);
             if (!rc) {
-                if (pstate->last_free) pstate->last_free(v);
+                free_obj(pstate->last_type, v, binds);
 
                 pstate->err.code = UJ_E_ADD;
                 pstate->err.pos = pstate->p;
@@ -200,7 +244,7 @@ static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds
 
             c = have_one_of(pstate, ",]");
             if (c == -1) {
-                if (pstate->last_free) pstate->last_free(v);
+                free_obj(pstate->last_type, v, binds);
                 goto err;
             }
 
@@ -216,7 +260,7 @@ static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds
             }
         } while (c == ',');
 
-    pstate->last_free = binds->free_array;
+    pstate->last_type = T_ARY;
     return ary;
 
 err:
@@ -288,7 +332,7 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     }
 
     if (pstate.p != pstate.e) {
-        if (pstate.last_free) pstate.last_free(v);
+        free_obj(pstate.last_type, v, binds);
         binds->on_error(UJ_E_GARBAGE, pstate.p - data);
         return NULL;
     }
