@@ -32,6 +32,8 @@ static void *parse_false(struct pstate *, struct uni_json_p_binding *);
 static void *parse_null(struct pstate *, struct uni_json_p_binding *);
 static void *parse_true(struct pstate *, struct uni_json_p_binding *);
 
+static void *parse_array(struct pstate *, struct uni_json_p_binding *);
+
 static void *parse_value(struct pstate *, struct uni_json_p_binding *);
 
 /*  variables */
@@ -43,14 +45,18 @@ static parse_func *tok_map[256] = {
 
     ['f'] =		parse_false,
     ['n'] =		parse_null,
-    ['t'] =		parse_true
+    ['t'] =		parse_true,
+    ['['] =		parse_array
 };
 
 static char *ec_msg_map[] = {
     [UJ_E_INV] =	"invalid token start char",
     [UJ_E_NO_VAL] =	"missing value",
     [UJ_E_INV_LIT] =	"invalid literal",
-    [UJ_E_GARBAGE] =	"garbage after value"
+    [UJ_E_GARBAGE] =	"garbage after value",
+    [UJ_E_EOS] =	"end of string in object",
+    [UJ_E_INV_IN] =	"invalid char in object",
+    [UJ_E_ADD] =	"failed to add value to object"
 };
 
 /*  routines */
@@ -116,6 +122,55 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
 
     pstate->last_free = binds->free_bool;
     return binds->make_bool(1);
+}
+
+static void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds)
+{
+    void *ary, *v;
+    uint8_t *p;
+    unsigned c;
+    int rc;
+
+    ary = binds->make_array();
+    ++pstate->p;
+
+    do {
+        v = parse_value(pstate, binds);
+        if (!v) goto err;
+
+        p = pstate->p;
+
+        rc = binds->add_2_array(v, ary);
+        if (!rc) {
+            if (pstate->last_free) pstate->last_free(v);
+
+            pstate->err.code = UJ_E_ADD;
+            pstate->err.pos = p;
+            goto err;
+        }
+
+        if (p == pstate->e) {
+            pstate->err.code = UJ_E_EOS;
+            pstate->err.pos = p;
+            goto err;
+        }
+
+        c = *p;
+        if (c != ',' && c != ']') {
+            pstate->err.code = UJ_E_INV_IN;
+            pstate->err.pos = p;
+            goto err;
+        }
+
+        pstate->p = p + 1;
+    } while (c != ']');
+
+    pstate->last_free = binds->free_array;
+    return ary;
+
+err:
+    binds->free_array(ary);
+    return NULL;
 }
 
 static void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds)
