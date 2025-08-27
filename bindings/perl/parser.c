@@ -66,13 +66,13 @@ static void *make_bool(int true_false)
 static void *make_av(void)
 {
     dTHX;
-    return newAV();
+    return newRV_noinc((SV *)newAV());
 }
 
 static int add_2_av(void *v, void *ary)
 {
     dTHX;
-    av_push(ary, v);
+    av_push((AV *)SvRV((SV*)ary), v);
     return 1;
 }
 
