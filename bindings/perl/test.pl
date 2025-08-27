@@ -1,7 +1,7 @@
 # uni-json test script
 #
 
-use Test::More tests => 14;
+use Test::More tests => 21;
 
 #**  overall tests
 #
@@ -68,6 +68,49 @@ for (qw(] } , :)) {
 #**  arrays
 #
 {
+    eval {
+        parse_json('[');
+    };
+    isnt($@, '', 'unclosed array errors');
+}
+
+{
+    eval {
+        parse_json('[,');
+    };
+    isnt($@, '', 'sep with no value in array errors');
+}
+
+{
     my $x = parse_json('[]');
     ok(ref($x) eq 'ARRAY' && @$x == 0, 'parsing an empty array works');
+}
+
+{
+    my $x = parse_json('[null]');
+    is_deeply($x, [undef], 'array with 1 value works');
+}
+
+{
+    my $x = parse_json('[null, null]');
+    is_deeply($x, [undef, undef], 'array with 2 values works');
+}
+
+{
+    eval {
+        parse_json('[null : null]');
+    };
+    isnt($@, '', 'array with wrong separator errors');
+}
+
+{
+    eval {
+        parse_json('[null,]');
+    };
+    isnt($@, '', 'array with missing value errors');
+}
+
+{
+    my $x = parse_json('[ [null,null] ]');
+    is_deeply($x, [[undef, undef]], 'array in array works');
 }
