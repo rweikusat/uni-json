@@ -1,7 +1,7 @@
 # uni-json test script
 #
 
-use Test::More tests => 21;
+use Test::More tests => 23;
 
 #**  overall tests
 #
@@ -114,3 +114,15 @@ for (qw(] } , :)) {
     my $x = parse_json('[ [null,null] ]');
     is_deeply($x, [[undef, undef]], 'array in array works');
 }
+
+#** numbers
+#
+{
+    my $x = parse_json('123');
+    ok($x == 123, 'parsing integer works')
+}
+
+eval {
+    parse_json('1x3');
+};
+isnt($@, '', 'integer with garbage errors');
