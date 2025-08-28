@@ -38,7 +38,6 @@ enum {
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
 static void *close_char(struct pstate *, struct uni_json_p_binding *);
-static void *sep_char(struct pstate *, struct uni_json_p_binding *);
 
 static void *parse_false(struct pstate *, struct uni_json_p_binding *);
 static void *parse_null(struct pstate *, struct uni_json_p_binding *);
@@ -57,9 +56,6 @@ static parse_func *tok_map[256] = {
 
     [']'] =		close_char,
     ['}'] =		close_char,
-
-    [','] =		sep_char,
-    [':'] =		sep_char,
 
     ['f'] =		parse_false,
     ['n'] =		parse_null,
@@ -175,13 +171,6 @@ static void *whitespace(struct pstate *, struct uni_json_p_binding *)
 static void *close_char(struct pstate *, struct uni_json_p_binding *)
 {
     return &no_value;
-}
-
-static void *sep_char(struct pstate *pstate, struct uni_json_p_binding *)
-{
-    pstate->err.code = UJ_E_NO_VAL;
-    pstate->err.pos = pstate->p;
-    return NULL;
 }
 
 static void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds)
