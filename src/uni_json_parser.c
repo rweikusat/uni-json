@@ -67,7 +67,7 @@ static parse_func *tok_map[256] = {
     ['f'] =		parse_false,
     ['n'] =		parse_null,
     ['t'] =		parse_true,
-    ['['] =		parse_array
+    ['['] =		parse_array,
 
     ['-'] =		parse_number,
     ['1'] =		parse_number,
@@ -229,15 +229,14 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
 static int parse_digits(struct pstate *pstate, size_t *len)
 {
     uint8_t *s, *p, *e;
-    unsigned c;
 
     s = p = pstate->p;
     e = pstate->e;
-    while (p < e && (c == *p, c - '0' < 10))
+    while (p < e && (unsigned)*p - '0' < 10)
         ++p;
 
     if (s == p) {
-        pstate->err.code. = UJ_E_NO_DGS;
+        pstate->err.code = UJ_E_NO_DGS;
         pstate->err.pos = s;
         return -1;
     }
@@ -254,18 +253,21 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
     size_t lens[3];
     int rc;
 
+    parts[INT] = parts[FRAC] = parts[EXP] = NULL;
+    exp_neg = 0;
+    neg = 0;
+
     if (*pstate->p == '-') {
         neg = 1;
         ++pstate->p;
-    } else
-        neg = 0;
+    }
 
     parts[INT] = pstate->p;
     rc = parse_digits(pstate, lens + INT);
     if (rc == -1) return NULL;
     if (*parts[INT] == '0') {
         pstate->err.code = UJ_E_LEADZ;
-        pstate->err.pos = partsp[INT];
+        pstate->err.pos = parts[INT];
         return NULL;
     }
 
