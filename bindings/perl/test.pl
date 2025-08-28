@@ -51,35 +51,27 @@ for (qw(] } , :)) {
     ok($@ eq '' && !defined($x), 'values can have leading and trailing whitespace');
 }
 
-{
-    eval {
-        parse_json('flase');
-    };
-    isnt($@, '', 'wrong chars in literals error');
-}
+eval {
+    parse_json('flase');
+};
+isnt($@, '', 'wrong chars in literals error');
 
-{
-    eval {
-        parse_json('nuller');
-    };
-    isnt($@, '', 'additional chars in literals error');
-}
+eval {
+    parse_json('nuller');
+};
+isnt($@, '', 'additional chars in literals error');
 
 #**  arrays
 #
-{
-    eval {
-        parse_json('[');
-    };
-    isnt($@, '', 'unclosed array errors');
-}
+eval {
+    parse_json('[');
+};
+isnt($@, '', 'unclosed array errors');
 
-{
-    eval {
-        parse_json('[,');
-    };
-    isnt($@, '', 'sep with no value in array errors');
-}
+eval {
+    parse_json('[,');
+};
+isnt($@, '', 'sep with no value in array errors');
 
 {
     my $x = parse_json('[]');
@@ -96,19 +88,15 @@ for (qw(] } , :)) {
     is_deeply($x, [undef, undef], 'array with 2 values works');
 }
 
-{
-    eval {
-        parse_json('[null : null]');
-    };
-    isnt($@, '', 'array with wrong separator errors');
-}
+eval {
+    parse_json('[null : null]');
+};
+isnt($@, '', 'array with wrong separator errors');
 
-{
-    eval {
-        parse_json('[null,]');
-    };
-    isnt($@, '', 'array with missing value errors');
-}
+eval {
+    parse_json('[null,]');
+};
+isnt($@, '', 'array with missing value errors');
 
 {
     my $x = parse_json('[ [null,null] ]');
