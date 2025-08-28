@@ -88,7 +88,9 @@ static char *ec_msg_map[] = {
     [UJ_E_GARBAGE] =	"garbage after value",
     [UJ_E_EOS] =	"end of string in object",
     [UJ_E_INV_IN] =	"invalid char in object",
-    [UJ_E_ADD] =	"failed to add value to object"
+    [UJ_E_ADD] =	"failed to add value to object",
+    [UJ_E_LEADZ] =	"leading zero in integer part of number",
+    [UJ_E_NO_DGS] =	"no digits in number part"
 };
 
 static int no_value;
