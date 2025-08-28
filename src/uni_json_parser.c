@@ -253,7 +253,7 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
     size_t lens[3];
     int rc;
 
-    parts[INT] = parts[FRAC] = parts[EXP] = NULL;
+    parts[FRAC] = parts[EXP] = NULL;
     exp_neg = 0;
     neg = 0;
 
