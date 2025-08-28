@@ -25,7 +25,7 @@ LIB :=		$(L_MAJ).$(V_MIN)
 
 #**  CFLAGS
 #
-CFLAGS :=	-g -W -Wall -Wno-pointer-sign
+CFLAGS :=	-g -W -Wall -Wno-pointer-sign -Wno-implicit-fallthrough
 
 ifdef FINAL
 CFLAGS :=	-O2 $(CFLAGS)
