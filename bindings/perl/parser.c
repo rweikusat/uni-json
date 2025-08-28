@@ -36,7 +36,9 @@ static struct uni_json_p_binding binding = {
 
     .make_bool =	make_bool,
     .make_null =	make_null,
+
     .make_number =	make_number,
+    .free_number =	free_obj,
 
     .make_array =	make_av,
     .free_array =	free_obj,
