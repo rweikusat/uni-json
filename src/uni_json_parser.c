@@ -291,7 +291,6 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
                 return NULL;
             }
 
-            exp_neg = 0;
             switch (*pstate->p) {
             case '-':
                 exp_neg = 1;
