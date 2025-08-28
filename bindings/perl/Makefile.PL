@@ -37,5 +37,6 @@ WriteMakefile(
               INC =>		'-I../../include',
               LIBS =>		["-L$MY::LPATH -luni-json"],
               OBJECT =>		'parser$(OBJ_EXT) Uni$(OBJ_EXT)',
-              depend =>		{'parser$(OBJ_EXT)' => '../../include/uni_json_p_binding.h' }
+              depend =>		{
+                                 'parser$(OBJ_EXT)' => '../../include/uni_json_p_binding.h ../../include/uni_json_parser.h'}
              );
