@@ -74,44 +74,54 @@ static void *make_number(int neg, uint8_t *int_part, size_t int_len,
                          int exp_neg, uint8_t *exp_part, size_t exp_len)
 {
     dTHX;
-    size_t len;
-    uint8_t *s, *s_nv;
     UV uv;
     IV iv;
     int rc;
+    size_t need;
+    uint8_t *s_nv, *p;
 
-    s = int_part;
-    len = int_len;
-    if (neg) {
-        ++len;
-        --s;
+    if (!(frac_len || exp_len)) {
+        rc = grok_number(int_part, int_len, &uv);
+        if (!(rc & IS_NUMBER_GREATER_THAN_UV_MAX)) {
+            if (!neg) return newSVuv(uv);
+
+            if (uv < (UV)IV_MAX + 2) {
+                if (uv < (UV)IV_MAX + 1)
+                    iv = -uv;
+                else {
+                    iv = -(uv - 1);
+                    --iv;
+                }
+
+                return newSViv(iv);
+            }
+        }
     }
 
-    if (frac_len) len += 1 + frac_len;
+    need = int_len;
+    if (neg) ++need;
+    if (frac_len) need += frac_len + 1;
+    if (exp_len) need += exp_len + exp_neg + 1;
+    p = s_nv = alloca(need + 1);
+
+    if (neg) *p++ = '-';
+    memcpy(p, int_part, int_len);
+    p += int_len;
+
+    if (frac_len) {
+        *p++ = '.';
+        memcpy(p, frac_part, frac_len);
+        p += frac_len;
+    }
 
     if (exp_len) {
-        len += exp_len + 1;
-
-        switch (exp_part[-1]) {
-        case '-':
-        case '+':
-            ++len;
-        }
+        *p++ = 'e';
+        if (exp_neg) *p++ = '-';
+        memcpy(p, exp_part, exp_len);
+        p += exp_len;
     }
 
-    rc = grok_number(s, len, &uv);
-    if (!(frac_len || exp_len || (rc & IS_NUMBER_GREATER_THAN_UV_MAX))) {
-        if (!neg) return newSVuv(uv);
-
-        if (uv <= IV_MAX) {
-            iv = uv;
-            return newSViv(-iv);
-        }
-    }
-
-    s_nv = alloca(len + 1);
-    memcpy(s_nv, s, len);
-    s_nv[len] = 0;
+    *p = 0;
     return newSVnv(my_atof(s_nv));
 }
 
