@@ -1,7 +1,7 @@
 # uni-json test script
 #
 
-use Test::More tests => 23;
+use Test::More tests => 27;
 
 #**  overall tests
 #
@@ -126,3 +126,23 @@ eval {
     parse_json('1x3');
 };
 isnt($@, '', 'integer with garbage errors');
+
+eval {
+    parse_json('0123');
+};
+isnt($@, '', 'leading zeroes error');
+
+{
+    my $x = parse_json('-1234');
+    ok($x == -1234, 'negative integers work');
+}
+
+{
+    my $x = parse_json('1.234');
+    ok($x == 1.234, 'fracs work');
+}
+
+{
+    my $x = parse_json('1.23e3');
+    ok($x == 1230, 'positive e-notation works');
+}
