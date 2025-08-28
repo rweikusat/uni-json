@@ -35,6 +35,12 @@ enum {
     T_OBJ
 };
 
+enum {
+    INT,
+    FRAC,
+    EXP
+};
+
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
 static void *close_char(struct pstate *, struct uni_json_p_binding *);
@@ -43,6 +49,7 @@ static void *parse_false(struct pstate *, struct uni_json_p_binding *);
 static void *parse_null(struct pstate *, struct uni_json_p_binding *);
 static void *parse_true(struct pstate *, struct uni_json_p_binding *);
 
+static void *parse_number(struct pstate *, struct uni_json_p_binding *);
 static void *parse_array(struct pstate *, struct uni_json_p_binding *);
 
 static void *parse_value(struct pstate *, struct uni_json_p_binding *);
@@ -61,6 +68,17 @@ static parse_func *tok_map[256] = {
     ['n'] =		parse_null,
     ['t'] =		parse_true,
     ['['] =		parse_array
+
+    ['-'] =		parse_number,
+    ['1'] =		parse_number,
+    ['2'] =		parse_number,
+    ['3'] =		parse_number,
+    ['4'] =		parse_number,
+    ['5'] =		parse_number,
+    ['6'] =		parse_number,
+    ['7'] =		parse_number,
+    ['8'] =		parse_number,
+    ['9'] =		parse_number,
 };
 
 static char *ec_msg_map[] = {
@@ -204,6 +222,66 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
 
     pstate->last_type = T_BOOL;
     return binds->make_bool(1);
+}
+
+static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
+{
+    int neg, exp_neg;
+    uint8_t *parts[3], spos;
+    size_t lens[3];
+    int rc;
+
+    if (*pstate->p == '-') {
+        neg = 1;
+        ++pstate->p;
+    } else
+        neg = 0;
+
+    spos = pstate->p;
+    rc = parse_digits(pstate, parts + INT, lens + INT);
+    if (rc == -1) return NULL;
+    if (*parts[INT] == '0') {
+        pstate->err.code = UJ_E_LEADZ;
+        pstate->err.pos = spos;
+        return NULL;
+    }
+
+    lens[FRAC] = lens[EXP] = 0;
+    if (pstate->p < pstate->e) {
+        if (*pstate->p == '.') {
+            ++pstate->p;
+            rc = parse_digits(pstate, parts + FRAC, lens + FRAC);
+            if (rc == -1) return NULL;
+            if (pstate->p == pstate->e) goto done;
+        }
+
+        switch (*pstate->p) {
+        case 'e':
+        case 'E':
+            ++pstate->p;
+            if (pstate->p == pstate->e) {
+                pstate->err.code = UJ_E_EOS;
+                pstate->err.pos = pstate->p;
+                return NULL;
+            }
+
+            exp_neg = 0;
+            switch (*pstate->p) {
+            case '-':
+                exp_neg = 1;
+
+            case '+':
+                ++pstate->p;
+            }
+
+            rc = parse_digits(pstate, parts + EXP, lens + EXP);
+            if (rc == -1) return NULL;
+        }
+    }
+
+done:
+    return binds->make_number(neg, parts[INT], lens[INT], parts[FRAC], lens[FRAC],
+                              exp_neg, parts[EXP], lens[EXP]);
 }
 
 static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding *binds,
