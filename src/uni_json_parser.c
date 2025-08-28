@@ -306,6 +306,7 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
     }
 
 done:
+    pstate->last_type = T_NUM;
     return binds->make_number(neg, parts[INT], lens[INT], parts[FRAC], lens[FRAC],
                               exp_neg, parts[EXP], lens[EXP]);
 }
