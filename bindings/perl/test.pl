@@ -1,7 +1,7 @@
 # uni-json test script
 #
 
-use Test::More tests => 27;
+use Test::More tests => 29;
 
 #**  overall tests
 #
@@ -145,4 +145,14 @@ isnt($@, '', 'leading zeroes error');
 {
     my $x = parse_json('1.23e3');
     ok($x == 1230, 'positive e-notation works');
+}
+
+{
+    my $x = parse_json('2e-2');
+    ok($x == 0.02, 'negative e-notation works');
+}
+
+{
+    my $x = parse_json('-1.23e-2');
+    ok($x == -0.0123, 'numbers with all parts work');
 }
