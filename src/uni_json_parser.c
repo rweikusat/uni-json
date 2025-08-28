@@ -224,10 +224,31 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
     return binds->make_bool(1);
 }
 
+static int parse_digits(struct pstate *pstate, size_t *len)
+{
+    uint8_t *s, *p, *e;
+    unsigned c;
+
+    s = p = pstate->p;
+    e = pstate->e;
+    while (p < e && (c == *p, c - '0' < 10))
+        ++p;
+
+    if (s == p) {
+        pstate->err.code. = UJ_E_NO_DGS;
+        pstate->err.pos = s;
+        return -1;
+    }
+
+    *len = p - s;
+    pstate->p = p;
+    return 0;
+}
+
 static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     int neg, exp_neg;
-    uint8_t *parts[3], spos;
+    uint8_t *parts[3];
     size_t lens[3];
     int rc;
 
@@ -237,12 +258,12 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
     } else
         neg = 0;
 
-    spos = pstate->p;
-    rc = parse_digits(pstate, parts + INT, lens + INT);
+    parts[INT] = pstate->p;
+    rc = parse_digits(pstate, lens + INT);
     if (rc == -1) return NULL;
     if (*parts[INT] == '0') {
         pstate->err.code = UJ_E_LEADZ;
-        pstate->err.pos = spos;
+        pstate->err.pos = partsp[INT];
         return NULL;
     }
 
@@ -250,7 +271,8 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
     if (pstate->p < pstate->e) {
         if (*pstate->p == '.') {
             ++pstate->p;
-            rc = parse_digits(pstate, parts + FRAC, lens + FRAC);
+            parts[FRAC] = pstate->p;
+            rc = parse_digits(pstate, lens + FRAC);
             if (rc == -1) return NULL;
             if (pstate->p == pstate->e) goto done;
         }
@@ -274,7 +296,8 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
                 ++pstate->p;
             }
 
-            rc = parse_digits(pstate, parts + EXP, lens + EXP);
+            parts[EXP] = pstate->p;
+            rc = parse_digits(pstate, lens + EXP);
             if (rc == -1) return NULL;
         }
     }
