@@ -21,6 +21,9 @@ static void on_error(unsigned, size_t);
 static void *make_bool(int);
 static void *make_hv(void);
 static void *make_null(void);
+static void *make_number(int, uint8_t *, size_t,
+                         uint8_t *, size_t,
+                         int, uint8_t *, size_t);
 
 static void *make_av(void);
 static int add_2_av(void *, void *);
@@ -33,6 +36,7 @@ static struct uni_json_p_binding binding = {
 
     .make_bool =	make_bool,
     .make_null =	make_null,
+    .make_number =	make_number,
 
     .make_array =	make_av,
     .free_array =	free_obj,
@@ -61,6 +65,52 @@ static void *make_bool(int true_false)
 {
     dTHX;
     return true_false ? &PL_sv_yes : &PL_sv_no;
+}
+
+static void *make_number(int neg, uint8_t *int_part, size_t int_len,
+                         uint8_t *frac_part, size_t frac_len,
+                         int exp_neg, uint8_t *exp_part, size_t exp_len)
+{
+    dTHX;
+    size_t len;
+    uint8_t *s, *s_nv;
+    UV uv;
+    IV iv;
+    int rc;
+
+    s = int_part;
+    len = int_len;
+    if (neg) {
+        ++len;
+        --s;
+    }
+
+    if (frac_len) len += 1 + frac_len;
+
+    if (exp_len) {
+        len += exp_len + 1;
+
+        switch (exp_part[-1]) {
+        case '-':
+        case '+':
+            ++len;
+        }
+    }
+
+    rc = grok_number(s, len, &uv);
+    if (!(frac_len || exp_len || (rc & IS_NUMBER_GREATER_THAN_UV_MAX))) {
+        if (!neg) return newSVuv(uv);
+
+        if (uv <= IV_MAX) {
+            iv = uv;
+            return newSViv(-iv);
+        }
+    }
+
+    s_nv = alloca(len + 1);
+    memcpy(s_nv, s, len);
+    s_nv[len] = 0;
+    return newSVnv(my_atof(s_nv));
 }
 
 static void *make_av(void)
