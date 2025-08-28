@@ -254,6 +254,7 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
     int rc;
 
     parts[FRAC] = parts[EXP] = NULL;
+    lens[FRAC] = lens[EXP] = 0;
     exp_neg = 0;
     neg = 0;
 
@@ -271,7 +272,6 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
         return NULL;
     }
 
-    lens[FRAC] = lens[EXP] = 0;
     if (pstate->p < pstate->e) {
         if (*pstate->p == '.') {
             ++pstate->p;
