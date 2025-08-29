@@ -69,6 +69,7 @@ static void *make_bool(int true_false)
     return true_false ? &PL_sv_yes : &PL_sv_no;
 }
 
+#if 0
 static void *make_number(int neg, uint8_t *int_part, size_t int_len,
                          uint8_t *frac_part, size_t frac_len,
                          int exp_neg, uint8_t *exp_part, size_t exp_len)
@@ -124,6 +125,7 @@ static void *make_number(int neg, uint8_t *int_part, size_t int_len,
     *p = 0;
     return newSVnv(my_atof(s_nv));
 }
+#endif
 
 static void *make_av(void)
 {
