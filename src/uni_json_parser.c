@@ -320,10 +320,7 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
             }
 
             c = have_one_of(pstate, ",]");
-            if (c == -1) {
-                free_obj(pstate->last_type, v, binds);
-                return -1;
-            }
+            if (c == -1) return -1;
 
             if (c == ',') {
                 v = parse_value(pstate, binds);
