@@ -3,13 +3,18 @@
 # test parsing of numbers
 #
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 use JSON::Uni 'parse_json';
 
 my $x;
 
 $x = parse_json('123');
 is($x, 123, 'parsing integer works');
+
+eval {
+    parse_json('0123');
+};
+isnt($@, '', 'leading zero in integer part errors');
 
 eval {
     parse_json('12x');
