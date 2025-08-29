@@ -11,8 +11,14 @@
 /*  includes */
 #include <stdint.h>
 
+/**  constants */
+enum {
+    UJ_NF_NEG,                  /* number is negative */
+    UJ_NF_INT                   /* number is an integer */
+};
+
 /*  types */
-/**  parser */
+/**  parser bindings */
 struct uni_json_p_binding
 {
     /*  error handler */
@@ -40,10 +46,7 @@ struct uni_json_p_binding
     void *(*make_bool)(int true_false);
     void (*free_bool)(void *);
 
-    void *(*make_number)(int neg,
-                         uint8_t *int_part, size_t int_len,
-                         uint8_t *frac_part, size_t frac_len,
-                         int exp_neg, uint8_t *exp_part, size_t exp_len);
+    void *(*make_number)(uint8_t *data, size_t len, unsigned flags);
     void (*free_number)(void *);
 };
 
