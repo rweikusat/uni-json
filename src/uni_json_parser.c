@@ -226,7 +226,7 @@ static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
     return binds->make_bool(1);
 }
 
-static int parse_digits(struct pstate *pstate, size_t *len)
+static int skip_digits(struct pstate *pstate)
 {
     uint8_t *s, *p, *e;
 
@@ -248,35 +248,33 @@ static int parse_digits(struct pstate *pstate, size_t *len)
 
 static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
-    int neg, exp_neg;
-    uint8_t *parts[3];
-    size_t lens[3];
+    uint8_t *s, *dig_0;
+    unsigned flags;
     int rc;
 
-    parts[FRAC] = parts[EXP] = NULL;
-    lens[FRAC] = lens[EXP] = 0;
-    exp_neg = 0;
-    neg = 0;
+    dig_0 = s = pstate.p;
+    flags = UJ_NF_INT;
 
     if (*pstate->p == '-') {
-        neg = 1;
         ++pstate->p;
+        ++dig_0;
+        flags |= UJ_NF_NEG;
     }
 
-    parts[INT] = pstate->p;
-    rc = parse_digits(pstate, lens + INT);
+    rc = skip_digits(pstate);
     if (rc == -1) return NULL;
-    if (*parts[INT] == '0') {
+    if (*dig_0 == '0') {
         pstate->err.code = UJ_E_LEADZ;
-        pstate->err.pos = parts[INT];
+        pstate->err.pos = dig_0;
         return NULL;
     }
 
     if (pstate->p < pstate->e) {
         if (*pstate->p == '.') {
             ++pstate->p;
-            parts[FRAC] = pstate->p;
-            rc = parse_digits(pstate, lens + FRAC);
+            flags &= ~UJ_NF_INT;
+
+            rc = skip_digits(pstate);
             if (rc == -1) return NULL;
             if (pstate->p == pstate->e) goto done;
         }
@@ -284,31 +282,28 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
         switch (*pstate->p) {
         case 'e':
         case 'E':
+            flags &= ~ UJ_NF_INT;
+
             ++pstate->p;
             if (pstate->p == pstate->e) {
                 pstate->err.code = UJ_E_EOS;
-                pstate->err.pos = pstate->p;
+                pstate->err.pos = pstate->p - 1;
                 return NULL;
             }
 
             switch (*pstate->p) {
-            case '-':
-                exp_neg = 1;
-
             case '+':
-                ++pstate->p;
+            case '-':
+                ++psate-?p;
             }
 
-            parts[EXP] = pstate->p;
-            rc = parse_digits(pstate, lens + EXP);
+            rc = skip_digits(pstate);
             if (rc == -1) return NULL;
         }
     }
 
 done:
-    pstate->last_type = T_NUM;
-    return binds->make_number(neg, parts[INT], lens[INT], parts[FRAC], lens[FRAC],
-                              exp_neg, parts[EXP], lens[EXP]);
+    return binds->make_number(s, pstate->p - s, flags);
 }
 
 static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding *binds,
