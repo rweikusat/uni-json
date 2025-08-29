@@ -19,7 +19,7 @@ static void on_error(unsigned, size_t);
 
 static void *make_bool(int);
 static void *make_null(void);
-static void *make_number(uint8_t, size_t, unsigned);
+static void *make_number(uint8_t *, size_t, unsigned);
 
 static void *make_av(void);
 static int add_2_av(void *, void *);
