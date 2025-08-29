@@ -3,15 +3,15 @@
 # test high-level value parser
 #
 
-use Test::Nore tests => 4;
+use Test::More tests => 3;
 use JSON::Uni 'parse_json';
 
 my $x;
 
-$x = parse_json('\t\n\r 123');
+$x = parse_json("\t\n\r 123");
 is($x, 123, 'whitespace before value is ignored');
 
-$x = parse_json('122  \n ');
+$x = parse_json("122  \n ");
 is($x, 122, 'whitespace after value is ignored');
 
 eval {
