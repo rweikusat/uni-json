@@ -1,11 +1,17 @@
 Universal Json
 ==============
 
-This is a project in very early stages of development. It contains no
-useful code so far, just a build system that's capable of building the
-main shared library, a better dummy module with Perl language
-bindingins and test.pl script which actually calls a (dummy) function
-in the main shared library in the proper way.
+This is a project in development. So far, it should be capable of
+parsing literals, numbers and arrays. Perl-bindings and
+test-suite for these exist. The way to run it from the top-level is
+
+make
+make -C bindings/perl test TEST_VERBOSE=1
+
+TEST_VERBOSE isn't strictly necessary, it just caused some output
+showing what is actually being tested.
+
+There's so far no support for installing any of this anywhere.
 
 
 Plan
