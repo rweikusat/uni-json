@@ -241,7 +241,6 @@ static int skip_digits(struct pstate *pstate)
         return -1;
     }
 
-    *len = p - s;
     pstate->p = p;
     return 0;
 }
@@ -252,7 +251,7 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
     unsigned flags;
     int rc;
 
-    dig_0 = s = pstate.p;
+    dig_0 = s = pstate->p;
     flags = UJ_NF_INT;
 
     if (*pstate->p == '-') {
@@ -294,7 +293,7 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
             switch (*pstate->p) {
             case '+':
             case '-':
-                ++psate-?p;
+                ++pstate->p;
             }
 
             rc = skip_digits(pstate);
