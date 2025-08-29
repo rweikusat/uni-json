@@ -8,7 +8,7 @@ test-suite for these exist. The way to run it from the top-level is
 make
 make -C bindings/perl test TEST_VERBOSE=1
 
-TEST_VERBOSE isn't strictly necessary, it just caused some output
+TEST_VERBOSE isn't strictly necessary, it just causes some output
 showing what is actually being tested.
 
 There's so far no support for installing any of this anywhere.
