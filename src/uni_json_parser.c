@@ -7,6 +7,7 @@
 */
 
 /*  includes */
+#include <stddef.h>
 #include <stdio.h>
 
 #include "uni_json_p_binding.h"
@@ -93,6 +94,19 @@ static char *ec_msg_map[] = {
     [UJ_E_NO_DGS] =	"no digits in number part"
 };
 
+static size_t dtor_ofs[] = {
+#define binds_ofs(m) offsetof(struct uni_json_p_binding, m)
+
+    [T_NULL] =		binds_ofs(free_null),
+    [T_BOOL] =		binds_ofs(free_bool),
+    [T_NUM] =		binds_ofs(free_number),
+    [T_STR] =		binds_ofs(free_string),
+    [T_ARY] =		binds_ofs(free_array),
+    [T_OBJ] =		binds_ofs(free_object)
+
+#undef binds_ofs
+};
+
 static int no_value;
 
 /*  routines */
@@ -102,31 +116,7 @@ static void free_obj(int type, void *obj, struct uni_json_p_binding *binds)
     void (**pdtor)(void *);
     void (*dtor)(void *);
 
-    switch (type) {
-    case T_NULL:
-        pdtor = &binds->free_null;
-        break;
-
-    case T_BOOL:
-        pdtor = &binds->free_bool;
-        break;
-
-    case T_NUM:
-        pdtor = &binds->free_number;
-        break;
-
-    case T_STR:
-        pdtor = &binds->free_string;
-        break;
-
-    case T_ARY:
-        pdtor = &binds->free_array;
-        break;
-
-    case T_OBJ:
-        pdtor = &binds->free_object;
-    }
-
+    pdtor = (void *)((uint8_t *)binds + dtor_ofs[type]);
     dtor = *pdtor;
     if (dtor) dtor(obj);
 }
