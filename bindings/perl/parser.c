@@ -67,7 +67,37 @@ static void *make_bool(int true_false)
     return true_false ? &PL_sv_yes : &PL_sv_no;
 }
 
+static void *make_number(uint8_t *data, size_t len, unsigned flags)
+{
+    dTHX;
+    uint8_t *tmp;
+    UV uv;
+    IV iv;
+    int rc;
 
+    if (flags & UJ_NF_INT) {
+        rc = grok_number(data, len, &uv);
+        if (!(rc & IS_NUMBER_GREATER_THAN_UV_MAX)) {
+            if (!(flags & UJ_NF_NEG)) return newSVuv(uv);
+
+            if (uv < (UV)IV_MAX + 2) {
+                if (uv < (UV)IV_MAX + 1)
+                    iv = -uv;
+                else {
+                    iv = -(uv - 1);
+                    --iv;
+                }
+
+                return newSViv(iv);
+            }
+        }
+    }
+
+    tmp = alloca(len + 1);
+    memcpy(tmp, data, len);
+    tmp[len] = 0;
+    return newSVnv(my_atof(tmp));
+}
 
 #if 0
 static void *make_number(int neg, uint8_t *int_part, size_t int_len,
