@@ -3,7 +3,7 @@
 # test parsing of numbers
 #
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -46,3 +46,8 @@ is($x, 567, 'parsing exponent with - works');
 
 $x = parse_json('123.456e3');
 is($x, 123456, 'parsing number with fraction and exponent works');
+
+eval {
+    parse_json('123e');
+};
+isnt($@, '', 'e with nothing following errors');
