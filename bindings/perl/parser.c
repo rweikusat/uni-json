@@ -17,16 +17,14 @@
 /*  prototypes */
 static void on_error(unsigned, size_t);
 
-
 static void *make_bool(int);
-static void *make_hv(void);
 static void *make_null(void);
-static void *make_number(int, uint8_t *, size_t,
-                         uint8_t *, size_t,
-                         int, uint8_t *, size_t);
+static void *make_number(uint8_t, size_t, unsigned);
 
 static void *make_av(void);
 static int add_2_av(void *, void *);
+
+static void *make_hv(void);
 
 static void free_obj(void *);
 
@@ -68,6 +66,8 @@ static void *make_bool(int true_false)
     dTHX;
     return true_false ? &PL_sv_yes : &PL_sv_no;
 }
+
+
 
 #if 0
 static void *make_number(int neg, uint8_t *int_part, size_t int_len,
