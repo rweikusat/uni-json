@@ -13,8 +13,8 @@
 
 /**  constants */
 enum {
-    UJ_NF_NEG,                  /* number is negative */
-    UJ_NF_INT                   /* number is an integer */
+    UJ_NF_NEG = 1,              /* number is negative */
+    UJ_NF_INT = 2               /* number is an integer */
 };
 
 /*  types */
