@@ -51,6 +51,8 @@ static void *parse_null(struct pstate *, struct uni_json_p_binding *);
 static void *parse_true(struct pstate *, struct uni_json_p_binding *);
 
 static void *parse_number(struct pstate *, struct uni_json_p_binding *);
+static void *parse_string(struct pstate *, struct uni_json_p_binding *);
+
 static void *parse_array(struct pstate *, struct uni_json_p_binding *);
 
 static void *parse_value(struct pstate *, struct uni_json_p_binding *);
@@ -68,7 +70,6 @@ static parse_func *tok_map[256] = {
     ['f'] =		parse_false,
     ['n'] =		parse_null,
     ['t'] =		parse_true,
-    ['['] =		parse_array,
 
     ['-'] =		parse_number,
     ['1'] =		parse_number,
@@ -80,6 +81,10 @@ static parse_func *tok_map[256] = {
     ['7'] =		parse_number,
     ['8'] =		parse_number,
     ['9'] =		parse_number,
+
+    ['"'] =		parse_string,
+
+    ['['] =		parse_array,
 };
 
 static char *ec_msg_map[] = {
@@ -296,6 +301,13 @@ done:
     return binds->make_number(s, pstate->p - s, flags);
 }
 
+static void *parse_string(struct pstate *p, struct uni_json_p_binding *binds)
+{
+    pstate->err.code = -1;
+    pstate->err.pos = pstate->p;
+    return NULL;
+}
+
 static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding *binds,
                                void *ary)
 {
@@ -390,7 +402,7 @@ char *uni_json_ec_2_msg(unsigned ec)
 {
     if (ec < sizeof(ec_msg_map) / sizeof(*ec_msg_map))
         return ec_msg_map[ec];
-    return NULL;
+    return "not implemented";
 }
 
 void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds)
