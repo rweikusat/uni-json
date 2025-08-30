@@ -258,7 +258,7 @@ static void *parse_number(struct pstate *pstate, struct uni_json_p_binding *bind
 
     rc = skip_digits(pstate);
     if (rc == -1) return NULL;
-    if (*dig_0 == '0') {
+    if (*dig_0 == '0' && pstate->p - dig_0 > 1) {
         pstate->err.code = UJ_E_LEADZ;
         pstate->err.pos = dig_0;
         return NULL;
@@ -302,7 +302,7 @@ done:
     return binds->make_number(s, pstate->p - s, flags);
 }
 
-static void *parse_string(struct pstate *p, struct uni_json_p_binding *binds)
+static void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     pstate->err.code = -1;
     pstate->err.pos = pstate->p;
