@@ -72,6 +72,7 @@ static parse_func *tok_map[256] = {
     ['t'] =		parse_true,
 
     ['-'] =		parse_number,
+    ['0'] =		parse_number,
     ['1'] =		parse_number,
     ['2'] =		parse_number,
     ['3'] =		parse_number,
