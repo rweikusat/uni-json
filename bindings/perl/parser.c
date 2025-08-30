@@ -23,6 +23,7 @@ static void *make_number(uint8_t *, size_t, unsigned);
 
 static void *make_string(void);
 static int add_2_string(uint8_t *, size_t, void *);
+static int add_uni_2_string(uint32_t, void *);
 
 static void *make_av(void);
 static int add_2_av(void *, void *);
@@ -117,6 +118,15 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
     dTHX;
     sv_catpvn(str, data, len);
     return 1;
+}
+
+static int add_uni_2_string(uint32_t uni_char, void *str)
+{
+    dTHX;
+    uint8_t buf[UTF8_MAXBYTES + 1], *e;
+
+    e = uvchr_to_utf8(buf, uni_char);
+    return add_2_string(buf, e - buf, str);
 }
 
 static void *make_av(void)
