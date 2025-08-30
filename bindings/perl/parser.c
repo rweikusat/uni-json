@@ -21,6 +21,8 @@ static void *make_bool(int);
 static void *make_null(void);
 static void *make_number(uint8_t *, size_t, unsigned);
 
+static void *make_string(void);
+
 static void *make_av(void);
 static int add_2_av(void *, void *);
 
@@ -37,6 +39,9 @@ static struct uni_json_p_binding binding = {
 
     .make_number =	make_number,
     .free_number =	free_obj,
+
+    .make_string =	make_string,
+    .free_string =	free_obj;
 
     .make_array =	make_av,
     .free_array =	free_obj,
