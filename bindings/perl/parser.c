@@ -104,6 +104,11 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
     return newSVnv(my_atof(tmp));
 }
 
+static void *make_string(void)
+{
+    return newSVpvn_utf8("", 0, 1);
+}
+
 static void *make_av(void)
 {
     dTHX;
