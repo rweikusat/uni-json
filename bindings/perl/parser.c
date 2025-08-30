@@ -22,6 +22,7 @@ static void *make_null(void);
 static void *make_number(uint8_t *, size_t, unsigned);
 
 static void *make_string(void);
+static int add_2_string(uint8_t *, size_t, void *);
 
 static void *make_av(void);
 static int add_2_av(void *, void *);
@@ -41,7 +42,8 @@ static struct uni_json_p_binding binding = {
     .free_number =	free_obj,
 
     .make_string =	make_string,
-    .free_string =	free_obj;
+    .free_string =	free_obj,
+    .add_2_string =	add_2_string,
 
     .make_array =	make_av,
     .free_array =	free_obj,
@@ -106,7 +108,15 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
 
 static void *make_string(void)
 {
+    dTHX;
     return newSVpvn_utf8("", 0, 1);
+}
+
+static int add_2_string(uint8_t *data, size_t len, void *str)
+{
+    dTHX;
+    sv_catpvn(str, data, len);
+    return 1;
 }
 
 static void *make_av(void)
