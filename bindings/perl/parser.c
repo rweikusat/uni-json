@@ -104,64 +104,6 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
     return newSVnv(my_atof(tmp));
 }
 
-#if 0
-static void *make_number(int neg, uint8_t *int_part, size_t int_len,
-                         uint8_t *frac_part, size_t frac_len,
-                         int exp_neg, uint8_t *exp_part, size_t exp_len)
-{
-    dTHX;
-    UV uv;
-    IV iv;
-    int rc;
-    size_t need;
-    uint8_t *s_nv, *p;
-
-    if (!(frac_len || exp_len)) {
-        rc = grok_number(int_part, int_len, &uv);
-        if (!(rc & IS_NUMBER_GREATER_THAN_UV_MAX)) {
-            if (!neg) return newSVuv(uv);
-
-            if (uv < (UV)IV_MAX + 2) {
-                if (uv < (UV)IV_MAX + 1)
-                    iv = -uv;
-                else {
-                    iv = -(uv - 1);
-                    --iv;
-                }
-
-                return newSViv(iv);
-            }
-        }
-    }
-
-    need = int_len;
-    if (neg) ++need;
-    if (frac_len) need += frac_len + 1;
-    if (exp_len) need += exp_len + exp_neg + 1;
-    p = s_nv = alloca(need + 1);
-
-    if (neg) *p++ = '-';
-    memcpy(p, int_part, int_len);
-    p += int_len;
-
-    if (frac_len) {
-        *p++ = '.';
-        memcpy(p, frac_part, frac_len);
-        p += frac_len;
-    }
-
-    if (exp_len) {
-        *p++ = 'e';
-        if (exp_neg) *p++ = '-';
-        memcpy(p, exp_part, exp_len);
-        p += exp_len;
-    }
-
-    *p = 0;
-    return newSVnv(my_atof(s_nv));
-}
-#endif
-
 static void *make_av(void)
 {
     dTHX;
