@@ -309,6 +309,7 @@ static void *parse_string(struct pstate *pstate, struct uni_json_p_binding *bind
 
     str = binds->make_string();
 
+    ++pstate->p;
     rc = parse_string_content(pstate, str);
     if (rc == -1) {
         binds->free_string(str);
