@@ -352,7 +352,7 @@ done:
 static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
-    unsigned c, marker, vl, maybe_long;
+    unsigned c, marker, maybe_long;
 
     c = *p;
     sp = utf8_seqs;
@@ -379,7 +379,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 
     ++p;
     if (p == e) return NULL;
-    if ((*p & 0x80) != 0x80) return NULL;
+    if ((*p & 0xc0) != 0x80) return NULL;
     if (maybe_long) {
         if (sp->v_len == 1) return NULL;
         if ((*p & sp->smask1) == 0) return NULL;
@@ -389,12 +389,12 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     case 3:
         ++p;
         if (p == e) return NULL;
-        if ((p & 0x80) != 0x80) return NULL;
+        if ((*p & 0xc0) != 0x80) return NULL;
 
     case 2:
         ++p;
         if (p == e) return NULL;
-        if ((p & 0x80) != 0x80) return NULL;
+        if ((*p & 0xc0) != 0x80) return NULL;
     }
 
     return p + 1;
