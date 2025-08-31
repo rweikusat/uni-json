@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -68,3 +68,8 @@ eval {
     parse_json("\"\xc0\x80\"");
 };
 isnt($@, '', 'overlong 2-byte sequence errors');
+
+eval {
+    parse_json("\"\xe0\x80\"");
+};
+isnt($@, '', 'overlong 3-byte sequence errors');
