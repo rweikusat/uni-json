@@ -21,7 +21,8 @@ enum {
     UJ_E_INV_IN,                 /* invalid char in object */
     UJ_E_ADD,                    /* failed to add value to object */
     UJ_E_LEADZ,                  /* leading zero in int part of number */
-    UJ_E_NO_DGS                  /* no digits in number part */
+    UJ_E_NO_DGS,                 /* no digits in number part */
+    UJ_E_INV_CHAR                /* illegal char in string */
 };
 
 /*   types */
