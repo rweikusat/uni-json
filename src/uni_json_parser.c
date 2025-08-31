@@ -42,6 +42,10 @@ enum {
     EXP
 };
 
+enum {
+    MIN_LEGAL =	32              /* minimum char code which may appear unescaped in a string */
+};
+
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
 static void *close_char(struct pstate *, struct uni_json_p_binding *);
@@ -97,7 +101,8 @@ static char *ec_msg_map[] = {
     [UJ_E_INV_IN] =	"invalid char in object",
     [UJ_E_ADD] =	"failed to add value to object",
     [UJ_E_LEADZ] =	"leading zero in integer part of number",
-    [UJ_E_NO_DGS] =	"no digits in number part"
+    [UJ_E_NO_DGS] =	"no digits in number part",
+    [UJ_E_INV_CHAR] =	"illegal char in string"
 };
 
 static size_t dtor_ofs[] = {
@@ -315,6 +320,12 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
     while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
             pstate->err.code = -1;
+            pstate->err.pos = p;
+            return -1;
+        }
+
+        if (c < MIN_LEGAL) {
+            pstate->err.code = UJ_E_INV_CHAR;
             pstate->err.pos = p;
             return -1;
         }
