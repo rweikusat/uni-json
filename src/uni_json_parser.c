@@ -312,7 +312,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
     s = p = pstate->p;
     e = pstate->e;
 
-    while (e < p && (c = *p, c != '"')) {
+    while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
             pstate->err.code = -1;
             pstate->err.pos = p;
