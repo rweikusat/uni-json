@@ -302,6 +302,38 @@ done:
     return binds->make_number(s, pstate->p - s, flags);
 }
 
+static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
+                                void *str)
+{
+    uint8_t *p, *e, *s;
+    unsigned c;
+    int rc;
+
+    s = p = pstate->p;
+    e = pstate->e;
+
+    while (e < p && (c = *p, c != '"')) {
+        if (c == '\\') {
+            pstate->err.code = -1;
+            pstate->err.pos = p;
+            return -1;
+        }
+
+        ++p;
+    }
+
+    if (c != '"') {
+        pstate->err.code = UJ_E_EOS;
+        pstate->err.pos = p;
+        return -1;
+    }
+
+    rc = binds->add_2_string(s, p - s, str);
+    if (!rc) return -1;
+
+    return 0;
+}
+
 static void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     void *str;
@@ -310,7 +342,7 @@ static void *parse_string(struct pstate *pstate, struct uni_json_p_binding *bind
     str = binds->make_string();
 
     ++pstate->p;
-    rc = parse_string_content(pstate, str);
+    rc = parse_string_content(pstate, binds, str);
     if (rc == -1) {
         binds->free_string(str);
         return NULL;
