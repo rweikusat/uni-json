@@ -109,9 +109,9 @@ static parse_func *tok_map[256] = {
 
 static struct utf8_seq utf8_seqs[] = {
     {
-        .marker =	UTF8_4,
-        .hi_mask =	UTF8_4_HI,
-        .v_len =	3 },
+        .marker =	UTF8_2,
+        .hi_mask =	UTF8_2_HI,
+        .v_len =	1  },
 
     {
         .marker =	UTF8_3,
@@ -119,9 +119,9 @@ static struct utf8_seq utf8_seqs[] = {
         .v_len =	2 },
 
     {
-        .marker =	UTF8_2,
-        .hi_mask =	UTF8_2_HI,
-        .v_len =	1  },
+        .marker =	UTF8_4,
+        .hi_mask =	UTF8_4_HI,
+        .v_len =	3 },
 
     {
         .marker =	0 }
@@ -352,8 +352,19 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     sp = utf8_seqs;
     marker = sp->marker;
     do {
-        fprintf(stderr, "marker %x, c %x, c& %x\n", marker, c, c & marker);
-        if ((c & marker) == marker) break;
+        /*
+          The first byte of a UTF-8 sequence is bit-wise either
+
+          110xxxxx
+          1110xxxx
+          11110xxx
+
+          with x denoting a value bit. Hence, when testing from
+          shortest to longest, masking out the current set of value
+          bits will only result in the current marker value if the
+          actual marker is the current marker.
+         */
+        if ((c & ~sp->hi_mask) == marker) break;
         ++sp;
     } while (marker = sp->marker, marker);
 
