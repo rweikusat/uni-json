@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -81,3 +81,6 @@ eval {
     parse_json("\"\xf0\x80\"");
 };
 isnt($@, '', 'overlong 4-byte sequence errors');
+
+$x = parse_json("\"\xf0\x90\x80\x80\"");
+is($x, "\N{U+10000}", 'shortest valid 4-byte sequence works');
