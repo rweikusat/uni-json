@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 13;
+use Test::More tests => 15;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -70,6 +70,14 @@ eval {
 isnt($@, '', 'overlong 2-byte sequence errors');
 
 eval {
-    parse_json("\"\xe0\x80\"");
+    parse_json("\"\xe0\x80\""); # only first two bytes matter for overlength detection
 };
 isnt($@, '', 'overlong 3-byte sequence errors');
+
+$x = parse_json("\"\xe0\xa0\x80\"");
+is($x, "\N{U+800}", 'shortest valid 3-byte sequence works');
+
+eval {
+    parse_json("\"\xf0\x80\"");
+};
+isnt($@, '', 'overlong 4-byte sequence errors');
