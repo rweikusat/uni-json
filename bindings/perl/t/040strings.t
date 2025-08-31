@@ -3,11 +3,13 @@
 # test parsing of strings
 #
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 use JSON::Uni 'parse_json';
 
 my $x;
 
+#*  simple strings tests
+#
 $x = parse_json('"abc"');
 is($x, 'abc', 'parsing a simple string works');
 
@@ -24,5 +26,10 @@ eval {
 };
 isnt($@, '', 'unescaped control char errors');
 
+#*  UTF-8 tests
+#
 $x = parse_json("\"\xc2\xa3\"");
 is($x, "\N{U+00a3}", 'parsing 2-byte UTF-8 sequence works');
+
+$x = parse_json("\"\xe2\x86\x93\"");
+is($x, "\N{U+2193}", 'parsing 3-byte UTF-8 sequence works');
