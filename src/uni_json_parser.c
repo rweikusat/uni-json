@@ -27,7 +27,7 @@ struct pstate {
 typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 struct utf8_seq {
-    unsigned marker, smask0, smask1, v_len;
+    unsigned marker, ovmask0, ovmask1, v_len;
 };
 
 /*  constants */
@@ -113,20 +113,20 @@ static parse_func *tok_map[256] = {
 static struct utf8_seq utf8_seqs[] = {
     {
         .marker =	UTF8_2,
-        .smask0 =	UTF8_SM2_0,
-        .smask1 =	UTF8_SM2_1,
+        .ovmask0 =	UTF8_OV2_0,
+        .ovmask1 =	UTF8_OV2_1,
         .v_len =	1  },
 
     {
         .marker =	UTF8_3,
-        .smask0 =	UTF8_SM3_0,
-        .smask1 =	UTF8_SM3_1,
+        .ovmask0 =	UTF8_OV3_0,
+        .ovmask1 =	UTF8_OV3_1,
         .v_len =	2 },
 
     {
         .marker =	UTF8_4,
-        .smask0 =	UTF8_SM4_0,
-        .smask1 =	UTF8_SM4_1,
+        .ovmask0 =	UTF8_OV4_0,
+        .ovmask1 =	UTF8_OV4_1,
         .v_len =	3 },
 
     {
@@ -370,19 +370,27 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
           bits will only result in the current marker value if the
           actual marker is the current marker.
          */
-        if ((c & ~sp->smask0) == marker) break;
+        if ((c & ~sp->ovmask0) == marker) break;
         ++sp;
     } while (marker = sp->marker, marker);
     if (!marker) return NULL;
 
-    maybe_long = (c & sp->smask0) == 0;
+    /*
+      As valid sequences have either 11 or 16 or 21 value bits, a
+      syntactically valid encoding is overlong if the highest 5 value
+      bits are all clear. This is the case if none of the ovmask0 bits
+      is set in the first byte and, for sequences of more than 2
+      bytes, if the ovmask1 bits in the second byte are also all clear.
+    */
+
+    maybe_long = (c & sp->ovmask0) == 0;
 
     ++p;
     if (p == e) return NULL;
     if ((*p & 0xc0) != 0x80) return NULL;
     if (maybe_long) {
         if (sp->v_len == 1) return NULL;
-        if ((*p & sp->smask1) == 0) return NULL;
+        if ((*p & sp->ovmask1) == 0) return NULL;
     }
 
     switch (sp->v_len) {
