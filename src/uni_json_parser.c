@@ -26,6 +26,10 @@ struct pstate {
 
 typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
+struct utf8_seq {
+    unsigned marker, hi_mask, v_len;
+};
+
 /*  constants */
 enum {
     T_NULL,
@@ -44,6 +48,17 @@ enum {
 
 enum {
     MIN_LEGAL =	32              /* minimum char code which may appear unescaped in a string */
+};
+
+enum {
+    UTF8_2 =	192,
+    UTF8_2_HI =	31,
+
+    UTF8_3 =	224,
+    UTF8_3_HI =	15,
+
+    UTF8_4 =	240,
+    UTF8_4_HI =	7
 };
 
 /*  prototypes */
@@ -90,6 +105,26 @@ static parse_func *tok_map[256] = {
     ['"'] =		parse_string,
 
     ['['] =		parse_array,
+};
+
+static struct utf8_seq utf8_seqs[] = {
+    {
+        .marker =	UTF8_2,
+        .hi_mask =	UTF8_2_HI,
+        .v_len =	1  },
+
+    {
+        .marker =	UTF8_3,
+        .hi_mask =	UTF8_3_HI,
+        .v_len =	2 },
+
+    {
+        .marker =	UTF8_4,
+        .hi_mask =	UTF8_4_HI,
+        .v_len =	3 },
+
+    {
+        .marker =	0 }
 };
 
 static char *ec_msg_map[] = {
@@ -308,10 +343,35 @@ done:
     return binds->make_number(s, pstate->p - s, flags);
 }
 
+static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
+{
+    struct utf8_seq *sp;
+    unsigned c, marker, vl;
+
+    c = *p;
+    sp = utf8_seqs;
+    marker = sp->marker;
+    do {
+        if ((c & marker) == marker) break;
+        ++sp;
+    } while (marker = sp->marker, marker);
+    if (!marker) return NULL;
+    if ((c & sp->hi_mask) == 0) return NULL; /* not shortest sequence */
+
+    vl = sp->v_len;
+    do {
+        ++p;
+        if (p == e) return NULL;
+        if ((*p & 0xc0) != 0x80) return NULL;
+    } while (--vl);
+
+    return p + 1;
+}
+
 static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
                                 void *str)
 {
-    uint8_t *p, *e, *s;
+    uint8_t *p, *pp, *e, *s;
     unsigned c;
     int rc;
 
@@ -332,12 +392,14 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
         }
 
         if (c & 0x80) {
-            p = skip_utf8(p, e);
-            if (!p) {
+            pp = skip_utf8(p, e);
+            if (!pp) {
                 pstate->err.code = UJ_E_INV_UTF8;
                 pstate->err.pos = p;
                 return -1;
             }
+
+            p = pp;
         } else
             ++p;
     }
