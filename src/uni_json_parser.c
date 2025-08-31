@@ -27,7 +27,7 @@ struct pstate {
 typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 struct utf8_seq {
-    unsigned marker, hi_mask, v_len;
+    unsigned marker, smask0, smask1, v_len;
 };
 
 /*  constants */
@@ -47,18 +47,21 @@ enum {
 };
 
 enum {
-    MIN_LEGAL =	32              /* minimum char code which may appear unescaped in a string */
+    MIN_LEGAL =		32              /* minimum char code which may appear unescaped in a string */
 };
 
 enum {
-    UTF8_2 =	192,
-    UTF8_2_HI =	31,
+    UTF8_2 =		192,
+    UTF8_SM2_0 =	31,
+    UTF8_SM2_1 =	0,
 
-    UTF8_3 =	224,
-    UTF8_3_HI =	15,
+    UTF8_3 =		224,
+    UTF8_SM3_0 =	15,
+    UTF8_SM3_1 =	32,
 
-    UTF8_4 =	240,
-    UTF8_4_HI =	7
+    UTF8_4 =		240,
+    UTF8_SM4_0 =	7,
+    UTF8_SM4_1 =	48
 };
 
 /*  prototypes */
@@ -110,17 +113,20 @@ static parse_func *tok_map[256] = {
 static struct utf8_seq utf8_seqs[] = {
     {
         .marker =	UTF8_2,
-        .hi_mask =	UTF8_2_HI,
+        .smask0 =	UTF8_SM2_0,
+        .smask1 =	UTF8_SM2_1,
         .v_len =	1  },
 
     {
         .marker =	UTF8_3,
-        .hi_mask =	UTF8_3_HI,
+        .smask0 =	UTF8_SM3_0,
+        .smask1 =	UTF8_SM3_1,
         .v_len =	2 },
 
     {
         .marker =	UTF8_4,
-        .hi_mask =	UTF8_4_HI,
+        .smask0 =	UTF8_SM4_0,
+        .smask1 =	UTF8_SM4_1,
         .v_len =	3 },
 
     {
@@ -346,7 +352,7 @@ done:
 static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
-    unsigned c, marker, vl;
+    unsigned c, marker, vl, maybe_long;
 
     c = *p;
     sp = utf8_seqs;
@@ -364,20 +370,32 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
           bits will only result in the current marker value if the
           actual marker is the current marker.
          */
-        if ((c & ~sp->hi_mask) == marker) break;
+        if ((c & ~sp->smask0) == marker) break;
         ++sp;
     } while (marker = sp->marker, marker);
-
-
     if (!marker) return NULL;
-    if ((c & sp->hi_mask) == 0) return NULL; /* not shortest sequence */
 
-    vl = sp->v_len;
-    do {
+    maybe_long = (c & sp->smask0) == 0;
+
+    ++p;
+    if (p == e) return NULL;
+    if ((*p & 0x80) != 0x80) return NULL;
+    if (maybe_long) {
+        if (sp->v_len == 1) return NULL;
+        if ((*p & sp->smask1) == 0) return NULL;
+    }
+
+    switch (sp->v_len) {
+    case 3:
         ++p;
         if (p == e) return NULL;
-        if ((*p & 0xc0) != 0x80) return NULL;
-    } while (--vl);
+        if ((p & 0x80) != 0x80) return NULL;
+
+    case 2:
+        ++p;
+        if (p == e) return NULL;
+        if ((p & 0x80) != 0x80) return NULL;
+    }
 
     return p + 1;
 }
