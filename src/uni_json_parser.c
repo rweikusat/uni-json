@@ -102,7 +102,8 @@ static char *ec_msg_map[] = {
     [UJ_E_ADD] =	"failed to add value to object",
     [UJ_E_LEADZ] =	"leading zero in integer part of number",
     [UJ_E_NO_DGS] =	"no digits in number part",
-    [UJ_E_INV_CHAR] =	"illegal char in string"
+    [UJ_E_INV_CHAR] =	"illegal char in string",
+    [UJ_E_INV_UTF8] =	"illegal UTF-8 sequence"
 };
 
 static size_t dtor_ofs[] = {
@@ -330,7 +331,15 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
             return -1;
         }
 
-        ++p;
+        if (c & 0x80) {
+            p = skip_utf8(p, e);
+            if (!p) {
+                pstate->err.code = UJ_E_INV_UTF8;
+                pstate->err.pos = p;
+                return -1;
+            }
+        } else
+            ++p;
     }
 
     if (c != '"') {
