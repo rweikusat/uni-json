@@ -27,6 +27,7 @@ eval {
 isnt($@, '', 'unescaped control char errors');
 
 #*  UTF-8 tests
+#**  valid sequences
 #
 $x = parse_json("\"\xc2\xa3\"");
 is($x, "\N{U+00a3}", 'parsing 2-byte UTF-8 sequence works');
@@ -37,11 +38,15 @@ is($x, "\N{U+2193}", 'parsing 3-byte UTF-8 sequence works');
 $x = parse_json("\"\xf0\x9f\x8e\xb2\"");
 is($x, "\N{U+1f3b2}", 'parsing 4-byte UTF-8 sequence works');
 
+#**  invalid marker
+#
 eval {
     parse_json("\"\xff\"");
 };
 isnt($@, '', 'invalid UTF-8 marker errors');
 
+#**  invalid value bytes
+#
 eval {
     parse_json("\"\xc2\xc0\"");
 };
@@ -57,6 +62,8 @@ eval {
 };
 isnt($@, '', 'invalid 3rd value byte errors');
 
+#**  overlong sequences
+#
 eval {
     parse_json("\"\xc0\x80\"");
 };
