@@ -52,16 +52,16 @@ enum {
 
 enum {
     UTF8_2 =		192,
-    UTF8_SM2_0 =	31,
-    UTF8_SM2_1 =	0,
+    UTF8_OV2_0 =	31,
+    UTF8_OV2_1 =	0,
 
     UTF8_3 =		224,
-    UTF8_SM3_0 =	15,
-    UTF8_SM3_1 =	32,
+    UTF8_OV3_0 =	15,
+    UTF8_OV3_1 =	32,
 
     UTF8_4 =		240,
-    UTF8_SM4_0 =	7,
-    UTF8_SM4_1 =	48
+    UTF8_OV4_0 =	7,
+    UTF8_OV4_1 =	48
 };
 
 /*  prototypes */
@@ -417,6 +417,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
 
     s = p = pstate->p;
     e = pstate->e;
+    c = 0;
 
     while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
