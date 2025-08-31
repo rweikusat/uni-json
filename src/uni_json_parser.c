@@ -304,9 +304,19 @@ done:
 
 static void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
-    pstate->err.code = -1;
-    pstate->err.pos = pstate->p;
-    return NULL;
+    void *str;
+    int rc;
+
+    str = binds->make_string();
+
+    rc = parse_string_content(pstate, str);
+    if (rc == -1) {
+        binds->free_string(str);
+        return NULL;
+    }
+
+    pstate->last_type = T_STR;
+    return str;
 }
 
 static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding *binds,
