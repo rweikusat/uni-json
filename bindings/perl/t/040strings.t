@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 7;
+use Test::More tests => 10;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -36,3 +36,18 @@ is($x, "\N{U+2193}", 'parsing 3-byte UTF-8 sequence works');
 
 $x = parse_json("\"\xf0\x9f\x8e\xb2\"");
 is($x, "\N{U+1f3b2}", 'parsing 4-byte UTF-8 sequence works');
+
+eval {
+    parse_json("\"\xff\"");
+};
+isnt($@, '', 'invalid UTF-8 marker errors');
+
+eval {
+    parse_json("\"\xc2\xc0\"");
+};
+isnt($@, '', 'invalid 1st value byte errors');
+
+eval {
+    parse_json("\"\xe2\x86\x00\"");
+};
+isnt($@, '', 'invalid 2nd value byte errors');
