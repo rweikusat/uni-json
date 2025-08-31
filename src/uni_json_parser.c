@@ -331,6 +331,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
     rc = binds->add_2_string(s, p - s, str);
     if (!rc) return -1;
 
+    pstate->p = p + 1;
     return 0;
 }
 
