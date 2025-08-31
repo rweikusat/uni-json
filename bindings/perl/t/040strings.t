@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 16;
+use Test::More tests => 19;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -84,3 +84,14 @@ isnt($@, '', 'overlong 4-byte sequence errors');
 
 $x = parse_json("\"\xf0\x90\x80\x80\"");
 is($x, "\N{U+10000}", 'shortest valid 4-byte sequence works');
+
+#**  embedded sequences
+#
+$x = parse_json("\"ab\xc2\xa3ba\"");
+is($x, "ab\N{U+a3}ba", 'embedded 2-byte sequence works');
+
+$x = parse_json("\"cd\xe2\x86\x93dc\"");
+is($x, "cd\N{U+2193}dc", 'embedded 3-byte sequence works');
+
+$x = parse_json("\"efg\xf0\x9f\x8e\xb2gfe\"");
+is($x, "efg\N{U+1f3b2}gfe", 'embedded 4-byte sequence works');
