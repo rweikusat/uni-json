@@ -172,7 +172,7 @@ static uint8_t escs[256] = {
     ['n'] =		'\n',
     ['r'] =		'\r',
     ['t'] =		'\t',
-    ['u'] =		-1
+    ['u'] =		'u'
 };
 
 static size_t dtor_ofs[] = {
@@ -467,6 +467,8 @@ static uint8_t *parse_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *bin
     p_esc = escs + *p;
     switch (*p_esc) {
     case (uint8_t)-1:
+        return parse_u_esc(p + 1, e, binds, str);
+
     case 0:
         return NULL;
     }
