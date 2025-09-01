@@ -368,7 +368,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
     unsigned c, marker, maybe_long;
-    uint32_t x;
+    uint32_t tbs;               /* three-byte sequence */
 
     c = *p;
     sp = utf8_seqs;
@@ -391,7 +391,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     } while (marker = sp->marker, marker);
     if (!marker) return NULL;
 
-    x = c << 16;
+    tbs = c << 16;
 
     /*
       An UTF-8 sequence is said to be overlong if it uses a
@@ -416,7 +416,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
           result and avoids a special-case.
         */
         && (c & sp->ovmask1) == 0) return NULL;
-    x |= c << 8;
+    tbs |= c << 8;
 
     switch (sp->v_len) {
     case 3:
@@ -428,12 +428,12 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
         c = *++p;
         if (p == e) return NULL;
         if ((c & 0xc0) != 0x80) return NULL;
-        x |= c;
+        tbs |= c;
     }
 
     if (sp->v_len == 2
-        && x >= UTF8_SURR_MIN
-        && x <= UTF8_SURR_MAX) return NULL;
+        && tbs >= UTF8_SURR_MIN
+        && tbs <= UTF8_SURR_MAX) return NULL;
 
     return p + 1;
 }
