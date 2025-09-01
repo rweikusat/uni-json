@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 24;
+use Test::More tests => 25;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -125,3 +125,6 @@ eval {
     parse_json('"\\');
 };
 isnt($@, '', 'end of data in escape sequence errors');
+
+$x = parse_json('"a\\u270db"');
+is($x, "a\N{U+270d}b", 'single \u escape works');
