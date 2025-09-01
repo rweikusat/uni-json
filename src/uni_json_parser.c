@@ -466,7 +466,7 @@ static uint8_t *parse_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *bin
 
     p_esc = escs + *p;
     switch (*p_esc) {
-    case -1:
+    case (uint8_t)-1:
     case 0:
         return NULL;
     }
