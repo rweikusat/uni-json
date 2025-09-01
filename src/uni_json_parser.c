@@ -53,20 +53,6 @@ enum {
     MIN_LEGAL =		32              /* minimum char code which may appear unescaped in a string */
 };
 
-enum {
-    UTF8_2 =		192,
-    UTF8_OV2_0 =	31,
-    UTF8_OV2_1 =	0,
-
-    UTF8_3 =		224,
-    UTF8_OV3_0 =	15,
-    UTF8_OV3_1 =	32,
-
-    UTF8_4 =		240,
-    UTF8_OV4_0 =	7,
-    UTF8_OV4_1 =	48
-};
-
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
 static void *close_char(struct pstate *, struct uni_json_p_binding *);
