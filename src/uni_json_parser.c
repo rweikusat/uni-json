@@ -159,7 +159,8 @@ static char *ec_msg_map[] = {
     [UJ_E_LEADZ] =	"leading zero in integer part of number",
     [UJ_E_NO_DGS] =	"no digits in number part",
     [UJ_E_INV_CHAR] =	"illegal char in string",
-    [UJ_E_INV_UTF8] =	"illegal UTF-8 sequence"
+    [UJ_E_INV_UTF8] =	"illegal UTF-8 sequence",
+    [UJ_E_INV_ESC] =	"illegal escape sequence"
 };
 
 static uint8_t escs[256] = {
@@ -455,6 +456,26 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     return p + 1;
 }
 
+static uint8_t *parse_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *binds,
+                          void *str)
+{
+    uint8_t *p_esc;
+    int rc;
+
+    if (p == e) return NULL;
+
+    p_esc = escs + *p;
+    switch (*p_esc) {
+    case -1:
+    case 0:
+        return NULL;
+    }
+
+    rc = binds->add_2_string(p_esc, 1, str);
+    if (!rc) return NULL;
+    return p + 1;
+}
+
 static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
                                 void *str)
 {
@@ -467,8 +488,12 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
 
     while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
-            pp = parse_esc(p + 1, e, str, binds);
-            if (!pp) return -1;
+            pp = parse_esc(p + 1, e, binds, str);
+            if (!pp) {
+                pstate->err.code = UJ_E_INV_ESC;
+                pstate->err.pos = p;
+                return -1;
+            }
 
             p = pp;
             continue;
