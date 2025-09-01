@@ -65,7 +65,10 @@ isnt($@, '', 'invalid 3rd value byte errors');
 #**  overlong sequences
 #
 eval {
-    parse_json("\"\xc0\x80\"");
+    # 1-byte sequences have 7 value bits while all other have at most 6
+    # value bits per byte
+    #
+    parse_json("\"\xc1\x80\"");
 };
 isnt($@, '', 'overlong 2-byte sequence errors');
 
