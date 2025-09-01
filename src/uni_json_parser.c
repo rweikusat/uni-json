@@ -15,7 +15,7 @@
 
 /*  types */
 struct pstate {
-    uint8_t *s, *p, *e;
+    uint8_t *p, *e;
     int last_type;
 
     struct {
@@ -612,7 +612,7 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
         return NULL;
     }
 
-    pstate.s = pstate.p = data;
+    pstate.p = data;
     pstate.e = data + len;
 
     v = parse_value(&pstate, binds);
