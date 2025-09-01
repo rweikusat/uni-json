@@ -456,40 +456,56 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     return p + 1;
 }
 
-static uint8_t *parse_u_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *binds,
-                            void *str)
+static int parse_u_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
+                       void *str)
 {
     uint32_t v0, v1;
     int rc;
 
-    v0 = parse_4dg_hex(p, e);
-    if (v0 == -1) return NULL;
+    v0 = parse_4dg_hex(pstate->p, pstate->e);
+    if (v0 == -1) {
+        pstate->err.code = UJ_E_INV_ESC;
+        pstate->err.pos = pstate->p;
+        return -1;
+    }
 
     rc = binds->add_uni_2_str(v0, str);
     if (!rc) {
+        pstate->err.code = UJ_E_ADD;
+        pstate->err.pos = pstate->p;
+    }
 
+    pstate->p += 4;
+    return 0;
 }
 
-static uint8_t *parse_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *binds,
-                          void *str)
+static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
+                     void *str)
 {
     uint8_t *p_esc;
     int rc;
 
-    if (p == e) return NULL;
+    if (pstate->p == pstate->e) return -1;
 
-    p_esc = escs + *p;
+    p_esc = escs + *pstate->p;
     switch (*p_esc) {
     case 'u':
-        return parse_u_esc(p + 1, e, binds, str);
+        ++pstate->p;
+        return parse_u_esc(pstate, e, binds, str);
 
     case 0:
         return NULL;
     }
 
     rc = binds->add_2_string(p_esc, 1, str);
-    if (!rc) return NULL;
-    return p + 1;
+    if (!rc) {
+        pstate->err.code = UJ_E_ADD;
+        pstate->err.pos = pstate->p;
+        return -1;
+    }
+
+    ++pstate->p;
+    return 0;
 }
 
 static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
@@ -514,10 +530,10 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
             }
 
             pstate->p = p;
-            pp = parse_esc(pstate, e, binds, str);
-            if (!pp) return -1;
+            rc = parse_esc(pstate, e, binds, str);
+            if (rc == -1) return -1;
 
-            s = p = pp;
+            s = p = pstate->p;
             continue;
         }
 
