@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 19;
+use Test::More tests => 21;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -87,6 +87,18 @@ isnt($@, '', 'overlong 4-byte sequence errors');
 
 $x = parse_json("\"\xf0\x90\x80\x80\"");
 is($x, "\N{U+10000}", 'shortest valid 4-byte sequence works');
+
+#**  encoded surrogates
+#
+eval {
+    parse_json("\"\xed\xad\x80\"");
+};
+isnt($@, '', 'encoded minimum surrogate errors');
+
+eval {
+    parse_json("\"xed\xbf\xbf\"");
+};
+isnt($@, '', 'encoded maxium surrogate errors');
 
 #**  embedded sequences
 #
