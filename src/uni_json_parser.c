@@ -416,7 +416,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
           result and avoids a special-case.
         */
         && (c & sp->ovmask1) == 0) return NULL;
-    x = c << 8;
+    x |= c << 8;
 
     switch (sp->v_len) {
     case 3:
