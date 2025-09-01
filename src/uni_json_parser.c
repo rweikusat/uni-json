@@ -30,7 +30,7 @@ struct utf8_seq {
     unsigned marker,            /* fixed bit pattern in 1st byte */
         first_val,              /* all value bits in 1st byte */
         ovmask0, ovmask1,       /* bitmasks for detecting overlong encodings */
-        v_len                   /* number of values bytes after 1st */
+        v_len;                   /* number of values bytes after 1st */
 };
 
 /*  constants */
@@ -99,23 +99,35 @@ static parse_func *tok_map[256] = {
     ['['] =		parse_array,
 };
 
+/*
+  RFC3629
+  -------
+
+   Char. number range  |        UTF-8 octet sequence
+      (hexadecimal)    |              (binary)
+   --------------------+---------------------------------------------
+   0000 0000-0000 007F | 0xxxxxxx
+   0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+   0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+   0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+*/
 static struct utf8_seq utf8_seqs[] = {
     {
-        .marker =	UTF8_2,
-        .ovmask0 =	UTF8_OV2_0,
-        .ovmask1 =	UTF8_OV2_1,
-        .v_len =	1  },
-
+        .marker =	0xc0,
+        .first_val =	31,
+        .ovmask0 =	30,
+        .v_len =	1 },
     {
-        .marker =	UTF8_3,
-        .ovmask0 =	UTF8_OV3_0,
-        .ovmask1 =	UTF8_OV3_1,
+        .marker =	0xe0,
+        .first_val =	15,
+        .ovmask0 =	15,
+        .ovmask1 =	32,
         .v_len =	2 },
-
     {
-        .marker =	UTF8_4,
-        .ovmask0 =	UTF8_OV4_0,
-        .ovmask1 =	UTF8_OV4_1,
+        .marker =	0xf0,
+        .first_val =	7,
+        .ovmask0 =	7,
+        .ovmask1 =	48,
         .v_len =	3 },
 
     {
@@ -359,28 +371,34 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
           bits will only result in the current marker value if the
           actual marker is the current marker.
          */
-        if ((c & ~sp->ovmask0) == marker) break;
+        if ((c & ~sp->first_val) == marker) break;
         ++sp;
     } while (marker = sp->marker, marker);
     if (!marker) return NULL;
 
     /*
-      As valid sequences have either 11 or 16 or 21 value bits, a
-      syntactically valid encoding is overlong if the highest 5 value
-      bits are all clear. This is the case if none of the ovmask0 bits
-      is set in the first byte and, for sequences of more than 2
-      bytes, if the ovmask1 bits in the second byte are also all clear.
-    */
+      An UTF-8 sequence is said to be overlong if it uses a
+      representation with more value bits than would be needed to
+      encode the actual value. Valid sequences have either 7, 11, 16
+      or 21 value bits. This means a 2-byte sequences is overlong if
+      the highest 4 value bits are all clear and 3- and 4-byte
+      sequences if the highest 5 value bits are all clear.
 
-    maybe_long = (c & sp->ovmask0) == 0;
+      Generally. this means it's overlong if all ovmask0 bits in the
+      first byte are clear and all ovmask1 bits in the second byte,
+      too.
+    */
+    maybe_long = (*p & sp->ovmask0) == 0;
 
     ++p;
     if (p == e) return NULL;
     if ((*p & 0xc0) != 0x80) return NULL;
-    if (maybe_long) {
-        if (sp->v_len == 1) return NULL;
-        if ((*p & sp->ovmask1) == 0) return NULL;
-    }
+    if (maybe_long
+        /*
+          Redundant for 2-byte sequences but it won't affect the
+          result and avoids a special-case.
+        */
+        && (*p & sp->ovmask1) == 0) return NULL;
 
     switch (sp->v_len) {
     case 3:
