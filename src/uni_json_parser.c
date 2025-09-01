@@ -488,6 +488,15 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
 
     while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
+            if (p > s) {
+                rc = binds->add_2_string(s, p - s, str);
+                if (!rc) {
+                    pstate->err.code = UJ_E_ADD;
+                    pstate->err.pos = p;
+                    return -1;
+                }
+            }
+
             pp = parse_esc(p + 1, e, binds, str);
             if (!pp) {
                 pstate->err.code = UJ_E_INV_ESC;
@@ -495,7 +504,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
                 return -1;
             }
 
-            p = pp;
+            s = p = pp;
             continue;
         }
 
@@ -524,8 +533,14 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
         return -1;
     }
 
-    rc = binds->add_2_string(s, p - s, str);
-    if (!rc) return -1;
+    if (p > s) {
+        rc = binds->add_2_string(s, p - s, str);
+        if (!rc) {
+            pstate->err.code = UJ_E_ADD;
+            pstate->err.pos = p;
+            return -1;
+        }
+    }
 
     pstate->p = p + 1;
     return 0;
