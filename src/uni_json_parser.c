@@ -30,7 +30,7 @@ struct utf8_seq {
     unsigned marker,            /* fixed bit pattern in 1st byte */
         first_val,              /* all value bits in 1st byte */
         ovmask0, ovmask1,       /* bitmasks for detecting overlong encodings */
-        v_len;                   /* number of values bytes after 1st */
+        v_len;                  /* number of values bytes after 1st */
 };
 
 /*  constants */
