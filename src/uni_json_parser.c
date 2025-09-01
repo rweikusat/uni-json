@@ -162,6 +162,18 @@ static char *ec_msg_map[] = {
     [UJ_E_INV_UTF8] =	"illegal UTF-8 sequence"
 };
 
+static uint8_t escs[256] = {
+    ['"'] =		'"',
+    ['\\'] =		'\\',
+    ['/'] =		'/',
+    ['b'] =		'\b',
+    ['f'] =		'\f',
+    ['n'] =		'\n',
+    ['r'] =		'\r',
+    ['t'] =		'\t',
+    ['u'] =		-1
+};
+
 static size_t dtor_ofs[] = {
 #define binds_ofs(m) offsetof(struct uni_json_p_binding, m)
 
@@ -455,9 +467,11 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
 
     while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
-            pstate->err.code = -1;
-            pstate->err.pos = p;
-            return -1;
+            pp = parse_esc(p + 1, e, str, binds);
+            if (!pp) return -1;
+
+            p = pp;
+            continue;
         }
 
         if (c < MIN_LEGAL) {
