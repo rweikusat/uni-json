@@ -477,15 +477,15 @@ static uint32_t parse_4dg_hex(uint8_t *p, uint8_t *e)
 
     dg = from_hex(*p++);
     if (dg == un1) return -1;
-    x = dg << 24;
-
-    dg = from_hex(*p++);
-    if (dg == un1) return -1;
-    x |= dg << 16;
+    x = dg << 12;
 
     dg = from_hex(*p++);
     if (dg == un1) return -1;
     x |= dg << 8;
+
+    dg = from_hex(*p++);
+    if (dg == un1) return -1;
+    x |= dg << 4;
 
     dg = from_hex(*p);
     if (dg == un1) return -1;
