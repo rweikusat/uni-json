@@ -456,6 +456,20 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     return p + 1;
 }
 
+static uint8_t *parse_u_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *binds,
+                            void *str)
+{
+    uint32_t v0, v1;
+    int rc;
+
+    v0 = parse_4dg_hex(p, e);
+    if (v0 == -1) return NULL;
+
+    rc = binds->add_uni_2_str(v0, str);
+    if (!rc) {
+
+}
+
 static uint8_t *parse_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *binds,
                           void *str)
 {
@@ -466,7 +480,7 @@ static uint8_t *parse_esc(uint8_t *p, uint8_t *e, struct uni_json_p_binding *bin
 
     p_esc = escs + *p;
     switch (*p_esc) {
-    case (uint8_t)-1:
+    case 'u':
         return parse_u_esc(p + 1, e, binds, str);
 
     case 0:
@@ -499,12 +513,9 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
                 }
             }
 
-            pp = parse_esc(p + 1, e, binds, str);
-            if (!pp) {
-                pstate->err.code = UJ_E_INV_ESC;
-                pstate->err.pos = p;
-                return -1;
-            }
+            pstate->p = p;
+            pp = parse_esc(pstate, e, binds, str);
+            if (!pp) return -1;
 
             s = p = pp;
             continue;
