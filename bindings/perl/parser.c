@@ -45,6 +45,7 @@ static struct uni_json_p_binding binding = {
     .make_string =	make_string,
     .free_string =	free_obj,
     .add_2_string =	add_2_string,
+    .add_uni_2_string =	add_uni_2_string,
 
     .make_array =	make_av,
     .free_array =	free_obj,
