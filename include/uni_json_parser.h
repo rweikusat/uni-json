@@ -23,7 +23,8 @@ enum {
     UJ_E_LEADZ,                  /* leading zero in int part of number */
     UJ_E_NO_DGS,                 /* no digits in number part */
     UJ_E_INV_CHAR,               /* illegal char in string */
-    UJ_E_INV_UTF8                /* illegal UTF-8 sequence */
+    UJ_E_INV_UTF8,               /* illegal UTF-8 sequence */
+    UJ_E_INV_ESC                 /* illegal escape sequence */
 };
 
 /*   types */
