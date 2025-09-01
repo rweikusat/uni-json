@@ -3,7 +3,7 @@
 # test parsing of strings
 #
 
-use Test::More tests => 21;
+use Test::More tests => 24;
 use JSON::Uni 'parse_json';
 
 my $x;
@@ -110,3 +110,18 @@ is($x, "cd\N{U+2193}dc", 'embedded 3-byte sequence works');
 
 $x = parse_json("\"efg\xf0\x9f\x8e\xb2gfe\"");
 is($x, "efg\N{U+1f3b2}gfe", 'embedded 4-byte sequence works');
+
+#*  escape sequences
+#
+$x = parse_json('"ab\\"cd"');
+is($x, 'ab"cd', 'simple escape sequence works');
+
+eval {
+    parse_json('"\\y"');
+};
+isnt($@, '', 'invalid simple escape sequence errors');
+
+eval {
+    parse_json('"\\');
+};
+isnt($@, '', 'end of data in escape sequence errors');
