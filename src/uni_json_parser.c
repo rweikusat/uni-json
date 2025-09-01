@@ -27,7 +27,10 @@ struct pstate {
 typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 struct utf8_seq {
-    unsigned marker, ovmask0, ovmask1, v_len;
+    unsigned marker,            /* fixed bit pattern in 1st byte */
+        first_val,              /* all value bits in 1st byte */
+        ovmask0, ovmask1,       /* bitmasks for detecting overlong encodings */
+        v_len                   /* number of values bytes after 1st */
 };
 
 /*  constants */
