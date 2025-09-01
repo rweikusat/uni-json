@@ -53,6 +53,20 @@ enum {
     MIN_LEGAL =		32              /* minimum char code which may appear unescaped in a string */
 };
 
+enum {
+    /*
+      RFC3629
+      -------
+
+      The definition of UTF-8 prohibits encoding character numbers between
+      U+D800 and U+DFFF, which are reserved for use with the UTF-16
+      encoding form (as surrogate pairs) and do not directly represent
+      characters.
+    */
+    UTF8_SURR_MIN =	0xedad80, /* 0xd800 as 3-byte UTF-8 sequence */
+    UTF8_SURR_MAX =	0xedbfbf  /* ditto for 0xdfff */
+};
+
 /*  prototypes */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *);
 static void *close_char(struct pstate *, struct uni_json_p_binding *);
@@ -354,6 +368,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
     unsigned c, marker, maybe_long;
+    uint32_t x;
 
     c = *p;
     sp = utf8_seqs;
@@ -376,6 +391,8 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     } while (marker = sp->marker, marker);
     if (!marker) return NULL;
 
+    x = c << 16;
+
     /*
       An UTF-8 sequence is said to be overlong if it uses a
       representation with more value bits than would be needed to
@@ -390,15 +407,16 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     */
     maybe_long = (*p & sp->ovmask0) == 0;
 
-    ++p;
+    c = *++p;
     if (p == e) return NULL;
-    if ((*p & 0xc0) != 0x80) return NULL;
+    if ((c & 0xc0) != 0x80) return NULL;
     if (maybe_long
         /*
           Redundant for 2-byte sequences but it won't affect the
           result and avoids a special-case.
         */
-        && (*p & sp->ovmask1) == 0) return NULL;
+        && (c & sp->ovmask1) == 0) return NULL;
+    x = c << 8;
 
     switch (sp->v_len) {
     case 3:
@@ -407,10 +425,15 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
         if ((*p & 0xc0) != 0x80) return NULL;
 
     case 2:
-        ++p;
+        c = *++p;
         if (p == e) return NULL;
-        if ((*p & 0xc0) != 0x80) return NULL;
+        if ((c & 0xc0) != 0x80) return NULL;
+        x |= c;
     }
+
+    if (sp->v_len == 2
+        && x >= UTF8_SURR_MIN
+        && x <= UTF8_SURR_MAX) return NULL;
 
     return p + 1;
 }
