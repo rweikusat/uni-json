@@ -19,7 +19,7 @@ is($x, '', 'parsing an empty string works');
 eval {
     parse_json('"');
 };
-isnt($@, '', 'parsing an untermiated string errors');
+isnt($@, '', 'parsing an unterminated string errors');
 
 eval {
     parse_json("\"\x00\"");
