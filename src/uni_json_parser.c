@@ -572,7 +572,6 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
             if (rc == -1) return -1;
 
             s = p = pstate->p;
-            fprintf(stderr, "after esc: %.*s\n", (int)(e - p), p);
             continue;
         }
 
@@ -755,8 +754,6 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     }
 
     if (pstate.p != pstate.e) {
-        fprintf(stderr, "garb %.*s\n", (int)(pstate.p - pstate.e), pstate.p);
-
         free_obj(pstate.last_type, v, binds);
         binds->on_error(UJ_E_GARBAGE, pstate.p - data);
         return NULL;
