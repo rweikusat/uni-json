@@ -456,20 +456,58 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     return p + 1;
 }
 
+static inline unsigned from_hex(unsigned c)
+{
+    if (c - '0' < 10) return c - '0';
+
+    c &= ~0x20;
+    if (c - 'A' < 7) return c - 'A' + 10;
+
+    return -1;
+}
+
+static uint32_t parse_4dg_hex(uint8_t *p, uint8_t *e)
+{
+#define un1 (unsigned)-1
+
+    uint32_t x;
+    unsigned dg;
+
+    if (e - p < 4) return -1;
+
+    dg = from_hex(*p++);
+    if (dg == un1) return -1;
+    x = dg << 24;
+
+    dg = from_hex(*p++);
+    if (dg == un1) return -1;
+    x |= dg << 16;
+
+    dg = from_hex(*p++);
+    if (dg == un1) return -1;
+    x |= dg << 8;
+
+    dg = from_hex(*p);
+    if (dg == un1) return -1;
+    return x | dg;
+
+#undef un1
+}
+
 static int parse_u_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
                        void *str)
 {
-    uint32_t v0, v1;
+    uint32_t v0;
     int rc;
 
     v0 = parse_4dg_hex(pstate->p, pstate->e);
-    if (v0 == -1) {
+    if (v0 == (uint32_t)-1) {
         pstate->err.code = UJ_E_INV_ESC;
         pstate->err.pos = pstate->p;
         return -1;
     }
 
-    rc = binds->add_uni_2_str(v0, str);
+    rc = binds->add_uni_2_string(v0, str);
     if (!rc) {
         pstate->err.code = UJ_E_ADD;
         pstate->err.pos = pstate->p;
@@ -491,10 +529,10 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
     switch (*p_esc) {
     case 'u':
         ++pstate->p;
-        return parse_u_esc(pstate, e, binds, str);
+        return parse_u_esc(pstate, binds, str);
 
     case 0:
-        return NULL;
+        return -1;
     }
 
     rc = binds->add_2_string(p_esc, 1, str);
@@ -529,11 +567,12 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
                 }
             }
 
-            pstate->p = p;
-            rc = parse_esc(pstate, e, binds, str);
+            pstate->p = p + 1;
+            rc = parse_esc(pstate, binds, str);
             if (rc == -1) return -1;
 
             s = p = pstate->p;
+            fprintf(stderr, "after esc: %.*s\n", (int)(e - p), p);
             continue;
         }
 
@@ -716,6 +755,8 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     }
 
     if (pstate.p != pstate.e) {
+        fprintf(stderr, "garb %.*s\n", (int)(pstate.p - pstate.e), pstate.p);
+
         free_obj(pstate.last_type, v, binds);
         binds->on_error(UJ_E_GARBAGE, pstate.p - data);
         return NULL;
