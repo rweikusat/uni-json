@@ -364,6 +364,11 @@ done:
     return binds->make_number(s, pstate->p - s, flags);
 }
 
+static inline int no_val_byte(unsigned c)
+{
+    return (c & 0xc0) != 0x80;
+}
+
 static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
@@ -409,7 +414,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 
     c = *++p;
     if (p == e) return NULL;
-    if ((c & 0xc0) != 0x80) return NULL;
+    if (no_val_byte(c)) return NULL;
     if (maybe_long
         /*
           Redundant for 2-byte sequences but it won't affect the
@@ -422,12 +427,12 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     case 3:
         ++p;
         if (p == e) return NULL;
-        if ((*p & 0xc0) != 0x80) return NULL;
+        if (no_val_byte(*p)) return NULL;
 
     case 2:
         c = *++p;
         if (p == e) return NULL;
-        if ((c & 0xc0) != 0x80) return NULL;
+        if (no_val_byte(c)) return NULL;
         tbs |= c;
     }
 
