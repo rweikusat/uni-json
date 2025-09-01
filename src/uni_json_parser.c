@@ -447,7 +447,6 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
 
     s = p = pstate->p;
     e = pstate->e;
-    c = 0;
 
     while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
@@ -475,7 +474,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
             ++p;
     }
 
-    if (c != '"') {
+    if (p == e) {
         pstate->err.code = UJ_E_EOS;
         pstate->err.pos = p;
         return -1;
