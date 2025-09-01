@@ -461,7 +461,7 @@ static inline unsigned from_hex(unsigned c)
     if (c - '0' < 10) return c - '0';
 
     c &= ~0x20;                 /* ASCII 'toupper' */
-    if (c - 'A' < 7) return c - 'A' + 10;
+    if (c - 'A' < 6) return c - 'A' + 10;
 
     return -1;
 }
