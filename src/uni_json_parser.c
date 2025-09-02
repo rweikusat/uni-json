@@ -27,12 +27,6 @@ struct utf8_seq {
 
 /*  constants */
 enum {
-    INT,
-    FRAC,
-    EXP
-};
-
-enum {
     MIN_LEGAL =		32              /* minimum char code which may appear unescaped in a string */
 };
 
