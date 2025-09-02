@@ -11,6 +11,16 @@
 /*  includes */
 #include <inttypes.h>
 
+/*  constants */
+enum {
+    T_NULL,
+    T_BOOL,
+    T_NUM,
+    T_STR,
+    T_ARY,
+    T_OBJ
+};
+
 /*  types */
 struct pstate {
     uint8_t *p, *e;
