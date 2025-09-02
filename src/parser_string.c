@@ -218,11 +218,37 @@ static uint32_t parse_4dg_hex(uint8_t *p, uint8_t *e)
 #undef un1
 }
 
+static uint32_t parse_u_esc(struct pstate *p)
+{
+    uint32_t v0, v1;
+
+    v0 = parse_4dg_hex(pstate->p, pstate->e);
+    if (v0 == (uint32_t)-1) return -1;
+
+    if (v0 >= SURR_FROM && v0 <= SURR_TO) {
+        if (v0 >= SURR_LO) return -1;
+
+        if (pstate->e - pstate->p < 6
+            || *pstate->p++ != '\\' || *pstate->p++ != 'u')
+            return -1;
+
+        v1 = parse_4dg_hex(pstate->p, pstate->e);
+        if (v1 == (uint32_t)-1
+            || v1 < SURR_LO || v1 > SURR_TO) return -1;
+        pstate->p += 4;
+        v0 &= 0x3ff;
+        v0 = (v0 << 10) | (v1 & 0x3ff);
+    }
+
+    return v0;
+}
+
+
 static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
                      void *str)
 {
     uint8_t *p_esc;
-    uint32_t v0, v1;
+    uint32_t uni_c;
     int rc;
 
     if (pstate->p == pstate->e) return -1;
@@ -231,22 +257,11 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
     switch (*p_esc) {
     case 'u':
         ++pstate->p;
-        v0 = parse_4dg_hex(pstate->p, pstate->e);
-        if (v0 == (uint32_t)-1) goto invalid;
-
-        if (v0 >= SURR_FROM && v0 <= SURR_TO) {
-            if (v0 >= SURR_LO) goto invalid;
-
-            if (pstate->e - pstate->p < 6
-                || *pstate->p++ != '\\' || *pstate->p++ != 'u')
-                goto invalid;
-
-            v1 = parse_4dg_hex(pstate->p, pstate->e);
-            if (v1 == (uint32_t)-1
-                || v1 < SURR_LO || v1 > SURR_TO) goto invalid;
-            pstate->p += 4;
-            v0 &= 0x3ff;
-            v0 = (v0 << 10) | (v1 & 0x3ff);
+        uni_c = parse_u_esc(pstate);
+        if (uni_c == (uint32_t)-1) {
+            pstate->err.code = UJ_E_INV_ESC;
+            pstate->err.pos = pstate->p;
+            return -1;
         }
 
         rc = binds->add_uni_2_string(v0, str);
@@ -256,11 +271,9 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
             return -1;
         }
 
-        pstate->p += 4;
         return 0;
 
     case 0:
-    invalid:
         pstate->err.code = UJ_E_INV_ESC;
         pstate->err.pos = pstate->p;
         return -1;
