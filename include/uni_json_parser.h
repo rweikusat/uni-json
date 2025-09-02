@@ -10,6 +10,7 @@
 
 /*  includes */
 #include <stdint.h>
+#include <stddef.h>
 
 /*  constants */
 enum {
