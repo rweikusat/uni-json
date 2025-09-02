@@ -9,6 +9,7 @@
 #define uni_json_lib_h
 
 /*  includes */
+#include <inttypes.h>
 #include "compiler.h"
 
 /*  types */
