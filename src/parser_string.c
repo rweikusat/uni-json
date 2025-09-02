@@ -20,6 +20,11 @@ enum {
 };
 
 enum {
+    HI,
+    LO
+};
+
+enum {
     /*
       RFC3629
       -------
@@ -31,6 +36,11 @@ enum {
     */
     UTF8_SURR_MIN =	0xedad80, /* 0xd800 as 3-byte UTF-8 sequence */
     UTF8_SURR_MAX =	0xedbfbf  /* ditto for 0xdfff */
+};
+
+enum {
+    SURR_FROM =		0xd800,
+    SURR_TO =		0xdfff
 };
 
 /*  types */
@@ -207,33 +217,11 @@ static uint32_t parse_4dg_hex(uint8_t *p, uint8_t *e)
 #undef un1
 }
 
-static int parse_u_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
-                       void *str)
-{
-    uint32_t v0;
-    int rc;
-
-    v0 = parse_4dg_hex(pstate->p, pstate->e);
-    if (v0 == (uint32_t)-1) {
-        pstate->err.code = UJ_E_INV_ESC;
-        pstate->err.pos = pstate->p;
-        return -1;
-    }
-
-    rc = binds->add_uni_2_string(v0, str);
-    if (!rc) {
-        pstate->err.code = UJ_E_ADD;
-        pstate->err.pos = pstate->p;
-    }
-
-    pstate->p += 4;
-    return 0;
-}
-
 static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
                      void *str)
 {
     uint8_t *p_esc;
+    uint32_t v0, v1;
     int rc;
 
     if (pstate->p == pstate->e) return -1;
@@ -242,7 +230,25 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
     switch (*p_esc) {
     case 'u':
         ++pstate->p;
-        return parse_u_esc(pstate, binds, str);
+        v0 = parse_4dg_hex(pstate->p, pstate->e);
+        if (v0 == (uint32_t)-1) {
+            pstate->err.code = UJ_E_INV_ESC;
+            pstate->err.pos = pstate->p;
+            return -1;
+        }
+
+        if (v0 >= SURR_FROM && v0 <= SURR_TO) {
+        }
+
+        rc = binds->add_uni_2_string(v0, str);
+        if (!rc) {
+            pstate->err.code = UJ_E_ADD;
+            pstate.->err.pos = pstate->p;
+            return -1;
+        }
+
+        pstate->p += 4;
+        return 0;
 
     case 0:
         return -1;
