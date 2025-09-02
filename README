@@ -2,9 +2,8 @@ Universal Json
 ==============
 
 This is a project in development. So far, it should be capable of
-parsing literals, numbers, strings without escape sequences and
-arrays. Perl-bindings and test-suite for these exist. The way to run
-it from the top-level is
+parsing literals, numbers, strings arrays. Perl-bindings and
+test-suite for these exist. The way to run it from the top-level is
 
 make
 make -C bindings/perl test TEST_VERBOSE=1
@@ -13,6 +12,9 @@ TEST_VERBOSE isn't strictly necessary, it just causes some output
 showing what is actually being tested.
 
 There's so far no support for installing any of this anywhere.
+
+Code for handling "surrogate pair" escapes has been written and is
+known to compile but it wasn't tested so far.
 
 
 Plan
