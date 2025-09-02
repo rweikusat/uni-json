@@ -16,8 +16,8 @@ struct uni_json_p_binding;
 struct pstate;
 
 /*  routines */
-void * _hidden_ parse_false(struct pstate *pstate, struct uni_json_p_binding *binds);
-void * _hidden_ parse_null(struct pstate *pstate, struct uni_json_p_binding *binds);
-void * _hidden_ parse_true(struct pstate *pstate, struct uni_json_p_binding *binds);
+void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds) _hidden_;
+void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds) _hidden_;
+void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds) _hidden_;
 
 #endif
