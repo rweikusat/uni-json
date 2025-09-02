@@ -216,7 +216,7 @@ static uint32_t parse_4dg_hex(uint8_t *p, uint8_t *e)
 #undef un1
 }
 
-static uint32_t parse_u_esc(struct pstate *p)
+static uint32_t parse_u_esc(struct pstate *pstate)
 {
     uint32_t v0, v1;
     uint8_t *p, *e;
@@ -238,15 +238,15 @@ static uint32_t parse_u_esc(struct pstate *p)
     /*
       A surrogate pair is a number from 0xd800 - 0xdbff paired with a
       number from 0xdc00 - 0xdfff. The lowest 10 bits of the first
-      number are the higher ten bits of the charancter code, the
+      number are the higher ten bits of the character code, the
       lowest ten bits of the second the lower ten bits. 0x1000 needs
-      to be added to this value because its the codepoint of the first
+      to be added to this value because it's the codepoint of the first
       extended Unicode character.
 
       Let the first number be a and the second b. The encoded
       character code is then
 
-      0x1000 + ((a & 0x3ff) << 10) | (b & 0x3ff)
+      0x1000 + ((a & 0x3ff) << 10 | (b & 0x3ff))
     */
     if (v0 >= SURR_FROM && v0 <= SURR_TO) {
         if (v0 >= SURR_LO) return -1;
@@ -258,8 +258,8 @@ static uint32_t parse_u_esc(struct pstate *p)
         if (v1 == (uint32_t)-1
             || v1 < SURR_LO || v1 > SURR_TO) return -1;
         v0 &= 0x3ff;
-        v0 = (v0 << 10) | (v1 & 0x3ff);
-        v += 10000;
+        v0 = v0 << 10 | (v1 & 0x3ff);
+        v0 += 10000;
 
         p += 4;
     }
@@ -267,7 +267,6 @@ static uint32_t parse_u_esc(struct pstate *p)
     pstate->p = p + 4;
     return v0;
 }
-
 
 static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
                      void *str)
@@ -289,7 +288,7 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
             return -1;
         }
 
-        rc = binds->add_uni_2_string(v0, str);
+        rc = binds->add_uni_2_string(uni_c, str);
         if (!rc) {
             pstate->err.code = UJ_E_ADD;
             pstate->err.pos = pstate->p;
