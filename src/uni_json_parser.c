@@ -12,18 +12,9 @@
 
 #include "uni_json_p_binding.h"
 #include "uni_json_parser.h"
+#include "pstate.h"
 
 /*  types */
-struct pstate {
-    uint8_t *p, *e;
-    int last_type;
-
-    struct {
-        unsigned code;
-        uint8_t *pos;
-    } err;
-};
-
 typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
 
 struct utf8_seq {
