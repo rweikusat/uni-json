@@ -35,7 +35,7 @@ static int skip_literal(struct pstate *pstate, uint8_t *want)
     return 0;
 }
 
-static void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds)
+void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     int rc;
 
@@ -46,7 +46,7 @@ static void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds
     return binds->make_bool(0);
 }
 
-static void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds)
+void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     int rc;
 
@@ -57,7 +57,7 @@ static void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds)
     return binds->make_null();
 }
 
-static void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
+void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     int rc;
 
