@@ -9,7 +9,8 @@
 #define uni_json_binding_h
 
 /*  includes */
-#include <stdint.h>
+#include <inttypes.h>
+#include <stddef.h>
 
 /**  constants */
 enum {
