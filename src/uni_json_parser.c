@@ -13,6 +13,7 @@
 #include "uni_json_p_binding.h"
 #include "uni_json_parser.h"
 #include "pstate.h"
+#include "parser_literals.h"
 
 /*  types */
 typedef void *parse_func(struct pstate *, struct uni_json_p_binding *);
