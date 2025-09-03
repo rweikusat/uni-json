@@ -259,7 +259,7 @@ static uint32_t parse_u_esc(struct pstate *pstate)
             || v1 < SURR_LO || v1 > SURR_TO) return -1;
         v0 &= 0x3ff;
         v0 = v0 << 10 | (v1 & 0x3ff);
-        v0 += 10000;
+        v0 += 0x10000;
 
         p += 4;
     }
