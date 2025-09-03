@@ -236,12 +236,13 @@ static uint32_t parse_u_esc(struct pstate *pstate)
     */
 
     /*
-      A surrogate pair is a number from 0xd800 - 0xdbff paired with a
-      number from 0xdc00 - 0xdfff. The lowest 10 bits of the first
-      number are the higher ten bits of the character code, the
-      lowest ten bits of the second the lower ten bits. 0x1000 needs
-      to be added to this value because it's the codepoint of the first
-      extended Unicode character.
+      A surrogate pair is a number from 0xd800 - 0xdbff (high
+      surrogates) paired with a number from 0xdc00 - 0xdfff (low
+      surrogates). The lowest 10 bits of the first number are the
+      higher ten bits of the character code, the lowest ten bits of
+      the second the lower ten bits. 0x1000 needs to be added to this
+      value because it's the codepoint of the first extended Unicode
+      character.
 
       Let the first number be a and the second b. The encoded
       character code is then
