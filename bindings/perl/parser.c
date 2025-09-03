@@ -23,7 +23,7 @@ static void *make_number(uint8_t *, size_t, unsigned);
 
 static void *make_string(void);
 static int add_2_string(uint8_t *, size_t, void *);
-static int add_uni_2_string(uint32_t, void *);
+static int add_char_2_string(uint32_t, void *);
 
 static void *make_av(void);
 static int add_2_av(void *, void *);
@@ -34,22 +34,22 @@ static void free_obj(void *);
 
 /*  variables */
 static struct uni_json_p_binding binding = {
-    .on_error =		on_error,
+    .on_error =			on_error,
 
-    .make_bool =	make_bool,
-    .make_null =	make_null,
+    .make_bool =		make_bool,
+    .make_null =		make_null,
 
-    .make_number =	make_number,
-    .free_number =	free_obj,
+    .make_number =		make_number,
+    .free_number =		free_obj,
 
-    .make_string =	make_string,
-    .free_string =	free_obj,
-    .add_2_string =	add_2_string,
-    .add_uni_2_string =	add_uni_2_string,
+    .make_string =		make_string,
+    .free_string =		free_obj,
+    .add_2_string =		add_2_string,
+    .add_char_2_string =	add_char_2_string,
 
-    .make_array =	make_av,
-    .free_array =	free_obj,
-    .add_2_array =	add_2_av
+    .make_array =		make_av,
+    .free_array =		free_obj,
+    .add_2_array =		add_2_av
 };
 
 /*  routines */
@@ -121,12 +121,12 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
     return 1;
 }
 
-static int add_uni_2_string(uint32_t uni_char, void *str)
+static int add_char_2_string(uint32_t chr, void *str)
 {
     dTHX;
     uint8_t buf[UTF8_MAXBYTES + 1], *e;
 
-    e = uvchr_to_utf8(buf, uni_char);
+    e = uvchr_to_utf8(buf, chr);
     return add_2_string(buf, e - buf, str);
 }
 

@@ -291,7 +291,7 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
         return -1;
     }
 
-    rc = binds->add_uni_2_string(chr, str);
+    rc = binds->add_char_2_string(chr, str);
     if (!rc) {
         pstate->err.code = UJ_E_ADD;
         pstate->err.pos = pstate->p - 1;
