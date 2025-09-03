@@ -95,6 +95,13 @@ void *parse_object(struct pstate *pstate, struct uni_json_p_binding *binds)
     void *obj;
     int rc;
 
+    ++pstate->level;
+    if (pstate->level > uni_json_max_nesting) {
+        pstate->err.code = UJ_E_TOO_DEEP;
+        pstate->err.pos = pstate->p;
+        return NULL;
+    }
+
     obj = binds->make_object();
     ++pstate->p;
 
@@ -105,5 +112,6 @@ void *parse_object(struct pstate *pstate, struct uni_json_p_binding *binds)
     }
 
     pstate->last_type = T_OBJ;
+    --pstate->level;
     return obj;
 }
