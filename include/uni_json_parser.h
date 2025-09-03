@@ -27,7 +27,8 @@ enum {
     UJ_E_INV_UTF8,               /* illegal UTF-8 sequence */
     UJ_E_INV_ESC,                /* illegal escape sequence */
     UJ_E_INV_KEY,                /* object key is no string */
-    UJ_E_NO_KEY                  /* missing key in object */
+    UJ_E_NO_KEY,                 /* missing key in object */
+    UJ_E_TOO_DEEP                /* too many levels of nesting */
 };
 
 /*   types */
