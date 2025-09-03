@@ -146,7 +146,7 @@ static int add_2_av(void *v, void *ary)
 static void *make_hv(void)
 {
     dTHX;
-    return newRV_noinv((SV *)newHV());
+    return newRV_noinc((SV *)newHV());
 }
 
 static int add_2_hv(void *key, void *value, void *obj)
@@ -154,7 +154,7 @@ static int add_2_hv(void *key, void *value, void *obj)
     dTHX;
     HE *he;
 
-    he = hv_store_ent((HV *)SvRV((SV *)obj), key, value);
+    he = hv_store_ent((HV *)SvRV((SV *)obj), key, value, 0);
     if (!he) return 0;
 
     free_obj(key);

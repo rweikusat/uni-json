@@ -41,14 +41,14 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
         if (c == -1) return -1;
     } else
         do {
-            c = have_one_of(pstate, ':');
+            c = have_one_of(pstate, ":");
             if (c == -1) {
-                binds->free_string(key);
+                binds->free_string(k);
                 return -1;
             }
 
-            v = parse_value(binds, pstate);
-            if (!v || (iunt *)v == &no_value) {
+            v = parse_value(pstate, binds);
+            if (!v || (int *)v == &no_value) {
                 binds->free_string(k);
 
                 if ((int *)v == &no_value) {
