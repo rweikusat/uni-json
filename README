@@ -1,9 +1,10 @@
 Universal Json
 ==============
 
-This is a project in development. So far, it should be capable of
-parsing literals, numbers, strings arrays. Perl-bindings and
-test-suite for these exist. The way to run it from the top-level is
+This is a project in development. The parser is complete now, Perl
+bindings for it are fully functional and it should have a full set of
+test cases. There still no installation support. The test suite can be
+run with.
 
 make
 make -C bindings/perl test TEST_VERBOSE=1
@@ -11,11 +12,8 @@ make -C bindings/perl test TEST_VERBOSE=1
 TEST_VERBOSE isn't strictly necessary, it just causes some output
 showing what is actually being tested.
 
-There's so far no support for installing any of this anywhere.
-
-Code for handling "surrogate pair" escapes has been written and is
-known to compile but it wasn't tested so far.
-
+The code should also be able to catch all instances of out-of-spec or
+erroneous UTF-8-like encodings.
 
 Plan
 ----
