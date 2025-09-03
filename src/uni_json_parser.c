@@ -144,6 +144,7 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
 
     pstate.p = data;
     pstate.e = data + len;
+    pstate.level = 0;
 
     v = parse_value(&pstate, binds);
 
