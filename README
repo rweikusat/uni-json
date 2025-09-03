@@ -4,7 +4,7 @@ Universal Json
 This is a project in development. The parser is complete now, Perl
 bindings for it are fully functional and it should have a full set of
 test cases. There still no installation support. The test suite can be
-run with.
+run with
 
 make
 make -C bindings/perl test TEST_VERBOSE=1
@@ -12,7 +12,7 @@ make -C bindings/perl test TEST_VERBOSE=1
 TEST_VERBOSE isn't strictly necessary, it just causes some output
 showing what is actually being tested.
 
-The code should also be able to catch all instances of out-of-spec or
+The code should be able to catch all instances of out-of-spec or
 erroneous UTF-8-like encodings.
 
 Plan
