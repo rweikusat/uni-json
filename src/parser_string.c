@@ -8,6 +8,7 @@
 
 /*  includes */
 #include <stddef.h>
+#include <stdio.h>
 
 #include "uni_json_parser.h"
 #include "uni_json_p_binding.h"
@@ -252,17 +253,16 @@ static uint32_t parse_u_esc(struct pstate *pstate)
     if (v0 >= SURR_FROM && v0 <= SURR_TO) {
         if (v0 >= SURR_LO) return -1;
 
+        p += 4;
         if (e - p < 2 || *p++ != '\\' || *p++ != 'u')
             return -1;
 
-        v1 = parse_4dg_hex(p, p);
+        v1 = parse_4dg_hex(p, e);
         if (v1 == (uint32_t)-1
             || v1 < SURR_LO || v1 > SURR_TO) return -1;
         v0 &= 0x3ff;
-        v0 = v0 << 10 | (v1 & 0x3ff);
+        v0 = (v0 << 10) | (v1 & 0x3ff);
         v0 += 0x10000;
-
-        p += 4;
     }
 
     pstate->p = p + 4;
