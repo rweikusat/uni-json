@@ -34,6 +34,9 @@ enum {
 /*   types */
 struct uni_json_p_binding;
 
+/*  variables */
+extern unsigned uni_json_max_nesting;
+
 /*  routines */
 char *uni_json_ec_2_msg(unsigned);
 void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *bind);
