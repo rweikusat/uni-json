@@ -25,6 +25,7 @@ enum {
 struct pstate {
     uint8_t *p, *e;
     int last_type;
+    unsigned level;
 
     struct {
         unsigned code;
