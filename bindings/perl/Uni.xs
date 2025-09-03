@@ -12,6 +12,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "uni_json_parser.h"
+
 /*  prototypes */
 void *parse(uint8_t *, size_t);
 
@@ -29,3 +31,17 @@ CODE:
         RETVAL = parse(d, len);
 OUTPUT:
 	RETVAL
+
+unsigned
+max_nesting()
+CODE:
+	RETVAL = uni_json_max_nesting;
+OUTPUT:
+	RETVAL
+
+void
+set_max_nesting(max)
+	unsigned max
+CODE:
+	uni_json_max_nesting = max;
+        
