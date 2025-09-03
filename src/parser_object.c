@@ -28,19 +28,20 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
     pos = pstate->p;
     k = parse_value(pstate, binds);
     if (!k) return -1;
-    if (pstate->last_type != T_STR) {
-        free_obj(pstate->last_type, k, binds);
 
-        pstate->err.code = UJ_E_INV_KEY;
-        pstate->err.pos = pos;
-        return -1;
-    }
-
-    if ((int *)v == &no_value) {
+    if ((int *)k == &no_value) {
         c = have_one_of(pstate, "}");
         if (c == -1) return -1;
-    } else
+    } else {
         do {
+            if (pstate->last_type != T_STR) {
+                free_obj(pstate->last_type, k, binds);
+
+                pstate->err.code = UJ_E_INV_KEY;
+                pstate->err.pos = pos;
+                return -1;
+            }
+
             c = have_one_of(pstate, ":");
             if (c == -1) {
                 binds->free_string(k);
@@ -82,16 +83,9 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
                     pstate->err.pos = pstate->p;
                     return -1;
                 }
-
-                if (pstate->last_type != T_STR) {
-                    free_obj(pstate->last_type, k, binds);
-
-                    pstate->err.code = UJ_E_INV_KEY;
-                    pstate->err.pos = pos;
-                    return -1;
-                }
             }
         } while (c == ',');
+    }
 
     return 0;
 }
