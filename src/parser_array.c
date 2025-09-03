@@ -64,6 +64,13 @@ void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds)
     void *ary;
     int rc;
 
+    ++pstate->level;
+    if (pstate->level > uni_json_max_nesting) {
+        pstate->err.code = UJ_E_TOO_DEEP;
+        pstate->err.pos = pstate->p;
+        return NULL;
+    }
+
     ary = binds->make_array();
     ++pstate->p;
 
@@ -74,5 +81,6 @@ void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds)
     }
 
     pstate->last_type = T_ARY;
+    --pstate->level;
     return ary;
 }
