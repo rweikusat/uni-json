@@ -80,6 +80,7 @@ static char *ec_msg_map[] = {
 };
 
 int no_value _hidden_;
+unsigned uni_json_max_nesting = -1;
 
 /*  routines */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *)
