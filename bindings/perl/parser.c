@@ -29,6 +29,7 @@ static void *make_av(void);
 static int add_2_av(void *, void *);
 
 static void *make_hv(void);
+static int add_2_hv(void *, void *, void *);
 
 static void free_obj(void *);
 
@@ -49,7 +50,11 @@ static struct uni_json_p_binding binding = {
 
     .make_array =		make_av,
     .free_array =		free_obj,
-    .add_2_array =		add_2_av
+    .add_2_array =		add_2_av,
+
+    .make_object =		make_hv,
+    .free_object =		free_obj,
+    .add_2_object =		add_2_hv
 };
 
 /*  routines */
@@ -58,11 +63,6 @@ static void on_error(unsigned code, size_t pos)
     croak_nocontext("%s (%u) at %zu", uni_json_ec_2_msg(code), code, pos);
 }
 
-static void *make_hv(void)
-{
-    dTHX;
-    return newHV();
-}
 
 static void *make_null(void)
 {
@@ -139,7 +139,25 @@ static void *make_av(void)
 static int add_2_av(void *v, void *ary)
 {
     dTHX;
-    av_push((AV *)SvRV((SV*)ary), v);
+    av_push((AV *)SvRV((SV *)ary), v);
+    return 1;
+}
+
+static void *make_hv(void)
+{
+    dTHX;
+    return newRV_noinv((SV *)newHV());
+}
+
+static int add_2_hv(void *key, void *value, void *obj)
+{
+    dTHX;
+    HE *he;
+
+    he = hv_store_ent((HV *)SvRV((SV *)obj), key, value);
+    if (!he) return 0;
+
+    free_obj(key);
     return 1;
 }
 
