@@ -271,31 +271,19 @@ static uint32_t parse_u_esc(struct pstate *pstate)
 static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
                      void *str)
 {
-    uint8_t *p_esc;
-    uint32_t uni_c;
+    uint32_t chr;
     int rc;
 
     if (pstate->p == pstate->e) return -1;
 
-    p_esc = escs + *pstate->p;
-    switch (*p_esc) {
+    chr = escs[*pstate->p++];
+    switch (chr) {
+    default:
+        break;
+
     case 'u':
-        ++pstate->p;
-        uni_c = parse_u_esc(pstate);
-        if (uni_c == (uint32_t)-1) {
-            pstate->err.code = UJ_E_INV_ESC;
-            pstate->err.pos = pstate->p;
-            return -1;
-        }
-
-        rc = binds->add_uni_2_string(uni_c, str);
-        if (!rc) {
-            pstate->err.code = UJ_E_ADD;
-            pstate->err.pos = pstate->p;
-            return -1;
-        }
-
-        return 0;
+        chr = parse_u_esc(pstate);
+        if (chr != (uint32_t)-1) break;
 
     case 0:
         pstate->err.code = UJ_E_INV_ESC;
@@ -303,14 +291,13 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
         return -1;
     }
 
-    rc = binds->add_2_string(p_esc, 1, str);
+    rc = binds->add_uni_2_string(chr, str);
     if (!rc) {
         pstate->err.code = UJ_E_ADD;
-        pstate->err.pos = pstate->p;
+        pstate->err.pos = pstate->p - 1;
         return -1;
     }
 
-    ++pstate->p;
     return 0;
 }
 
