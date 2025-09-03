@@ -14,5 +14,5 @@ is_deeply($x, {}, 'parsing empty object works');
 $x = parse_json('{"emil": 43 }');
 is_deeply($x, { emil => 43 }, 'parsing object with one kv-pair works');
 
-$x = parse_json('{ "emil" : 43, "anna" : null }');
-is_deeply($x, { emil => 43, anna => undef}, 'parsing object with more than one kv-pair works');
+$x = parse_json('{ "emil" : 43, "anna" : [1, 2, 3] }');
+is_deeply($x, { emil => 43, anna => [1, 2, 3]}, 'parsing object with more than one kv-pair works');
