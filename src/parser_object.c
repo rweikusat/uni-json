@@ -59,20 +59,20 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
     return 0;
 }
 
-void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds)
+void *parse_object(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
-    void *ary;
+    void *obj;
     int rc;
 
-    ary = binds->make_array();
+    obj = binds->make_object();
     ++pstate->p;
 
-    rc = parse_array_content(pstate, binds, ary);
+    rc = parse_object_content(pstate, binds, obj);
     if (rc == -1) {
-        binds->free_array(ary);
+        binds->free_array(obj);
         return NULL;
     }
 
-    pstate->last_type = T_ARY;
-    return ary;
+    pstate->last_type = T_OBJ;
+    return obj;
 }
