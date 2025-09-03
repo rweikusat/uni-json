@@ -73,7 +73,8 @@ static char *ec_msg_map[] = {
     [UJ_E_INV_CHAR] =	"illegal char in string",
     [UJ_E_INV_UTF8] =	"illegal UTF-8 sequence",
     [UJ_E_INV_ESC] =	"illegal escape sequence",
-    [UJ_E_INV_KEY] =	"object key is no string"
+    [UJ_E_INV_KEY] =	"object key is no string",
+    [UJ_E_NO_KEY] =	"missing key in object"
 };
 
 int no_value _hidden_;
