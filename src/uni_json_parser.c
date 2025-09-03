@@ -18,6 +18,7 @@
 #include "parser_array.h"
 #include "parser_literals.h"
 #include "parser_number.h"
+#include "parser_object.h"
 #include "parser_string.h"
 
 /*  types */
@@ -58,6 +59,7 @@ static parse_func *tok_map[256] = {
     ['"'] =		parse_string,
 
     ['['] =		parse_array,
+    ['{'] =		parse_object
 };
 
 static char *ec_msg_map[] = {
