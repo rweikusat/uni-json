@@ -117,8 +117,12 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 
       (sizeof(int) - 1) * 8 + n - 1
 
-      with *p being a valid start of an UTF-8 sequences if it's either
-      1, 2 or 3.
+      which means that *p is a valid start of an UTF-8 sequence if the
+      value of
+
+      __builtin_clrsb(*(int8_t *)p) - (sizeof(int) - 1) * 8
+
+      is either 1, 2 or 3.
     */
     sp_ndx = __builtin_clrsb(*(int8_t *)p) - (sizeof(int) - 1) * 8;
     if (sp_ndx < 1 || sp_ndx > 3) return NULL;
