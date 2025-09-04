@@ -46,9 +46,7 @@ enum {
 
 /*  types */
 struct utf8_seq {
-    unsigned marker,            /* fixed bit pattern in 1st byte */
-        first_val,              /* all value bits in 1st byte */
-        ovmask0, ovmask1,       /* bitmasks for detecting overlong encodings */
+    unsigned ovmask0, ovmask1, /* bitmasks for detecting overlong encodings */
         v_len;                  /* number of values bytes after 1st */
 };
 
@@ -66,25 +64,16 @@ struct utf8_seq {
 */
 static struct utf8_seq utf8_seqs[] = {
     {
-        .marker =	0xc0,
-        .first_val =	31,
         .ovmask0 =	30,
         .v_len =	1 },
     {
-        .marker =	0xe0,
-        .first_val =	15,
         .ovmask0 =	15,
         .ovmask1 =	32,
         .v_len =	2 },
     {
-        .marker =	0xf0,
-        .first_val =	7,
         .ovmask0 =	7,
         .ovmask1 =	48,
         .v_len =	3 },
-
-    {
-        .marker =	0 }
 };
 
 static uint8_t escs[256] = {
@@ -105,34 +94,36 @@ static inline int no_val_byte(unsigned c)
     return (c & 0xc0) != 0x80;
 }
 
-static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
+uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
-    unsigned c, marker, maybe_long;
+    unsigned c, maybe_long, sp_ndx;
     uint32_t tbs;               /* three-byte sequence */
 
-    c = *p;
-    sp = utf8_seqs;
-    marker = sp->marker;
-    do {
-        /*
-          The first byte of a UTF-8 sequence is bit-wise either
+    /*
+      Explanation of the expression below:
 
-          110xxxxx
-          1110xxxx
-          11110xxx
+      A valid UTF-8 sequences start bit-wise either with
 
-          with x denoting a value bit. Hence, when testing from
-          shortest to longest, masking out the current set of value
-          bits will only result in the current marker value if the
-          actual marker is the current marker.
-         */
-        if ((c & ~sp->first_val) == marker) break;
-        ++sp;
-    } while (marker = sp->marker, marker);
-    if (!marker) return NULL;
+      110xxxxx
+      1110xxxx
+      11110xxx
 
-    tbs = c << 16;
+      The value of *(int8_t *)p is *p sign-extended to the size of an
+      int. The __builtin_clrsb function returns the number of bits
+      below the highest bit ("sign bit") in its int argument which are
+      identical to it. If the number of leading 1 bits in *p is n, the
+      return value will thus be
+
+      (sizeof(int) - 1) * 8 + n - 1
+
+      with *p being a valid start of an UTF-8 sequences if it's either
+      1, 2 or 3.
+    */
+    sp_ndx = __builtin_clrsb(*(int8_t *)p) - (sizeof(int) - 1) * 8;
+    if (sp_ndx < 1 || sp_ndx > 3) return NULL;
+    sp = utf8_seqs + sp_ndx - 1;
+    tbs = *p << 16;
 
     /*
       An UTF-8 sequence is said to be overlong if it uses a
