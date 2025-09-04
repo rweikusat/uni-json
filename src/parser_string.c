@@ -103,7 +103,7 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     /*
       Explanation of the expression below:
 
-      A valid UTF-8 sequences start bit-wise either with
+      A valid UTF-8 sequences starts bit-wise either with
 
       110xxxxx
       1110xxxx
