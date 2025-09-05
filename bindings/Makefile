@@ -1,10 +1,13 @@
 # uni-json bindings Makefile
 #
 
-.PHONY: perl
+.PHONY: perl install
 
 perl: perl/Makefile
-	make -C perl
+	$(MAKE) -C perl
 
 perl/Makefile: perl/Makefile.PL
 	cd perl && perl Makefile.PL
+
+install: perl
+	$(MAKE) -C perl install

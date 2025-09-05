@@ -37,6 +37,8 @@ endif
 #**  installation
 #
 PREFIX ?=	/usr/local
+export PREFIX
+
 MULTI :=	$(shell gcc -print-multiarch)
 
 TARGET :=	$(DESTDIR)$(PREFIX)
@@ -58,6 +60,7 @@ install: all
 	$(INST_D) $(HDRS) $(TARGET_INC)
 	$(INST_D) bin/$(LIB) $(TARGET_LIB)
 	cd $(TARGET_LIB) && ln -sf $(LIB) $(L_MAJ) && ln -sf $(LIB) $(L_BASE)
+	$(MAKE) -C bindings install
 
 clean:
 	-rm tmp/*o
