@@ -16,7 +16,7 @@ erroneous UTF-8-like encodings.
 
 There's meanwile an install target and also, support for building a
 Debian package including the library and Perl language
-bindings. Details are in the INBSTALL file.
+bindings. Details are in the INSTALL file.
 
 
 Plan
