@@ -50,10 +50,13 @@ TARGET_INC :=	$(TARGET)/include
 
 #*  targets
 #
-.PHONY: all clean install
+.PHONY: all clean install deb
 
 all: bin/$(L_MAJ) bin/$(L_BASE)
 	$(MAKE) -C bindings
+
+deb:
+	fakeroot debian/rules binary
 
 install: all
 	$(INST_X) -d $(TARGET_INC) $(TARGET_LIB)
