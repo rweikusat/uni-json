@@ -37,7 +37,6 @@ endif
 #**  installation
 #
 PREFIX :=	$(shell cat PREFIX)
-export PREFIX
 
 MULTI :=	$(shell gcc -print-multiarch)
 
