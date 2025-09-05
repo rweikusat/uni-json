@@ -7,12 +7,15 @@
 GCC :=		gcc
 CC :=		$(GCC) -Iinclude
 LD :=		$(GCC)
+INST_D :=	install -m 0644
+INST_X :=	install -m 0755
 
 #**  files
 #
 SRCS :=		$(shell ls src/*.c)
 OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
 DEPS :=		$(OBJS:.o=.d)
+HDRS :=		$(addprefix include/, uni_json_parser.h uni_json_p_binding.h)
 
 #**  library
 #
@@ -31,15 +34,29 @@ ifdef FINAL
 CFLAGS :=	-O2 $(CFLAGS)
 endif
 
+#**  installation
+#
+PREFIX ?=	/usr/local
+MULTI :=	$(shell gcc -print-mulitarch)
+
+TARGET :=	$(DESTDIR)$(PREFIX)
+TARBET_LIB :=	$(TARGET)/lib/$(MULTI)
+TARGET_INC :=	$(TARGET)/include
+
 #**  lib version
 #
 
 #*  targets
 #
-.PHONY: all clean
+.PHONY: all clean install
 
 all: bin/$(L_MAJ) bin/$(L_BASE)
 	$(MAKE) -C bindings
+
+install: all
+	$(INST_X) -d $(TARGET_INC) $(TARGET_LIB)
+	$(INST_D) $(HDRS) $(TARGET_INC)
+	$(INST_D) $(BIN)/$(LIB) $(TARGET_LIB)
 
 clean:
 	-rm tmp/*o
