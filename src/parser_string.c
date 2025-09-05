@@ -95,7 +95,7 @@ static inline int no_val_byte(unsigned c)
 uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
-    unsigned c, maybe_long, seq_len;
+    unsigned maybe_long, seq_len;
     uint32_t tbs;               /* three-byte sequence */
 
     /*
@@ -125,8 +125,7 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     seq_len = __builtin_clz(~*(int8_t *)p) - (sizeof(int) - 1) * 8;
     if (seq_len < 2 || seq_len > 4) return NULL;
     sp = utf8_seqs + seq_len;
-    c = *p;
-    tbs = c << 16;
+    tbs = *p << 16;
 
     /*
       An UTF-8 sequence is said to be overlong if it uses a
@@ -140,18 +139,18 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
       first byte are clear and all ovmask1 bits in the second byte,
       too.
     */
-    maybe_long = (c & sp->ovmask0) == 0;
+    maybe_long = (*p & sp->ovmask0) == 0;
 
-    c = *++p;
+    ++p;
     if (p == e) return NULL;
-    if (no_val_byte(c)) return NULL;
+    if (no_val_byte(*p)) return NULL;
     if (maybe_long
         /*
           Redundant for 2-byte sequences but it won't affect the
           result and avoids a special-case.
         */
-        && (c & sp->ovmask1) == 0) return NULL;
-    tbs |= c << 8;
+        && (*p & sp->ovmask1) == 0) return NULL;
+    tbs |= *p << 8;
 
     switch (seq_len) {
     case 4:
@@ -160,10 +159,10 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
         if (no_val_byte(*p)) return NULL;
 
     case 3:
-        c = *++p;
+        ++p;
         if (p == e) return NULL;
-        if (no_val_byte(c)) return NULL;
-        tbs |= c;
+        if (no_val_byte(*p)) return NULL;
+        tbs |= *p;
     }
 
     if (seq_len == 3
