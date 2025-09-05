@@ -1,0 +1,27 @@
+Installation Instructions
+=========================
+
+Prerquisites
+------------
+
+	- gcc
+        - GNU make
+        - perl (for Perl bindings)
+        - debhelper (for building a debian package)
+
+
+Procedure
+---------
+
+make
+make install
+
+All files will be installed below the top-level directory specifed in
+the PREFIX file. Default is /usr/local, edit the file to change this.
+
+The Makefile also supports the DESTDIR mechanism for relocating the
+tree that's be installed at installation time.
+
+make deb
+
+can be used to build a Debian package.
