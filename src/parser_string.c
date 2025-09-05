@@ -46,8 +46,7 @@ enum {
 
 /*  types */
 struct utf8_seq {
-    unsigned ovmask0, ovmask1, /* bitmasks for detecting overlong encodings */
-        v_len;                  /* number of values bytes after 1st */
+    unsigned ovmask0, ovmask1; /* bitmasks for detecting overlong encodings */
 };
 
 /*  variables */
@@ -63,17 +62,16 @@ struct utf8_seq {
    0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 */
 static struct utf8_seq utf8_seqs[] = {
-    {
-        .ovmask0 =	30,
-        .v_len =	1 },
-    {
+    [2] = {
+        .ovmask0 =	30 },
+
+    [3] = {
         .ovmask0 =	15,
-        .ovmask1 =	32,
-        .v_len =	2 },
-    {
+        .ovmask1 =	32 },
+
+    [4] = {
         .ovmask0 =	7,
-        .ovmask1 =	48,
-        .v_len =	3 },
+        .ovmask1 =	48 }
 };
 
 static uint8_t escs[256] = {
@@ -97,7 +95,7 @@ static inline int no_val_byte(unsigned c)
 uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
-    unsigned c, maybe_long, sp_ndx;
+    unsigned c, maybe_long, seq_len;
     uint32_t tbs;               /* three-byte sequence */
 
     /*
@@ -110,24 +108,25 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
       11110xxx
 
       The value of *(int8_t *)p is *p sign-extended to the size of an
-      int. The __builtin_clrsb function returns the number of bits
-      below the highest bit ("sign bit") in its int argument which are
-      identical to it. If the number of leading 1 bits in *p is n, the
-      return value will thus be
+      int. The __builtin_clz function returns the number of leading 0
+      bits in its operand. If the number of leading 1 bits in byte *p
+      is n, the return value of __builtint_clz(~*(int8_t *)p) will
+      thus be
 
-      (sizeof(int) - 1) * 8 + n - 1
+      (sizeof(int) - 1) * 8 + n
 
       which means that *p is a valid start of an UTF-8 sequence if the
       value of
 
-      __builtin_clrsb(*(int8_t *)p) - (sizeof(int) - 1) * 8
+      __builtin_clz(~*(int8_t *)p) - (sizeof(int) - 1) * 8
 
-      is either 1, 2 or 3.
+      is either 2, 3 or 4.
     */
-    sp_ndx = __builtin_clrsb(*(int8_t *)p) - (sizeof(int) - 1) * 8;
-    if (sp_ndx < 1 || sp_ndx > 3) return NULL;
-    sp = utf8_seqs + sp_ndx - 1;
-    tbs = *p << 16;
+    seq_len = __builtin_clz(~*(int8_t *)p) - (sizeof(int) - 1) * 8;
+    if (seq_len < 2 || seq_len > 4) return NULL;
+    sp = utf8_seqs + seq_len;
+    c = *p;
+    tbs = c << 16;
 
     /*
       An UTF-8 sequence is said to be overlong if it uses a
@@ -141,7 +140,7 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
       first byte are clear and all ovmask1 bits in the second byte,
       too.
     */
-    maybe_long = (*p & sp->ovmask0) == 0;
+    maybe_long = (c & sp->ovmask0) == 0;
 
     c = *++p;
     if (p == e) return NULL;
@@ -154,20 +153,20 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
         && (c & sp->ovmask1) == 0) return NULL;
     tbs |= c << 8;
 
-    switch (sp->v_len) {
-    case 3:
+    switch (seq_len) {
+    case 4:
         ++p;
         if (p == e) return NULL;
         if (no_val_byte(*p)) return NULL;
 
-    case 2:
+    case 3:
         c = *++p;
         if (p == e) return NULL;
         if (no_val_byte(c)) return NULL;
         tbs |= c;
     }
 
-    if (sp->v_len == 2
+    if (seq_len == 3
         && tbs >= UTF8_SURR_MIN
         && tbs <= UTF8_SURR_MAX) return NULL;
 
