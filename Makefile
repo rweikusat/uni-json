@@ -36,7 +36,7 @@ endif
 
 #**  installation
 #
-PREFIX ?=	/usr/local
+PREFIX :=	$(shell cat PREFIX)
 export PREFIX
 
 MULTI :=	$(shell gcc -print-multiarch)
