@@ -3,8 +3,7 @@ Universal Json
 
 This is a project in development. The parser is complete now, Perl
 bindings for it are fully functional and it should have a full set of
-test cases. There still no installation support. The test suite can be
-run with
+test cases. The test suite can be run with
 
 make
 make -C bindings/perl test TEST_VERBOSE=1
@@ -14,6 +13,10 @@ showing what is actually being tested.
 
 The code should be able to catch all instances of out-of-spec or
 erroneous UTF-8-like encodings.
+
+There's meanwile an install target and also, support for building a
+Debian package including the library and Perl language bindings.
+
 
 Plan
 ----
