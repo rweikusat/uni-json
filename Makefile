@@ -30,7 +30,7 @@ LIB :=		$(L_MAJ).$(V_MIN)
 #
 CFLAGS :=	-g -W -Wall -Wno-pointer-sign -Wno-implicit-fallthrough
 
-ifdef FINAL
+ifndef DEV
 CFLAGS :=	-O2 $(CFLAGS)
 endif
 
