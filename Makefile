@@ -37,10 +37,10 @@ endif
 #**  installation
 #
 PREFIX ?=	/usr/local
-MULTI :=	$(shell gcc -print-mulitarch)
+MULTI :=	$(shell gcc -print-multiarch)
 
 TARGET :=	$(DESTDIR)$(PREFIX)
-TARBET_LIB :=	$(TARGET)/lib/$(MULTI)
+TARGET_LIB :=	$(TARGET)/lib/$(MULTI)
 TARGET_INC :=	$(TARGET)/include
 
 #**  lib version
@@ -56,7 +56,8 @@ all: bin/$(L_MAJ) bin/$(L_BASE)
 install: all
 	$(INST_X) -d $(TARGET_INC) $(TARGET_LIB)
 	$(INST_D) $(HDRS) $(TARGET_INC)
-	$(INST_D) $(BIN)/$(LIB) $(TARGET_LIB)
+	$(INST_D) bin/$(LIB) $(TARGET_LIB)
+	cd $(TARGET_LIB) && ln -sf $(LIB) $(L_MAJ) && ln -sf $(LIB) $(L_BASE)
 
 clean:
 	-rm tmp/*o
