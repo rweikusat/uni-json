@@ -67,6 +67,7 @@ install: all
 clean:
 	-rm tmp/*o
 	-rm bin/*
+	$(MAKE) -C bindings clean
 
 bin/$(LIB): $(OBJS)
 
