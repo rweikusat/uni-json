@@ -1,1 +1,7 @@
-/usr/local
+# installation prefix
+#
+# This file will be sourced by a shell and must
+# define a PRDFIX variables
+#
+
+PREFIX=/usr/local
