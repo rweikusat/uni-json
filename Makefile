@@ -36,7 +36,7 @@ endif
 
 #**  installation
 #
-PREFIX :=	$(shell cat PREFIX)
+PREFIX :=	$(shell scripts/read-prefix ./PREFIX)
 
 MULTI :=	$(shell gcc -print-multiarch)
 
