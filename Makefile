@@ -65,7 +65,7 @@ install: all
 	$(MAKE) -C bindings install
 
 clean:
-	-rm tmp/*o
+	-rm tmp/*.o tmp/*.d
 	-rm bin/*
 	$(MAKE) -C bindings clean
 
