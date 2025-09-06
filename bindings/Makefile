@@ -3,7 +3,14 @@
 
 PRE_FILE :=	../PREFIX
 
-.PHONY: perl install
+.PHONY: all perl install clean
+
+all: perl
+
+install: perl
+	$(MAKE) -C perl install
+
+clean: clean-perl
 
 perl: perl/Makefile
 	$(MAKE) -C perl
@@ -11,5 +18,6 @@ perl: perl/Makefile
 perl/Makefile: perl/Makefile.PL $(PRE_FILE)
 	cd perl && perl Makefile.PL INSTALL_BASE=$(shell ../scripts/read-prefix $(PRE_FILE))
 
-install: perl
-	$(MAKE) -C perl install
+
+clean-perl:
+	test -f perl/Makefile && $(MAKE) -C perl clean || true
