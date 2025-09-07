@@ -299,27 +299,25 @@ unsigned utf8_encode(uint32_t c, uint8_t *p)
     unsigned len;
 
     len = utf8_seq_len(c);
-    if (len == 1) {
-        *p = c;
-        return 1;
+    if (len > 1) {
+        switch (len) {
+        case 4:
+            p[3] = 0x80 | (c & 0x3f);
+            c >>= 6;
+
+        case 3:
+            p[2] = 0x80 | (c & 0x3f);
+            c >>= 6;
+
+        case 2:
+            p[1] = 0x80 | (c & 0x3f);
+            c >>= 6;
+        }
+
+        c |= 0xff << (8 - len);
     }
 
-    p += len;
-    switch (len) {
-    case 4:
-        *--p = 0x80 | (c & 0x3f);
-        c >>= 6;
-
-    case 3:
-        *--p = 0x80 | (c & 0x3f);
-        c >>= 6;
-
-    case 2:
-        *--p = 0x80 | (c & 0x3f);
-        c >>= 6;
-    }
-
-    *--p = 0xff << (8 - len) | c;
+    *p = c;
     return len;
 }
 
