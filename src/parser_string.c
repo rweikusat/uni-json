@@ -35,7 +35,13 @@ enum {
       characters.
     */
     UTF8_SURR_MIN =	0xedad80, /* 0xd800 as 3-byte UTF-8 sequence */
-    UTF8_SURR_MAX =	0xedbfbf  /* ditto for 0xdfff */
+    UTF8_SURR_MAX =	0xedbfbf,  /* ditto for 0xdfff */
+
+    /*
+      "non-characters" (0xfffe, 0xffff)
+    */
+    NON_CHAR_FE =	0xefbfbe,
+    NON_CHAR_FF =	0xefbfbf
 };
 
 enum {
@@ -165,9 +171,13 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
         tbs |= *p;
     }
 
-    if (seq_len == 3
-        && tbs >= UTF8_SURR_MIN
-        && tbs <= UTF8_SURR_MAX) return NULL;
+    if (seq_len == 3) {
+        if (tbs >= UTF8_SURR_MIN && tbs <= UTF8_SURR_MAX)
+            return NULL;
+
+        if (tbs == NON_CHAR_FE || tbs == NON_CHAR_FF)
+            return NULL;
+    }
 
     return p + 1;
 }
