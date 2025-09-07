@@ -272,7 +272,7 @@ static uint32_t parse_u_esc(struct pstate *pstate)
     return v0;
 }
 
-static unsigned utf8_seq_len(uint32_t c)
+unsigned utf8_seq_len(uint32_t c)
 {
     if (c < 0x100) return 1;
     if (c < 0x1000) return 2;
@@ -280,17 +280,18 @@ static unsigned utf8_seq_len(uint32_t c)
     return 4;
 }
 
-static unsigned utf8_encode(uint32_t c, uint8_t *p)
+unsigned utf8_encode(uint32_t c, uint8_t *p)
 {
     unsigned len;
 
     len = utf8_seq_len(c);
+    if (len == 1) {
+        *p = c;
+        return 1;
+    }
+
     p += len;
     switch (len) {
-    case 1:
-        *--p = c;
-        return 1;
-
     case 4:
         *--p = 0x80 | (c & 0x3f);
         c >>= 6;
