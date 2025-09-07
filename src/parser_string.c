@@ -287,7 +287,12 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
 
     case 'u':
         chr = parse_u_esc(pstate);
-        if (chr != (uint32_t)-1) break;
+        if (chr == (uint32_t)-1) return -1;
+        if (chr >= UTF8_SURR_MIN && chr <= UTF8_SURR_MAX)
+            return -1;
+        if (chr == NON_CHAR_FE || chr == NON_CHAR_FF)
+            return -1;
+        break;
 
     case 0:
         pstate->err.code = UJ_E_INV_ESC;
