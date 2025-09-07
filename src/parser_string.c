@@ -272,10 +272,39 @@ static uint32_t parse_u_esc(struct pstate *pstate)
     return v0;
 }
 
+static unsigned utf8_encode(uint32_t c, uint8_t *p)
+{
+    unsigned len;
+
+    len = utf8_seq_len(c);
+    p += len;
+    switch (len) {
+    case 1:
+        *--p = c;
+        return 1;
+
+    case 4:
+        *--p = 0x80 | (c & 0x3f);
+        c >>= 6;
+
+    case 3:
+        *--p = 0x80 | (c & 0x3f);
+        c >>= 6;
+
+    case 2:
+        *--p = 0x80 | (c & 0x3f);
+        c >>= 6;
+    }
+
+    *--p = 0xff << (8 - len) | c;
+    return len;
+}
+
 static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
                      void *str)
 {
     uint32_t chr;
+    uint8_t utf_buf[4];
     int rc;
 
     if (pstate->p == pstate->e) return -1;
@@ -300,7 +329,8 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
         return -1;
     }
 
-    rc = binds->add_char_2_string(chr, str);
+    rc = utf8_encode(chr, utf_buf);
+    rc = binds->add_2_string(utf_buf, rc, str);
     if (!rc) {
         pstate->err.code = UJ_E_ADD;
         pstate->err.pos = pstate->p - 1;
