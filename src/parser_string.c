@@ -41,7 +41,15 @@ enum {
       "non-characters" (0xfffe, 0xffff)
     */
     NON_CHAR_FE =	0xefbfbe,
-    NON_CHAR_FF =	0xefbfbf
+    NON_CHAR_FF =	0xefbfbf,
+
+    /*
+      RFC3629
+      -------
+      In UTF-8, characters from the U+0000..U+10FFFF range (the UTF-16
+      accessible range) are encoded using sequences of 1 to 4 octets.
+    */
+    UTF8_MAX =		0xf48fbfbf
 };
 
 enum {
@@ -102,7 +110,7 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
     unsigned maybe_long, seq_len;
-    uint32_t tbs;               /* three-byte sequence */
+    uint32_t enc_val;
 
     /*
       Explanation of the expression below:
@@ -131,7 +139,7 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     seq_len = __builtin_clz(~*(int8_t *)p) - (sizeof(int) - 1) * 8;
     if (seq_len < 2 || seq_len > 4) return NULL;
     sp = utf8_seqs + seq_len;
-    tbs = *p << 16;
+    enc_val = *p << 8;
 
     /*
       An UTF-8 sequence is said to be overlong if it uses a
@@ -156,27 +164,33 @@ uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
           result and avoids a special-case.
         */
         && (*p & sp->ovmask1) == 0) return NULL;
-    tbs |= *p << 8;
+    enc_val |= *p;
 
     switch (seq_len) {
     case 4:
         ++p;
         if (p == e) return NULL;
         if (no_val_byte(*p)) return NULL;
+        enc_val = (enc_val << 8) | *p;
 
     case 3:
         ++p;
         if (p == e) return NULL;
         if (no_val_byte(*p)) return NULL;
-        tbs |= *p;
+        enc_val = (enc_val << 8) | *p;
     }
 
-    if (seq_len == 3) {
-        if (tbs >= UTF8_SURR_MIN && tbs <= UTF8_SURR_MAX)
+    switch (seq_len) {
+    case 3:
+        if (enc_val >= UTF8_SURR_MIN && enc_val <= UTF8_SURR_MAX)
             return NULL;
 
-        if (tbs == NON_CHAR_FE || tbs == NON_CHAR_FF)
+        if (enc_val == NON_CHAR_FE || enc_val == NON_CHAR_FF)
             return NULL;
+        break;
+
+    case 4:
+        if (enc_val > UTF8_MAX) return NULL;
     }
 
     return p + 1;
