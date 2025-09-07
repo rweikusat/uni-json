@@ -286,7 +286,7 @@ static uint32_t parse_u_esc(struct pstate *pstate)
     return v0;
 }
 
-static unsigned utf8_seq_len(uint32_t c)
+static inline unsigned utf8_seq_len(uint32_t c)
 {
     if (c < 0x100) return 1;
     if (c < 0x1000) return 2;
