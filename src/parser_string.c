@@ -106,7 +106,7 @@ static inline int no_val_byte(unsigned c)
     return (c & 0xc0) != 0x80;
 }
 
-uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
+static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
     struct utf8_seq *sp;
     unsigned maybe_long, seq_len;
@@ -286,7 +286,7 @@ static uint32_t parse_u_esc(struct pstate *pstate)
     return v0;
 }
 
-unsigned utf8_seq_len(uint32_t c)
+static unsigned utf8_seq_len(uint32_t c)
 {
     if (c < 0x100) return 1;
     if (c < 0x1000) return 2;
@@ -294,7 +294,7 @@ unsigned utf8_seq_len(uint32_t c)
     return 4;
 }
 
-unsigned utf8_encode(uint32_t c, uint8_t *p)
+static unsigned utf8_encode(uint32_t c, uint8_t *p)
 {
     unsigned len;
 
