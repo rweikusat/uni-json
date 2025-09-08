@@ -18,9 +18,9 @@ enum {
     UJ_E_NO_VAL,                 /* missing value */
     UJ_E_INV_LIT,                /* invalid literal */
     UJ_E_GARBAGE,                /* garbage after value */
-    UJ_E_EOS,                    /* end of string in object */
-    UJ_E_INV_IN,                 /* invalid char in object */
-    UJ_E_ADD,                    /* failed to add value to object */
+    UJ_E_EOS,                    /* end of string in value */
+    UJ_E_INV_IN,                 /* invalid char in value */
+    UJ_E_ADD,                    /* failed to add value */
     UJ_E_LEADZ,                  /* leading zero in int part of number */
     UJ_E_NO_DGS,                 /* no digits in number part */
     UJ_E_INV_CHAR,               /* illegal char in string */
