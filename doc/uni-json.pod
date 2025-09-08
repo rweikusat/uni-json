@@ -21,7 +21,7 @@ enough to understand that one can be reasonably confident that it actually works
 of trying to shave off every couple of nanoseconds which could be save somewhere. In
 particular, this means it's a recursive-descent parser based on handling each individual
 syntactic construct with a dedicated function and selecting the function to parse a
-particular construct by doing a table-lookup of the first character of it.
+particular construct by doing a table-lookup of its first character..
 
 =head1 SEE ALSO
 
