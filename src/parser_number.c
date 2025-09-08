@@ -17,6 +17,12 @@
 /*  routines */
 static int skip_digits(struct pstate *pstate)
 {
+    /*
+      Consume a string of digits.
+
+      Returns 0 and advances the position if a string of digits was
+      found, otherwise, returns -1 and sets an error state.
+    */
     uint8_t *s, *p, *e;
 
     s = p = pstate->p;
@@ -43,12 +49,14 @@ void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
     dig_0 = s = pstate->p;
     flags = UJ_NF_INT;
 
+    /*  handle leading - */
     if (*pstate->p == '-') {
         ++pstate->p;
         ++dig_0;
         flags |= UJ_NF_NEG;
     }
 
+    /* handle integral part */
     rc = skip_digits(pstate);
     if (rc == -1) return NULL;
     if (*dig_0 == '0' && pstate->p - dig_0 > 1) {
@@ -58,6 +66,7 @@ void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
     }
 
     if (pstate->p < pstate->e) {
+        /* handle fractional part */
         if (*pstate->p == '.') {
             ++pstate->p;
             flags &= ~UJ_NF_INT;
@@ -68,6 +77,7 @@ void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
         }
 
         switch (*pstate->p) {
+            /* handle exponent */
         case 'e':
         case 'E':
             flags &= ~ UJ_NF_INT;
