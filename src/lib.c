@@ -38,7 +38,7 @@ void free_obj(int type, void *obj, struct uni_json_p_binding *binds)
 }
 
 
-int have_one_of(struct pstate *pstate, uint8_t *set)
+int skip_one_of(struct pstate *pstate, uint8_t *set)
 {
     uint8_t *p;
     int c, cs;

@@ -30,7 +30,7 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
     if (!k) return -1;
 
     if ((int *)k == &no_value) {
-        c = have_one_of(pstate, "}");
+        c = skip_one_of(pstate, "}");
         if (c == -1) return -1;
     } else {
         do {
@@ -42,7 +42,7 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
                 return -1;
             }
 
-            c = have_one_of(pstate, ":");
+            c = skip_one_of(pstate, ":");
             if (c == -1) {
                 binds->free_string(k);
                 return -1;
@@ -70,7 +70,7 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
                 return -1;
             }
 
-            c = have_one_of(pstate, ",}");
+            c = skip_one_of(pstate, ",}");
             if (c == -1) return -1;
 
             if (c == ',') {

@@ -28,7 +28,7 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
     if (!v) return -1;
 
     if ((int *)v == &no_value) {
-        c = have_one_of(pstate, "]");
+        c = skip_one_of(pstate, "]");
         if (c == -1) return -1;
     } else
         do {
@@ -41,7 +41,7 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
                 return -1;
             }
 
-            c = have_one_of(pstate, ",]");
+            c = skip_one_of(pstate, ",]");
             if (c == -1) return -1;
 
             if (c == ',') {
