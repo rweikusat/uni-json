@@ -1,0 +1,5 @@
+=head1 NAME
+
+uni-json - A C JSON parser designed to be usable in any runtime environment
+
+=head1 SYNOPSIS
