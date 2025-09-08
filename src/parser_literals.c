@@ -14,6 +14,15 @@
 /*  routines */
 static int skip_literal(struct pstate *pstate, uint8_t *want)
 {
+    /*
+      Consume a literal value.
+
+      want	null-terminated string we're looking for
+
+      Returns 0 and advances the current position accordingly if the
+      sought for string was found, otherwise, returns -1 and sets an
+      error state.
+    */
     uint8_t *p, *e;
     unsigned c;
 
