@@ -109,9 +109,19 @@ static inline int no_val_byte(unsigned c)
     return (c & 0xc0) != 0x80;
 }
 
-
 static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
 {
+    /*
+      Validate and consume an UTF-8 sequence.
+
+      p		current position
+      e		end of data
+
+      Returns a pointer to the first byte after the sequence on
+      success or NULL if there was no valid UTF-8 sequences at the
+      current position.
+    */
+
     struct utf8_seq *sp;
     unsigned maybe_long, seq_len;
     uint32_t enc_val;
@@ -241,6 +251,13 @@ static uint32_t parse_4dg_hex(uint8_t *p, uint8_t *e)
 
 static uint32_t parse_u_esc(struct pstate *pstate)
 {
+    /*
+      Parse body of a \u escape sequence. Handles escaped characters
+      with codepoints above 0xffff encoded as two \u sequences
+      representing the corresponding UTF-16 surrogate pair.
+
+      Returns the encoded codepoint or (uint32_t)-1 on error.
+    */
     uint32_t v0, v1;
     uint8_t *p, *e;
 
