@@ -40,6 +40,15 @@ void free_obj(int type, void *obj, struct uni_json_p_binding *binds)
 
 int skip_one_of(struct pstate *pstate, uint8_t *set)
 {
+    /*
+      Consume a character provided it's in 'set'.
+
+      set	null-terminated string of characters to look for
+
+      If there was a character at the current position and it was in
+      set, it's returned and the position advanced. Otherwise, returns
+      -1 and sets an error state.
+    */
     uint8_t *p;
     int c, cs;
 
