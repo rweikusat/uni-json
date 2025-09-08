@@ -318,6 +318,14 @@ static inline unsigned utf8_seq_len(uint32_t c)
 
 static unsigned utf8_encode(uint32_t c, uint8_t *utf)
 {
+    /*
+      Encode a codepoint as UTF-8.
+
+      c		codepoint
+      utf	output buffer (4 bytes)
+
+      Returns the length of the encoded sequence.
+    */
     unsigned len;
 
     len = utf8_seq_len(c);
