@@ -51,13 +51,13 @@ mapping of JSON value types to Perl constructs.
 =item * C<max nesting>
 
 Returns the current value of the I<max nesting> parameter (default 0xffffffff, ie
-unlimited). JSON constructs which are more deeply nested than this value
-permits will cause an error when trying to parse them.
+unlimited).
 
 =item * C<set_max_nesting>
 
-Change the I<max nesting> parameter. This can be used to limit the maximum
-depth to which the parser will descent into nested structures to guard against DoS-attacks
+Change the I<max nesting> parameter. JSON constructs which are more deeply nested than this value
+permits will cause an error when trying to parse them. This can be used to limit the maximum
+depth to which the parser will descend into nested structures to guard against DoS-attacks
 when processing data from untrusted sources.
 
 =back
