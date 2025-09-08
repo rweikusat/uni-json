@@ -32,6 +32,15 @@ void *parse_value(struct pstate *, struct uni_json_p_binding *) _hidden_;
 
 /*  variables */
 static parse_func *tok_map[256] = {
+    /*
+      The type of a JSON value can be determined by looking at the
+      first character. This array maps "value start characters" to the
+      corresponding parser functions handling them.
+
+      To simplify the implementation of parse_value, it also maps
+      whitespace characters to a dummy parser function and the 'close
+      characters' ']' and '}' to a function returning &no_value.
+    */
     ['\t'] =		whitespace,
     ['\r'] =		whitespace,
     ['\n'] =		whitespace,
