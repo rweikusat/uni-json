@@ -16,6 +16,7 @@ SRCS :=		$(shell ls src/*.c)
 OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
 DEPS :=		$(OBJS:.o=.d)
 HDRS :=		$(addprefix include/, uni_json_parser.h uni_json_p_binding.h)
+MANS :=		$(addprefix doc/, uni-json.3)
 
 #**  library
 #
@@ -51,7 +52,7 @@ TARGET_INC :=	$(TARGET)/include
 #
 .PHONY: all clean install deb
 
-all: bin/$(L_MAJ) bin/$(L_BASE)
+all: bin/$(L_MAJ) bin/$(L_BASE) $(MANS)
 	$(MAKE) -C bindings
 
 deb:
@@ -67,6 +68,7 @@ install: all
 clean:
 	-rm tmp/*.o tmp/*.d
 	-rm bin/*
+	-rm doc/*.3
 	$(MAKE) -C bindings clean
 
 bin/$(LIB): $(OBJS)
@@ -86,3 +88,6 @@ tmp/%.o: src/%.c tmp/%.d
 
 bin/%:
 	$(LD) -shared -o $@ -Wl,-soname -Wl,$(notdir $(basename $@)) $^
+
+doc/%.3: doc/%.pod
+	pod2man $< >$@
