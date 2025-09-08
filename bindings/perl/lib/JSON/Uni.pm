@@ -70,6 +70,6 @@ error code and the position in the input string where the error was encountered.
 
 =head1 SEE ALSO
 
-L<uni_json_parse(3)>, L<uni_json_parser_bindings(5)>
+L<uni-json(3)>, L<uni-json-parser-bindings(5)>
 
 =cut
