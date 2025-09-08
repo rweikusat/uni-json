@@ -22,14 +22,14 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
                                void *ary)
 {
     void *v;
-    int c, rc;
+    int rc;
 
     v = parse_value(pstate, binds);
     if (!v) return -1;
 
     if ((int *)v == &no_value) {
-        c = skip_one_of(pstate, "]");
-        if (c == -1) return -1;
+        rc = skip_one_of(pstate, "]");
+        if (rc == -1) return -1;
     } else
         do {
             rc = binds->add_2_array(v, ary);
@@ -41,10 +41,10 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
                 return -1;
             }
 
-            c = skip_one_of(pstate, ",]");
-            if (c == -1) return -1;
+            rc = skip_one_of(pstate, ",]");
+            if (rc == -1) return -1;
 
-            if (c == ',') {
+            if (rc == ',') {
                 v = parse_value(pstate, binds);
                 if (!v) return -1;
 
@@ -54,7 +54,7 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
                     return -1;
                 }
             }
-        } while (c == ',');
+        } while (rc == ',');
 
     return 0;
 }
