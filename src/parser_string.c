@@ -316,7 +316,7 @@ static inline unsigned utf8_seq_len(uint32_t c)
     return 4;
 }
 
-static unsigned utf8_encode(uint32_t c, uint8_t *p)
+static unsigned utf8_encode(uint32_t c, uint8_t *utf)
 {
     unsigned len;
 
@@ -324,22 +324,22 @@ static unsigned utf8_encode(uint32_t c, uint8_t *p)
     if (len > 1) {
         switch (len) {
         case 4:
-            p[3] = 0x80 | (c & 0x3f);
+            utf[3] = 0x80 | (c & 0x3f);
             c >>= 6;
 
         case 3:
-            p[2] = 0x80 | (c & 0x3f);
+            utf[2] = 0x80 | (c & 0x3f);
             c >>= 6;
 
         case 2:
-            p[1] = 0x80 | (c & 0x3f);
+            utf[1] = 0x80 | (c & 0x3f);
             c >>= 6;
         }
 
         c |= 0xff << (8 - len);
     }
 
-    *p = c;
+    *utf = c;
     return len;
 }
 
