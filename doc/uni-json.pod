@@ -59,6 +59,86 @@ untrusted sources.
 
 =back
 
+=head2 Error Codes
+
+=over
+
+=item * C<UJ_E_INV>
+
+A character which cannot start a token was
+encountered when looking for a JSON value.
+
+=item * C<UJ_E_NO_VAL>
+
+No JSON value was found in a situation where one was expected. This can
+either happen because the text passed to C<uni_json_parse> didn't contain
+a JDON value at all (empty or only whitespace) or because text representing
+an JSON array or object ended with a separator without a value behind it.
+
+=item * C<UJ_E_INV_LIT>
+
+An invalid literal string was encountered, ie one with was neither B<false> nor
+B<null> nor B<true>.
+
+=item * C<UJ_E_GARBAGE>
+
+The JSON text passed to C<uni_json_parse> didn't contain a single JSON value
+possibly surrouned by whitespace.
+
+=item * C<UJ_E_EOS>
+
+The parser hit the end of the input text before the JSON value
+being parsed was complete (eg, an array not ending with B<]>).
+
+=item * C<UJ_E_INV_IN>
+
+An invalid character was encountered while parsing a JSON value, eg,
+because of an object lacking a B<:> separator between a key and the associated
+value.
+
+=item * C<UJ_E_ADD>
+
+A binding routine supposed to add data to a string or a value to
+an array or a key-value-pair to an object returned an error
+indicator.
+
+=item * C<UJ_E_LEADZ>
+
+The integral part of a number other than 0 started with a B<0> character.
+
+=item * C<UJ_E_NO_DGS>
+
+Some part of a number (integral, fractional or exponent) didn't
+contain any digits.
+
+=item * C<UJ_E_INV_CHAR>
+
+A literal control character was found in a string.
+
+=item * C<UJ_E_INV_UTF8>
+
+An invalid UTF-8 sequences was encountered in a string.
+
+=item * C<UJ_E_INV_ESC>
+
+An invalid escape sequences was found in a string.
+
+=item * C<UJ_E_INV_KEY>
+
+A JSON value in the key position of a key-value-pair in an
+object wasn't a string.
+
+=item * C<UJ_E_NO_KEY>
+
+A JSON object was missing a key in a position where one
+should have appeared.
+
+=item * C<UJ_E_TOO_DEEP>
+
+The parser exceeded the nesting limit set via C<uni_json_max_nesting>.
+
+=back
+
 =head1 SEE ALSO
 
 L<uni-json-parser-bindings(3)>
