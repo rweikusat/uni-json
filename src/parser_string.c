@@ -354,8 +354,15 @@ static unsigned utf8_encode(uint32_t c, uint8_t *utf)
 static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
                      void *str)
 {
+    /*
+      Consume an escape sequence. The escaped codepoint is added to the
+      string passed as str as UTF-8.
+
+      Returns 0 on success. Returns -1 and set an error state in case
+      of an error.
+    */
     uint32_t chr;
-    uint8_t utf_buf[4];
+    uint8_t utf[4];
     int rc;
 
     if (pstate->p == pstate->e) return -1;
@@ -380,8 +387,8 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
         return -1;
     }
 
-    rc = utf8_encode(chr, utf_buf);
-    rc = binds->add_2_string(utf_buf, rc, str);
+    rc = utf8_encode(chr, utf);
+    rc = binds->add_2_string(utf, rc, str);
     if (!rc) {
         pstate->err.code = UJ_E_ADD;
         pstate->err.pos = pstate->p - 1;
