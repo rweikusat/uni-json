@@ -103,6 +103,7 @@ static uint8_t escs[256] = {
    0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 */
 
+/**  UTF-8 validation */
 static inline int no_val_byte(unsigned c)
 {
     return (c & 0xc0) != 0x80;
@@ -199,6 +200,7 @@ static uint8_t *skip_utf8(uint8_t *p, uint8_t *e)
     return p + 1;
 }
 
+/**  handle escape sequences */
 static inline unsigned from_hex(unsigned c)
 {
     if (c - '0' < 10) return c - '0';
@@ -364,6 +366,7 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
     return 0;
 }
 
+/**  string handling proper */
 static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
                                 void *str)
 {
