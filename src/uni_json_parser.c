@@ -89,7 +89,13 @@ static char *ec_msg_map[] = {
     [UJ_E_TOO_DEEP] =	"too many levels of nesting"
 };
 
+/* parse_value returns &no_value if no value was found */
 int no_value _hidden_;
+
+/*
+  Maximum depth the parser will descend to before aborting with an
+  error.
+*/
 unsigned uni_json_max_nesting = -1;
 
 /*  routines */
@@ -106,6 +112,19 @@ static void *close_char(struct pstate *, struct uni_json_p_binding *)
 
 void *parse_value(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
+    /*
+      Parse a JSON value, skipping of leading and trailing
+      whitespace. This is more liberal than the JSON grammer allows
+      (whitespace is allowed before and after the 'structural chars'
+      '[', ']', '{', '}', ',' and ':'). The functions handling arrays
+      and objects call 'parse_value' to handle values contained in
+      them.
+
+      Returns a pointer to a "value object" (as determined by the
+      language bindings) or NULL in case of an error. The error code
+      and error position variables in *pstate will provide more
+      detailed information for this case.
+     */
     parse_func *parse;
     uint8_t *p, *e;
     void *v;
