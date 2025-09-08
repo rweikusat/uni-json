@@ -3,3 +3,26 @@
 uni-json - A C JSON parser designed to be usable in any runtime environment
 
 =head1 SYNOPSIS
+
+    extern unsigned uni_json_max_nesting;
+
+    char *uni_json_ec_2_msg(unsigned);
+    void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *bind);
+
+=head1 DESCRIPTION
+
+Uni-json (for "universal") is a JSON parsing library written in C that's designed to be
+independent of (and thus, usable in) any particular execution environment by delegating
+the task of creating and manageing actual objects representing particular JSON constructs
+to "someone else" via a set of callbacks (see L<uni-json-parser-bindings(3)> for details.
+
+Further design goals are simplicity  and speed, in that order. The code should be easy
+enough to understand that one can be reasonably confident that it actually works instead
+of trying to shave off every couple of nanoseconds which could be save somewhere. In
+particular, this means it's a recursive-descent parser based on handling each individual
+syntactic construct with a dedicated function and selecting the function to parse a
+particular construct by doing a table-lookup of the first character of it.
+
+=head1 SEE ALSO
+
+L<uni-json-parser-bindings(3)>
