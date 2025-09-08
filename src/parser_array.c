@@ -21,6 +21,13 @@ void *parse_value(struct pstate *, struct uni_json_p_binding *);
 static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding *binds,
                                void *ary)
 {
+    /*
+      Parse the interior of an array, adding values to the array
+      passed as ary as they're found.
+
+      Returns 0 if everything went ok, otherwise, -1 and sets an error
+      state.
+     */
     void *v;
     int rc;
 
