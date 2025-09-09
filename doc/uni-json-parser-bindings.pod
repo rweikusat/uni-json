@@ -121,6 +121,33 @@ responsible for its eventual disposal.
 
 =back
 
+=head3 String Creation/ Management
+
+=over
+
+=item * C<void *make_string(void)>
+
+Called by the parser when it needs to create a string. A string must be capable of
+holding an valid UTF-8 string, possibly including bytes with value 0 or other
+control characters.
+
+Must return a pointer to a string.
+
+=item * C<void free_string(void *str)>
+
+Will be called by the parser when it wants to dispose of a string created
+with C<make_string>. Should free all memory associated with the string.
+
+=item * C<int add_2_string(uint8_t *data, size_t len, void *str>)
+
+Add the sequence of bytes starting at B<data> of length B<len> to the string pointed to
+by B<str>. The byte sequence will be a valid UTF-8 string.
+
+Supposed to return a true value when the data was successfully stored and 0
+otherwise.
+
+=back
+
 =head1 SEE ALSO
 
 L<uni-json(3)>
