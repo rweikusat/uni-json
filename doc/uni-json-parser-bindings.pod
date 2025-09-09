@@ -94,7 +94,7 @@ eventual disposal in future.
 
 =back
 
-head3 Array Creation/ Management
+=head3 Array Creation/ Management
 
 =over
 
