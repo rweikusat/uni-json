@@ -46,6 +46,52 @@ uni-json-parser-bindings - object creation and management functions for uni-json
 Structure containing pointers to the functions which need to be provided to the uni-json parser
 to bind it to a particular runtime environment.
 
+=head2 Binding Functions
+
+=head3 Error Handling
+
+=over
+
+=item * C<void on_error(unsigned code, size)t pos>
+
+Will be called in case of a parsing error before the C<uni_json_parse> function returns.
+First argument will be the error code (see L<uni-json(3)> for a list, the second the offset
+in the input string where the error was encountered.
+
+By the time the his handler is called, all memory implicitly allocated by calling on of
+the other handlers will already have been freed, hence, it's save to call a function
+which causes a non-local control transfer, eg, the Perl API function C<croak>, from it.
+
+=back
+
+=head3 Object Creation/ Management
+
+=over
+
+=item * C<void *make_object(void)>
+
+Will be called when the parser wants to create an B<object>, something containing an unordered set
+of key-value pairs.
+
+Must return a pointer to an object.
+
+=item * C<void free_object(void *obj)>
+
+Will be called when the parser needs to free an object previously created via
+C<make_object>. Should free all memory used for the object itself and whatever
+is being used by the key-value pairs presently stored in it.
+
+=item * C<int add_2_object(void *key, void *value, void *obj)>
+
+Called when a key-value pair is to be added to an object. The B<key> will be a pointer
+to a string created by C<make_string>, B<value> will be pointer to a value created
+by invoking one of the other C<make_...> functions and B<obj> a pointer to the object
+the key-value pair is supposed to be added to.
+
+Supposed to return a true value when the addition succeeded or 0 in case of an error.
+
+=back
+
 =head1 SEE ALSO
 
 L<uni-json(3)>
