@@ -93,4 +93,4 @@ bin/%:
 	$(LD) -shared -o $@ -Wl,-soname -Wl,$(notdir $(basename $@)) $^
 
 doc/%.3: doc/%.pod
-	pod2man -n $(shell echo $* | tr '[a-z]' '[A-Z]') -s 3 $< >$@
+	pod2man -r 0.1 -n $(shell echo $* | tr '[a-z]' '[A-Z]') -s 3 $< >$@
