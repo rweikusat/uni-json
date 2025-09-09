@@ -20,7 +20,7 @@ to "someone else" via a set of callbacks (see L<uni-json-parser-bindings(3)> for
 
 Further design goals are simplicity  and speed, in that order. The code should be easy
 enough to understand that one can be reasonably confident that it actually works instead
-of trying to shave off every couple of nanoseconds which could be save somewhere. In
+of trying to shave off every couple of nanoseconds which could be saved somewhere. In
 particular, this means it's a recursive-descent parser based on handling each individual
 syntactic construct with a dedicated function and selecting the function to parse a
 particular construct by doing a table-lookup of its first character..
@@ -34,7 +34,7 @@ particular construct by doing a table-lookup of its first character..
 Parse C<len> bytes of JSON text starting at C<data> using the parser bindings passed
 via C<binds> for object creation and management. Returns a pointer to a data object
 representing the JSON value found in the text or C<NULL> on error. For the latter case,
-the C<on_error> handler passed via C<binds> will be invoked with an error code the
+the C<on_error> handler passed via C<binds> will be invoked with an error code and the
 position of the error in the input text.
 
 B<The text pointed to by C<data> is not expected to be a valid C string. Embedded null bytes
@@ -72,7 +72,7 @@ encountered when looking for a JSON value.
 
 No JSON value was found in a situation where one was expected. This can
 either happen because the text passed to C<uni_json_parse> didn't contain
-a JDON value at all (empty or only whitespace) or because text representing
+a JSON value at all (empty or only whitespace) or because text representing
 an JSON array or object ended with a separator without a value behind it.
 
 =item * C<UJ_E_INV_LIT>
@@ -82,8 +82,8 @@ B<null> nor B<true>.
 
 =item * C<UJ_E_GARBAGE>
 
-The JSON text passed to C<uni_json_parse> didn't contain a single JSON value
-possibly surrouned by whitespace.
+The JSON text passed to C<uni_json_parse> contained text beyond  a single JSON value
+possibly surrounded by whitespace.
 
 =item * C<UJ_E_EOS>
 
@@ -93,7 +93,7 @@ being parsed was complete (eg, an array not ending with B<]>).
 =item * C<UJ_E_INV_IN>
 
 An invalid character was encountered while parsing a JSON value, eg,
-because of an object lacking a B<:> separator between a key and the associated
+because of an object using B<,> instead of B<:> between a key and the associated
 value.
 
 =item * C<UJ_E_ADD>
