@@ -44,6 +44,8 @@ MULTI :=	$(shell gcc -print-multiarch)
 TARGET :=	$(DESTDIR)$(PREFIX)
 TARGET_LIB :=	$(TARGET)/lib/$(MULTI)
 TARGET_INC :=	$(TARGET)/include
+TARGET_MAN :=	$(TARGET)/share/man
+TARGET_MAN3 :=	$(TARGET_MAN)/man3
 
 #**  lib version
 #
@@ -59,7 +61,8 @@ deb:
 	fakeroot debian/rules binary
 
 install: all
-	$(INST_X) -d $(TARGET_INC) $(TARGET_LIB)
+	$(INST_X) -d $(TARGET_INC) $(TARGET_LIB) $(TARGET_MAN3)
+	$(INST_D) $(MANS) $(TARGET_MAN3)
 	$(INST_D) $(HDRS) $(TARGET_INC)
 	$(INST_D) bin/$(LIB) $(TARGET_LIB)
 	cd $(TARGET_LIB) && ln -sf $(LIB) $(L_MAJ) && ln -sf $(LIB) $(L_BASE)
