@@ -148,6 +148,42 @@ otherwise.
 
 =back
 
+=head3 Creation of Simple Types
+
+=over
+
+=item * C<void *make_null(void)>
+
+Called by the parser to create a B<null> value. Must return a pointer to one.
+
+=item * C(void free_null(void *null)>
+
+Called by the parser to free a B<null> value.
+
+=item * C<void *make_bool(int true_false)>
+
+Called by the parser to create a boolean. The value of the B<true_false> parameter will
+evalute to true if the boolean value is supposed to be B<true> and will be 0 if it's
+suppoed to be B<false>.
+
+=item * C(void free_bool(void *bool)>
+
+Called by the parser to free a boolean value.
+
+=item * C<void *make_number(uint8_t *data, size_t len, unsigned flags)>
+
+Called by the parser to create a number. The sequence of bytes starting at
+B<data> of length B<len> will be a string conforming to the JSON number
+syntax. The B<UJ_NF_NEG> bit will be set in B<flags> is the number is
+supposed to be negative, the B<UJ_NF_INT> if it's an integral value, ie,
+one with neither a fractional nor an exponent part.
+
+=item * C(void free_number(void *num)>
+
+Called by the parser to free a number.
+
+=back
+
 =head1 SEE ALSO
 
 L<uni-json(3)>
