@@ -20,8 +20,7 @@ enum {
 
 /*  types */
 /**  parser bindings */
-struct uni_json_p_binding
-{
+struct uni_json_p_binding {
     /*  error handler */
     void (*on_error)(unsigned code, size_t pos);
 
