@@ -1,12 +1,6 @@
 Universal Json
 ==============
 
-,----
-| KNOWN ISSUE: The MakeMaker generated Makefile for the Perl
-| interface module puts the modue files in a location where perl
-| (at least on Debian) won't find them.
-`----
-
 This is a project in development. The parser is complete now, Perl
 bindings for it are fully functional and it should have a full set of
 test cases. The test suite can be run with
@@ -23,6 +17,11 @@ erroneous UTF-8-like encodings.
 There's meanwile an install target and also, support for building a
 Debian package including the library and Perl language
 bindings. Details are in the INSTALL file.
+
+The C interface to the parser is now documented the
+uni-json(3) and uni-json-parser-bindings(3) manpages. The
+module providing the default Perl bindings in the JSON::Uni(3pm)
+manpage.
 
 
 Plan
