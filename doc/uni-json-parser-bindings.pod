@@ -11,8 +11,7 @@ uni-json-parser-bindings - object creation and management functions for uni-json
         UJ_NF_INT = 2               /* number is an integer */
     };
 
-    struct uni_json_p_binding
-    {
+    struct uni_json_p_binding {
         /*  error handler */
         void (*on_error)(unsigned code, size_t pos);
 
@@ -41,3 +40,12 @@ uni-json-parser-bindings - object creation and management functions for uni-json
         void *(*make_number)(uint8_t *data, size_t len, unsigned flags);
         void (*free_number)(void *);
     };
+
+=head1 DESCRIPTION
+
+Structure containing pointers to the functions which need to be provided to the uni-json parser
+to bind it to a particular runtime environment.
+
+=head1 SEE ALSO
+
+L<uni-json(3)>
