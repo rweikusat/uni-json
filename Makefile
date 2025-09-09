@@ -16,7 +16,7 @@ SRCS :=		$(shell ls src/*.c)
 OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
 DEPS :=		$(OBJS:.o=.d)
 HDRS :=		$(addprefix include/, uni_json_parser.h uni_json_p_binding.h)
-MANS :=		$(addprefix doc/, uni-json.3)
+MANS :=		$(addprefix doc/, uni-json.3 uni-json-parser-bindings.3)
 
 #**  library
 #
@@ -93,4 +93,4 @@ bin/%:
 	$(LD) -shared -o $@ -Wl,-soname -Wl,$(notdir $(basename $@)) $^
 
 doc/%.3: doc/%.pod
-	pod2man $< >$@
+	pod2man -s 3 $< >$@
