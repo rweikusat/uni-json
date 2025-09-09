@@ -88,9 +88,15 @@ to a string created by C<make_string>, B<value> will be pointer to a value creat
 by invoking one of the other C<make_...> functions and B<obj> a pointer to the object
 the key-value pair is supposed to be added to.
 
-Supposed to return a true value when the addition succeeded or 0 in case of an error.
+Supposed to return a true value when the addition succeeded or 0 in case of an error. If the store
+was successful, both key and value are now owned by the object which is responsible for their
+eventual disposal in future.
 
 =back
+
+head3 Array Creation/ Management
+
+
 
 =head1 SEE ALSO
 
