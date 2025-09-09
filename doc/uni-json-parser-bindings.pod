@@ -55,12 +55,12 @@ to bind it to a particular runtime environment.
 =item * C<void on_error(unsigned code, size)t pos>
 
 Will be called in case of a parsing error before the C<uni_json_parse> function returns.
-First argument will be the error code (see L<uni-json(3)> for a list, the second the offset
+First argument will be the error code (see L<uni-json(3)> for a list), the second the offset
 in the input string where the error was encountered.
 
-By the time the his handler is called, all memory implicitly allocated by calling on of
-the other handlers will already have been freed, hence, it's save to call a function
-which causes a non-local control transfer, eg, the Perl API function C<croak>, from it.
+By the time the his handler is called, all memory implicitly allocated by calling the other handlers will already
+have been freed, hence, it's save to call a function which causes a non-local control transfer, eg, the Perl API
+function C<croak>, from it.
 
 =back
 
@@ -70,7 +70,7 @@ which causes a non-local control transfer, eg, the Perl API function C<croak>, f
 
 =item * C<void *make_object(void)>
 
-Will be called when the parser wants to create an B<object>, something containing an unordered set
+Will be called when the parser wants to create an I<object>, something containing an unordered set
 of key-value pairs.
 
 Must return a pointer to an object.
@@ -90,7 +90,7 @@ the key-value pair is supposed to be added to.
 
 Supposed to return a true value when the addition succeeded or 0 in case of an error. If the store
 was successful, both key and value are now owned by the object which is responsible for their
-eventual disposal in future.
+eventual disposal.
 
 =back
 
@@ -100,7 +100,7 @@ eventual disposal in future.
 
 =item * C<void *make_array(void)>
 
-Called by the parser when it wants to create an B<array>, an ordered set of values.
+Called by the parser when it wants to create an I<array>, an ordered set of values.
 
 Must return a pointer to an array.
 
@@ -127,8 +127,8 @@ responsible for its eventual disposal.
 
 =item * C<void *make_string(void)>
 
-Called by the parser when it needs to create a string. A string must be capable of
-holding an valid UTF-8 string, possibly including bytes with value 0 or other
+Called by the parser when it needs to create a I<string>. A string must be capable of
+holding any valid UTF-8 string, possibly including bytes with value 0 or other
 control characters.
 
 Must return a pointer to a string.
@@ -154,25 +154,25 @@ otherwise.
 
 =item * C<void *make_null(void)>
 
-Called by the parser to create a B<null> value. Must return a pointer to one.
+Called by the parser to create a I<null> value. Must return a pointer to one.
 
 =item * C(void free_null(void *null)>
 
-Called by the parser to free a B<null> value.
+Called by the parser to free a null value.
 
 =item * C<void *make_bool(int true_false)>
 
-Called by the parser to create a boolean. The value of the B<true_false> parameter will
+Called by the parser to create a I<boolean>. The value of the B<true_false> parameter will
 evalute to true if the boolean value is supposed to be B<true> and will be 0 if it's
 suppoed to be B<false>.
 
 =item * C(void free_bool(void *bool)>
 
-Called by the parser to free a boolean value.
+Called by the parser to free a boolean.
 
 =item * C<void *make_number(uint8_t *data, size_t len, unsigned flags)>
 
-Called by the parser to create a number. The sequence of bytes starting at
+Called by the parser to create a I<number>. The sequence of bytes starting at
 B<data> of length B<len> will be a string conforming to the JSON number
 syntax. The B<UJ_NF_NEG> bit will be set in B<flags> is the number is
 supposed to be negative, the B<UJ_NF_INT> if it's an integral value, ie,
