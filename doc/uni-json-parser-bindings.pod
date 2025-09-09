@@ -96,7 +96,30 @@ eventual disposal in future.
 
 head3 Array Creation/ Management
 
+=over
 
+=item * C<void *make_array(void)>
+
+Called by the parser when it wants to create an B<array>, an ordered set of values.
+
+Must return a pointer to an array.
+
+=item * C<void free_array(void *ary)>
+
+Will be called when the parser needs to dispose of an array previously
+created via C<make_array>. Should free all memory used for the array
+itself and all values presently stored in it.
+
+=item * <int add_2_array(void *value, void *ary)>
+
+Called by the parser to add a value to the end of the array passed as B<ary>. B<value> will
+be a pointer to another value created by invoking one of the C<make_...> functions.
+
+Supposed to return a true value when the store was successful and 0 otherwise. If the
+store was successful, the value will henceforth be owned by the array which is
+responsible for its eventual disposal.
+
+=back
 
 =head1 SEE ALSO
 
