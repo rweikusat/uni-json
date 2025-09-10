@@ -56,11 +56,11 @@ to use it in particular runtime environment.
 
 Will be called in case of a parsing error before the C<uni_json_parse> function returns.
 First argument will be the error code (see L<uni-json(3)> for a list), the second the offset
-in the input string where the error was encountered.
+into the input string where the error was encountered.
 
-By the time the his handler is called, all memory implicitly allocated by calling the other handlers will already
-have been freed, hence, it's save to call a function which causes a non-local control transfer, eg, the Perl API
-function C<croak>, from it.
+By the time this handler is called, all memory implicitly allocated by earlier invocations of other handlers
+will already have been freed. Functions causing a non-local control transfer, eg, the Perl API
+function C<croak>, can thus safely be called from C<on_error>.
 
 =back
 
