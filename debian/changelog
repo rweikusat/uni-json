@@ -1,5 +1,5 @@
-uni-json (0.1) UNRELEASED; urgency=medium
+uni-json (0.1) experimental; urgency=medium
 
-  * Initial release.
+  * Initial release: parser with simple Perl bindings
 
- --
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Wed, 10 Sep 2025 17:46:53 +0100
