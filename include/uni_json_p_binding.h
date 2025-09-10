@@ -26,28 +26,28 @@ struct uni_json_p_binding {
 
     /*  objects */
     void *(*make_object)(void);
-    void (*free_object)(void *);
+    void (*free_object)(void *obj);
     int (*add_2_object)(void *key, void *value, void *obj);
 
     /*  arrays */
     void *(*make_array)(void);
-    void (*free_array)(void *);
+    void (*free_array)(void *ary);
     int (*add_2_array)(void *value, void *ary);
 
     /*  strings */
     void *(*make_string)(void);
-    void (*free_string)(void *);
+    void (*free_string)(void *str);
     int (*add_2_string)(uint8_t *data, size_t len, void *str);
 
     /*  simple types */
     void *(*make_null)(void);
-    void (*free_null)(void *);
+    void (*free_null)(void *null);
 
     void *(*make_bool)(int true_false);
-    void (*free_bool)(void *);
+    void (*free_bool)(void *boolean);
 
     void *(*make_number)(uint8_t *data, size_t len, unsigned flags);
-    void (*free_number)(void *);
+    void (*free_number)(void *num);
 };
 
 #endif
