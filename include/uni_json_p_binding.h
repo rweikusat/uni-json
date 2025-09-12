@@ -5,8 +5,8 @@
 
   MIT-licensed.
 */
-#ifndef uni_json_binding_h
-#define uni_json_binding_h
+#ifndef uni_json_p_binding_h
+#define uni_json_p_binding_h
 
 /*  includes */
 #include <inttypes.h>
