@@ -43,5 +43,5 @@ WriteMakefile(
                                  'serializer$(OBJ_EXT)' => '../../include/uni_json_s_binding.h ../../include/uni_json_serializer.h ../../include/uni_json_types.h',
                                  'Uni$(OBJ_EXT)' => '../../include/uni_json_parser.h', },
 
-              test =>		{ TESTS => 't/parser/*.t' }
+              test =>		{ TESTS => 't/parser/*.t t/serializer/*.t' }
              );
