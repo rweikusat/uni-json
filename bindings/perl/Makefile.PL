@@ -14,9 +14,10 @@ sub const_loadlibs
 
 sub test
 {
+    my $self = shift;
     my $sec;
 
-    $sec = $_[0]->SUPER::test();
+    $sec = $self->SUPER::test(@_);
     $sec =~ s|(PERL_DL_NONLAZY)|LD_LIBRARY_PATH=$LPATH $1|g;
     return $sec;
 }
@@ -40,5 +41,7 @@ WriteMakefile(
               depend =>		{
                                  'parser$(OBJ_EXT)' => '../../include/uni_json_p_binding.h ../../include/uni_json_parser.h',
                                  'serializer$(OBJ_EXT)' => '../../include/uni_json_s_binding.h ../../include/uni_json_serializer.h ../../include/uni_json_types.h',
-                                 'Uni$(OBJ_EXT)' => '../../include/uni_json_parser.h', }
+                                 'Uni$(OBJ_EXT)' => '../../include/uni_json_parser.h', },
+
+              test =>		{ TESTS => 't/parser/*.t' }
              );
