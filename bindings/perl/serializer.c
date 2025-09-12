@@ -26,9 +26,10 @@ static struct uni_json_s_binding binds;
 /*  routines */
 SV *serialize(void *val, int fmt)
 {
+    dTHX;
     SV *out;
 
-    out = newSVpv(INIT_SIZE);
+    out = newSV(INIT_SIZE);
     SvPOK_on(out);
     SvUTF8_on(out);
 
