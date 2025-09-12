@@ -24,7 +24,7 @@ enum {
 static struct uni_json_s_binding binds;
 
 /*  routines */
-SV *serialize(void *val, int fmt)
+SV *serialize(SV *val, int fmt)
 {
     dTHX;
     SV *out;

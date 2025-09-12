@@ -14,7 +14,7 @@ our @ISA = 'DynaLoader';
 __PACKAGE__->bootstrap();
 
 use Exporter	'import';
-our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting);
+our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting serialize_json);
 
 # Ach ja
 1;

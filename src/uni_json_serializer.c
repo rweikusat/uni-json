@@ -17,5 +17,5 @@
 void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *bind,
                         int fmt)
 {
-    puts("Thinkste!");
+    fputs("Thinkste!\n", stderr);
 }

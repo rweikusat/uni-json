@@ -16,6 +16,7 @@
 
 /*  prototypes */
 void *parse(uint8_t *, size_t);
+SV *serialize(SV *, int);
 
 /*  XS code */
 MODULE = JSON::Uni PACKAGE = JSON::Uni
@@ -44,4 +45,12 @@ set_max_nesting(max)
 	unsigned max
 CODE:
 	uni_json_max_nesting = max;
-        
+
+SV *
+serialize_json(data, fmt)
+	SV * data;
+        int fmt
+CODE:
+	RETVAL = serialize(data, fmt);
+OUTPUT:
+	RETVAL
