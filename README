@@ -45,3 +45,5 @@ make -C bindings/perl test TEST_VERBOSE=1
 from the top-level directory.
 
 Installation instructions are in the INSTALL file.
+
+-- Rainer Weikusat <rweikusat@talktalk.net>
