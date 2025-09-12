@@ -36,7 +36,7 @@ struct uni_json_s_binding {
     int (*next_kv_pair)(void *obj, void *oiter, struct kv_pair *kvp);
 
     /*  arrays */
-    void *(start_array_traversal)(void *ary);
+    void *(*start_array_traversal)(void *ary);
     void (*end_array_traversal)(void *aiter);
     void (*next_value)(void *ary, void *aiter);
 
