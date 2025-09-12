@@ -1,5 +1,5 @@
 /*
-  uni-json parser bindings for Perl
+  uni-json serializer bindings for Perl
 
   Copyright (C) 2025 Rainer Weikusat, rweikusat@talktalk.net
 
@@ -11,152 +11,28 @@
 #include "EXTERN.h"
 #include "perl.h"
 
-#include <uni_json_p_binding.h>
-#include <uni_json_parser.h>
+#include <uni_json_types.h>
+#include <uni_json_s_binding.h>
+#include <uni_json_serializer.h>
 
-/*  prototypes */
-static void on_error(unsigned, size_t);
-
-static void *make_bool(int);
-static void *make_null(void);
-static void *make_number(uint8_t *, size_t, unsigned);
-
-static void *make_string(void);
-static int add_2_string(uint8_t *, size_t, void *);
-
-static void *make_av(void);
-static int add_2_av(void *, void *);
-
-static void *make_hv(void);
-static int add_2_hv(void *, void *, void *);
-
-static void free_obj(void *);
-
-/*  variables */
-static struct uni_json_p_binding binding = {
-    .on_error =			on_error,
-
-    .make_bool =		make_bool,
-    .make_null =		make_null,
-
-    .make_number =		make_number,
-    .free_number =		free_obj,
-
-    .make_string =		make_string,
-    .free_string =		free_obj,
-    .add_2_string =		add_2_string,
-
-    .make_array =		make_av,
-    .free_array =		free_obj,
-    .add_2_array =		add_2_av,
-
-    .make_object =		make_hv,
-    .free_object =		free_obj,
-    .add_2_object =		add_2_hv
+/*  constants */
+enum {
+    INIT_SIZE = 128
 };
 
+/*  variables */
+static struct uni_json_s_binding binds;
+
 /*  routines */
-static void on_error(unsigned code, size_t pos)
+SV *serialize(void *val, int fmt)
 {
-    croak_nocontext("%s (%u) at %zu", uni_json_ec_2_msg(code), code, pos);
-}
+    SV *out;
 
+    out = newSVpv(INIT_SIZE);
+    SvPOK_on(out);
+    SvUTF8_on(out);
 
-static void *make_null(void)
-{
-    dTHX;
-    return &PL_sv_undef;
-}
+    uni_json_serialize(val, out, &binds, fmt);
 
-static void *make_bool(int true_false)
-{
-    dTHX;
-    return true_false ? &PL_sv_yes : &PL_sv_no;
-}
-
-static void *make_number(uint8_t *data, size_t len, unsigned flags)
-{
-    dTHX;
-    uint8_t *tmp;
-    UV uv;
-    IV iv;
-    int rc;
-
-    if (flags & UJ_NF_INT) {
-        rc = grok_number(data, len, &uv);
-        if (!(rc & IS_NUMBER_GREATER_THAN_UV_MAX)) {
-            if (!(flags & UJ_NF_NEG)) return newSVuv(uv);
-
-            if (uv < (UV)IV_MAX + 2) {
-                if (uv < (UV)IV_MAX + 1)
-                    iv = -uv;
-                else {
-                    iv = -(uv - 1);
-                    --iv;
-                }
-
-                return newSViv(iv);
-            }
-        }
-    }
-
-    tmp = alloca(len + 1);
-    memcpy(tmp, data, len);
-    tmp[len] = 0;
-    return newSVnv(my_atof(tmp));
-}
-
-static void *make_string(void)
-{
-    dTHX;
-    return newSVpvn_utf8("", 0, 1);
-}
-
-static int add_2_string(uint8_t *data, size_t len, void *str)
-{
-    dTHX;
-    sv_catpvn(str, data, len);
-    return 1;
-}
-
-static void *make_av(void)
-{
-    dTHX;
-    return newRV_noinc((SV *)newAV());
-}
-
-static int add_2_av(void *v, void *ary)
-{
-    dTHX;
-    av_push((AV *)SvRV((SV *)ary), v);
-    return 1;
-}
-
-static void *make_hv(void)
-{
-    dTHX;
-    return newRV_noinc((SV *)newHV());
-}
-
-static int add_2_hv(void *key, void *value, void *obj)
-{
-    dTHX;
-    HE *he;
-
-    he = hv_store_ent((HV *)SvRV((SV *)obj), key, value, 0);
-    if (!he) return 0;
-
-    free_obj(key);
-    return 1;
-}
-
-static void free_obj(void *obj)
-{
-    dTHX;
-    SvREFCNT_dec_NN(obj);
-}
-
-void *parse(uint8_t *data, size_t len)
-{
-    return uni_json_parse(data, len, &binding);
+    return out;
 }
