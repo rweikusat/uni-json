@@ -16,7 +16,7 @@ perl: perl/Makefile
 	$(MAKE) -C perl
 
 perl/Makefile: perl/Makefile.PL $(PRE_FILE)
-	cd perl && perl Makefile.PL INSTALL_BASE=$(shell ../scripts/read-prefix $(PRE_FILE))
+	cd perl && perl Makefile.PL PREFIX=$(shell ../scripts/read-prefix $(PRE_FILE))
 
 clean-perl:
 	test -f perl/Makefile && $(MAKE) -C perl clean || true
