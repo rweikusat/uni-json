@@ -1,53 +1,54 @@
 /*
-  parser bindings
+  serializer bindings
 
   Copyright (C) 2025 Rainer Weikusat, rweikusat@talktalk.net
 
   MIT-licensed.
 */
-#ifndef uni_json_binding_h
-#define uni_json_binding_h
+#ifndef uni_json_s_binding_h
+#define uni_json_s_binding_h
 
 /*  includes */
 #include <inttypes.h>
 #include <stddef.h>
 
-/**  constants */
-enum {
-    UJ_NF_NEG = 1,              /* number is negative */
-    UJ_NF_INT = 2               /* number is an integer */
+/*  types */
+/**  auxiliary */
+struct data {
+    uint8_t *s;
+    size_t len;
 };
 
-/*  types */
-/**  parser bindings */
-struct uni_json_p_binding {
-    /*  error handler */
-    void (*on_error)(unsigned code, size_t pos);
+struct kv_pair {
+    struct data key;
+    void *val;
+};
+
+/**  serializer bindings */
+struct uni_json_s_binding {
+    /*  general */
+    void (*output)(uint8_t *data, size_t len, void *sink);
+    int (*type_of)(void *p);
 
     /*  objects */
-    void *(*make_object)(void);
-    void (*free_object)(void *obj);
-    int (*add_2_object)(void *key, void *value, void *obj);
+    void *(*start_object_traversal)(void *obj);
+    void (*end_object_traversal)(void *oiter);
+    int (*next_kv_pair)(void *obj, void *oiter, struct kv_pair *kvp);
 
     /*  arrays */
-    void *(*make_array)(void);
-    void (*free_array)(void *ary);
-    int (*add_2_array)(void *value, void *ary);
+    void *(start_array_traversal)(void *ary);
+    void (*end_array_traversal)(void *aiter);
+    void (*next_value)(void *ary, void *aiter);
 
-    /*  strings */
-    void *(*make_string)(void);
-    void (*free_string)(void *str);
-    int (*add_2_string)(uint8_t *data, size_t len, void *str);
+    /*  "string data" types */
+    void (*get_num_data)(void *num, struct data *ndata);
+    void (*free_num_data)(void *num, struct data *ndata);
 
-    /*  simple types */
-    void *(*make_null)(void);
-    void (*free_null)(void *null);
+    void (*get_string_data)(void *str, struct data *sdata);
+    void (*free_string_data)(void *str, struct data *sdata);
 
-    void *(*make_bool)(int true_false);
-    void (*free_bool)(void *boolean);
-
-    void *(*make_number)(uint8_t *data, size_t len, unsigned flags);
-    void (*free_number)(void *num);
+    /*  bool */
+    int (*get_bool_value)(void *boolean);
 };
 
 #endif
