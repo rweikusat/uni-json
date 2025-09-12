@@ -1,31 +1,6 @@
 Universal Json
 ==============
 
-This is a project in development. The parser is complete now, Perl
-bindings for it are fully functional and it should have a full set of
-test cases. The test suite can be run with
-
-make
-make -C bindings/perl test TEST_VERBOSE=1
-
-TEST_VERBOSE isn't strictly necessary, it just causes some output
-showing what is actually being tested.
-
-The code should be able to catch all instances of out-of-spec or
-erroneous UTF-8-like encodings.
-
-There's meanwile an install target and also, support for building a
-Debian package including the library and Perl language
-bindings. Details are in the INSTALL file.
-
-The C interface to the parser is now documented the
-uni-json(3) and uni-json-parser-bindings(3) manpages. The
-module providing the default Perl bindings in the JSON::Uni(3pm)
-manpage.
-
-
-Plan
-----
 JSON is a nice, well-defined data format and it's a real shame that
 libraries handling it are so hideously complicated. Further, they (at
 least the C libraries I looked at) all suffer from the same design
@@ -44,7 +19,29 @@ representation to "someone else" and which can thus be used together
 with any other programming language which can interoperate with
 compiled C code.
 
-I'm planning to create language bindings for Perl and Python and
-possibly, C++, in this order.
+The code is meant to be simple and fast, in that order. It should
+rather be easy enough to understand so that one can be reasonably
+confident that it actually works than try to shave off every
+nanosecond which could conceivably be saved somewhere. In particular,
+this means it'll use lookup tables of function pointers instead of
+explicit switching logic and employ functional decomposition to break
+the task down into semantic units which make sense in the problem
+domain. Further, it's to utilize recursive descent for handling nested
+structures instead of employing some complicated, explicit stack
+management scheme to "avoid recursion."
 
--- Rainer Weikusat, rweikusat@talktalk.net
+
+What's There So Far?
+====================
+
+A complete parser core, a simple set of bindings for Perl and a test
+suite believed to be complete in the sense that it actually exercised
+all code paths.
+
+After building the code ("make"), the test suite can be run with
+
+make -C bindings/perl test TEST_VERBOSE=1
+
+from the top-level directory.
+
+Installation instructions are in the INSTALL file.
