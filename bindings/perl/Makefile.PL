@@ -36,8 +36,9 @@ WriteMakefile(
               #
               INC =>		'-I../../include',
               LIBS =>		["-L$MY::LPATH -luni-json"],
-              OBJECT =>		'parser$(OBJ_EXT) Uni$(OBJ_EXT)',
+              OBJECT =>		'parser$(OBJ_EXT) serializer$(OBJ_EXT) Uni$(OBJ_EXT)',
               depend =>		{
                                  'parser$(OBJ_EXT)' => '../../include/uni_json_p_binding.h ../../include/uni_json_parser.h',
+                                 'serializer$(OBJ_EXT)' => '../../include/uni_json_s_binding.h ../../include/uni_json_serializer.h ../../include/uni_json_types.h',
                                  'Uni$(OBJ_EXT)' => '../../include/uni_json_parser.h', }
              );
