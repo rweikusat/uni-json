@@ -9,6 +9,7 @@
 /*  includes */
 #include "uni_json_parser.h"
 #include "uni_json_p_binding.h"
+#include "uni_json_types.h"
 #include "pstate.h"
 #include "lib.h"
 #include "parser_object.h"
@@ -34,7 +35,7 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
         if (c == -1) return -1;
     } else {
         do {
-            if (pstate->last_type != T_STR) {
+            if (pstate->last_type != UJ_T_STR) {
                 free_obj(pstate->last_type, k, binds);
 
                 pstate->err.code = UJ_E_INV_KEY;
@@ -111,7 +112,7 @@ void *parse_object(struct pstate *pstate, struct uni_json_p_binding *binds)
         return NULL;
     }
 
-    pstate->last_type = T_OBJ;
+    pstate->last_type = UJ_T_OBJ;
     --pstate->level;
     return obj;
 }

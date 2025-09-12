@@ -9,6 +9,7 @@
 /*  includes */
 #include "uni_json_p_binding.h"
 #include "uni_json_parser.h"
+#include "uni_json_types.h"
 #include "pstate.h"
 #include "lib.h"
 
@@ -16,12 +17,12 @@
 static size_t dtor_ofs[] = {
 #define binds_ofs(m) offsetof(struct uni_json_p_binding, m)
 
-    [T_NULL] =		binds_ofs(free_null),
-    [T_BOOL] =		binds_ofs(free_bool),
-    [T_NUM] =		binds_ofs(free_number),
-    [T_STR] =		binds_ofs(free_string),
-    [T_ARY] =		binds_ofs(free_array),
-    [T_OBJ] =		binds_ofs(free_object)
+    [UJ_T_NULL] =	binds_ofs(free_null),
+    [UJ_T_BOOL] =	binds_ofs(free_bool),
+    [UJ_T_NUM] =	binds_ofs(free_number),
+    [UJ_T_STR] =	binds_ofs(free_string),
+    [UJ_T_ARY] =	binds_ofs(free_array),
+    [UJ_T_OBJ] =	binds_ofs(free_object)
 
 #undef binds_ofs
 };

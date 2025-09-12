@@ -9,6 +9,7 @@
 /*  includes */
 #include "uni_json_parser.h"
 #include "uni_json_p_binding.h"
+#include "uni_json_types.h"
 #include "pstate.h"
 #include "lib.h"
 #include "parser_array.h"
@@ -80,7 +81,7 @@ void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds)
         return NULL;
     }
 
-    pstate->last_type = T_ARY;
+    pstate->last_type = UJ_T_ARY;
     --pstate->level;
     return ary;
 }

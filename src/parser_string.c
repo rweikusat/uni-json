@@ -12,6 +12,7 @@
 
 #include "uni_json_parser.h"
 #include "uni_json_p_binding.h"
+#include "uni_json_types.h"
 #include "pstate.h"
 #include "parser_string.h"
 
@@ -480,6 +481,6 @@ void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
         return NULL;
     }
 
-    pstate->last_type = T_STR;
+    pstate->last_type = UJ_T_STR;
     return str;
 }
