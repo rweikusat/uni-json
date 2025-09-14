@@ -68,7 +68,7 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
 
     binds->get_num_data(val, &data);
     binds->output(data.s, data.len, sink);
-    if (binds->free_num_data) binds->free_num_data(&data);
+    if (binds->free_num_data) binds->free_num_data(val, &data);
 }
 
 static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
