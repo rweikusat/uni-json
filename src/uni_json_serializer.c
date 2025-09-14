@@ -38,7 +38,7 @@ static void ser_null(void *, void *sink, struct uni_json_s_binding *binds,
     binds->output("null", 4, sink);
 }
 
-static void ser_bool(void *val, void *sink, struc uni_json_s_binding *binds,
+static void ser_bool(void *val, void *sink, struct uni_json_s_binding *binds,
                      unsigned, int)
 {
     char *vs;
@@ -60,7 +60,7 @@ static void ser_bool(void *val, void *sink, struc uni_json_s_binding *binds,
 static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
                             unsigned level, int fmt)
 {
-    sersers[binds->type_of(val)](val, sink, binds, level, fmt);
+    serers[binds->type_of(val)](val, sink, binds, level, fmt);
 }
 
 void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
