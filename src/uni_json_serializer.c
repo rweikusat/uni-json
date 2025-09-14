@@ -24,10 +24,14 @@ static void ser_null(void *, void *, struct uni_json_s_binding *,
 static void ser_bool(void *, void *, struct uni_json_s_binding *,
                      unsigned, int);
 
+static void ser_number(void *, void *, struct uni_json_s_binding *,
+                       unsigned, int);
+
 /*  variables */
 static serialize_func *serers[] = {
     [UJ_T_NULL] =	ser_null,
     [UJ_T_BOOL] =	ser_bool,
+    [UJ_T_NUM] =	ser_number,
     [UJ_T_UNK] =	ser_null
 };
 
@@ -55,6 +59,16 @@ static void ser_bool(void *val, void *sink, struct uni_json_s_binding *binds,
     }
 
     binds->output(vs, len, sink);
+}
+
+static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
+                       unsigned, int)
+{
+    struct data data;
+
+    binds->get_num_data(val, &data);
+    binds->output(data.s, data.len, sink);
+    if (binds->free_num_data) binds->free_num_data(&data);
 }
 
 static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
