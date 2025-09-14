@@ -115,7 +115,7 @@ static void *make_string(void)
 static int add_2_string(uint8_t *data, size_t len, void *str)
 {
     dTHX;
-    sv_catpvn(str, data, len);
+    sv_catpvn_nomg(str, data, len);
     return 1;
 }
 
