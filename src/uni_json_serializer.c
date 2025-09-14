@@ -27,12 +27,54 @@ static void ser_bool(void *, void *, struct uni_json_s_binding *,
 static void ser_number(void *, void *, struct uni_json_s_binding *,
                        unsigned, int);
 
+static void ser_string(void *, void *, struct uni_json_s_binding *,
+                       unsigned, int);
+
 /*  variables */
 static serialize_func *serers[] = {
     [UJ_T_NULL] =	ser_null,
     [UJ_T_BOOL] =	ser_bool,
     [UJ_T_NUM] =	ser_number,
+    [UJ_T_STR] =	ser_string,
     [UJ_T_UNK] =	ser_null
+};
+
+static uint8_t escs[][8] = {
+    "\\u0000",
+    "\\u0001",
+    "\\u0002",
+    "\\u0003",
+    "\\u0004",
+    "\\u0005",
+    "\\u0006",
+    "\\u0007",
+    "\\b",
+    "\\t",
+    "\\n",
+    "\\u000b",
+    "\\f",
+    "\\r",
+    "\\u000e",
+    "\\u000f",
+    "\\u0010",
+    "\\u0011",
+    "\\u0012",
+    "\\u0013",
+    "\\u0014",
+    "\\u0015",
+    "\\u0016",
+    "\\u0017",
+    "\\u0018",
+    "\\u0019",
+    "\\u001a",
+    "\\u001b",
+    "\\u001c",
+    "\\u001d",
+    "\\u001e",
+    "\\u001f",
+
+    ['"'] = "\\\"",
+    ['\\'] = "\\\\"
 };
 
 /*  routines */
@@ -69,6 +111,39 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
     binds->get_num_data(val, &data);
     binds->output(data.s, data.len, sink);
     if (binds->free_num_data) binds->free_num_data(val, &data);
+}
+
+static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
+                       unsigned, int)
+{
+    struct uj_data data;
+    uint8_t *s, *p, *e, *esc;
+    unsigned c, len;
+    typeof (binds->output) outp;
+
+    outp = binds->output;
+    outp("\"", 1, sink);
+
+    binds->get_string_data(val, &data);
+    s = p = data.s;
+    e = p + data.len;
+    while (p < e) {
+        c = *p;
+        if (c < 32 || c == '"' || c == '\\') {
+            if (p > s) outp(s, p - s, sink);
+
+            esc = escs[c];
+            len = esc[1] == 'u' ? 6 : 2;
+            outp(esc, len, sink);
+
+            s = p + 1;
+        }
+
+        ++p;
+    }
+
+    if (p > s) outp(s, p - s, sink);
+    outp("\"", 1, sink);
 }
 
 static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
