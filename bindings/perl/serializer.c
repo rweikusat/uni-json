@@ -23,7 +23,7 @@ enum {
 /*  prototypes */
 static void output(uint8_t *data, size_t len, void *sink);
 static int type_of(void *p);
-static int get_num_data(void *num, struct uj_data *data);
+static void get_num_data(void *num, struct uj_data *data);
 static int get_bool_value(void *boolean);
 
 /*  variables */
@@ -70,6 +70,7 @@ static int type_of(void *p)
 
 static void get_num_data(void *num, struct uj_data *data)
 {
+    dTHX;
     char *pv;
     STRLEN len;
 
