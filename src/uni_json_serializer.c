@@ -14,7 +14,7 @@
 #include "uni_json_serializer.h"
 
 /*  routines */
-void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *bind,
+void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
                         int fmt)
 {
     binds->output("Thinkste!", 9, sink);

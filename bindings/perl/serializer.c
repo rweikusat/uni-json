@@ -22,10 +22,12 @@ enum {
 
 /*  prototypes */
 static void output(uint8_t *data, size_t len, void *sink);
+static int type_of(void *p);
 
 /*  variables */
 static struct uni_json_s_binding binds = {
-    .output =		output
+    .output =		output,
+    .type_of =		type_of
 };
 
 /*  routines */
@@ -33,6 +35,29 @@ static void output(uint8_t *data, size_t len, void *sink)
 {
     dTHX;
     sv_catpvn_nomg(sink, data, len);
+}
+
+static int type_of(void *p)
+{
+    dTHX;
+    SV *sv;
+    char const *rtype;
+
+    sv = p;
+    if (SvROK(sv)) {
+        rtype = sv_reftype(sv, 0);
+
+        if (strcmp(rtype, "ARRAY") == 0) return UJ_T_ARY;
+        if (strcmp(rtype, "HASH") == 0) return UJ_T_OBJ;
+        return UJ_T_UNK;
+    }
+
+    if (!SvOK(sv)) return UJ_T_NULL;
+    if (SvIsBOOL(sv)) return UJ_T_BOOL;
+    if (SvNIOK(sv)) return UJ_T_NUM;
+    if (SvPOK(sv)) return UJ_T_STR;
+
+    return UJ_T_UNK;
 }
 
 SV *serialize(SV *val, int fmt)
