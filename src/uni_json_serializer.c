@@ -130,6 +130,7 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
 
     while (p < e) {
         c = *p;
+
         if (c < 32 || c == '"' || c == '\\') {
             if (p > s) outp(s, p - s, sink);
 
