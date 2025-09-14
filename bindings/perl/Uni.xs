@@ -13,6 +13,7 @@
 #include "XSUB.h"
 
 #include "uni_json_parser.h"
+#include "uni_json_serializer.h"
 
 /*  prototypes */
 void *parse(uint8_t *, size_t);
@@ -47,7 +48,7 @@ CODE:
 	uni_json_max_nesting = max;
 
 SV *
-json_serialize(data, fmt)
+json_serialize(data, fmt = UJ_FMT_FAST)
 	SV * data;
         int fmt
 CODE:
