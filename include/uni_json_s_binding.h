@@ -20,7 +20,7 @@ struct uj_data {
 };
 
 struct uj_kv_pair {
-    struct data key;
+    struct uj_data key;
     void *val;
 };
 
