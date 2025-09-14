@@ -20,10 +20,21 @@ enum {
     INIT_SIZE = 128
 };
 
+/*  prototypes */
+static void output(uint8_t *data, size_t len, void *sink);
+
 /*  variables */
-static struct uni_json_s_binding binds;
+static struct uni_json_s_binding binds = {
+    .output =		output
+};
 
 /*  routines */
+static void output(uint8_t *data, size_t len, void *sink)
+{
+    dTHX;
+    sv_catpvn_nomg(data, len, sink);
+}
+
 SV *serialize(SV *val, int fmt)
 {
     dTHX;
