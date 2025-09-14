@@ -32,12 +32,12 @@ struct uni_json_s_binding {
 
     /*  objects */
     void *(*start_object_traversal)(void *obj);
-    void (*end_object_traversal)(void *oiter);
+    void (*end_object_traversal)(void *obj, void *oiter);
     int (*next_kv_pair)(void *obj, void *oiter, struct uj_kv_pair *kvp);
 
     /*  arrays */
     void *(*start_array_traversal)(void *ary);
-    void (*end_array_traversal)(void *aiter);
+    void (*end_array_traversal)(void *ary, void *aiter);
     void *(*next_value)(void *ary, void *aiter);
 
     /*  "string data" types */
