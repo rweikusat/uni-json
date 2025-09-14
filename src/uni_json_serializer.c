@@ -113,7 +113,7 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
     if (binds->free_num_data) binds->free_num_data(val, &data);
 }
 
-stativoid ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
+static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
                        unsigned, int)
 {
     struct uj_data data;
