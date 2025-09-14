@@ -24,14 +24,16 @@ enum {
 static void output(uint8_t *data, size_t len, void *sink);
 static int type_of(void *p);
 static void get_num_data(void *num, struct uj_data *data);
+static void get_string_data(void *str, struct uj_data *data);
 static int get_bool_value(void *boolean);
 
 /*  variables */
 static struct uni_json_s_binding binds = {
-    .output =		output,
-    .type_of =		type_of,
-    .get_num_data =	get_num_data,
-    .get_bool_value =	get_bool_value
+    .output =			output,
+    .type_of =			type_of,
+    .get_num_data =		get_num_data,
+    .get_string_data =		get_string_data,
+    .get_bool_value =		get_bool_value
 };
 
 /*  routines */
@@ -75,6 +77,17 @@ static void get_num_data(void *num, struct uj_data *data)
     STRLEN len;
 
     pv = SvPV((SV *)num, len);
+    data->s = pv;
+    data->len = len;
+}
+
+static void get_string_data(void *str, struct uj_data *data)
+{
+    dTHX;
+    char *pv;
+    STRLEN len;
+
+    pv = SvPVutf8((SV *)str, len);
     data->s = pv;
     data->len = len;
 }
