@@ -47,7 +47,7 @@ CODE:
 	uni_json_max_nesting = max;
 
 SV *
-serialize_json(data, fmt)
+json_serialize(data, fmt)
 	SV * data;
         int fmt
 CODE:
