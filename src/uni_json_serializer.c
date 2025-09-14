@@ -30,12 +30,16 @@ static void ser_number(void *, void *, struct uni_json_s_binding *,
 static void ser_string(void *, void *, struct uni_json_s_binding *,
                        unsigned, int);
 
+static void ser_arry(void *, void *, struct uni_json_s_binding *,
+                     unsigned, int);
+
 /*  variables */
 static serialize_func *serers[] = {
     [UJ_T_NULL] =	ser_null,
     [UJ_T_BOOL] =	ser_bool,
     [UJ_T_NUM] =	ser_number,
     [UJ_T_STR] =	ser_string,
+    [UJ_T_ARY] =	ser_array,
     [UJ_T_UNK] =	ser_null
 };
 
@@ -147,6 +151,46 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
     if (p > s) outp(s, p - s, sink);
     outp("\"", 1, sink);
     if (binds->free_string_data) binds->free_string_data(val, &data);
+}
+
+static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
+                      unsigned level, int fmt)
+{
+    uint8_t *sep;
+    unsigned sep_len;
+    void *aiter, *v;
+    typeof (binds->output) outp;
+    typeof (binds->next_value) next_val;
+
+    ++level;
+    outp = binds->output;
+    outp("[", 1, sink);
+    aiter = binds->start_array_traversal(ary);
+
+    if (fmt == UJ_FMT_PRETTY) {
+        sep = alloca(level + 2);
+        *sep = ',';
+        sep[1] = '\n';
+        sep_len = 2;
+        do sep[sep_len] = '\t'; while (++sep_len < level + 2);
+    } else {
+        sep = ",";
+        sep_len = 1;
+    }
+
+    next_val = binds->next_value;
+    v = next_val(ary, aiter);
+    if (v) {
+        serialize_value(v, sink, binds, level, fmt);
+
+        while (v = next_val(ary, aiter), v) {
+            outp(sep, sep_len, sink);
+            serialize_value(v, sink, binds, level, fmt);
+        }
+    }
+
+    if (binds->end_array_traversal) binds->end_array_traversal(ary, aiter);
+    outp("]", 1, sink);
 }
 
 static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
