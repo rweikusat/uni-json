@@ -3,7 +3,7 @@
 # general serializer tests
 #
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 BEGIN {
     use_ok('JSON::Uni', 'json_serialize');
@@ -22,3 +22,6 @@ is($x, 'true', 'boolean true serializes correclty');
 
 $x = json_serialize(123);
 is($x, '123', 'number serializes correctly');
+
+$x = json_serialize('abc');
+is($x, '"abc"', 'plain string serializes correctly');
