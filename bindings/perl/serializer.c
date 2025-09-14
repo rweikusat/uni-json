@@ -56,7 +56,11 @@ static int type_of(void *p)
 
     if (!SvOK(sv)) return UJ_T_NULL;
     if (SvIsBOOL(sv)) return UJ_T_BOOL;
-    if (SvNIOK(sv)) return UJ_T_NUM;
+
+    if (SvUOK(sv) || SvIOK(sv)) return UJ_T_NUM;
+    if (SvNOK(sv))
+        return isinfnan(SvNV(sv)) ? UJ_T_UNK : UJ_T_NUM;
+
     if (SvPOK(sv)) return UJ_T_STR;
 
     return UJ_T_UNK;
