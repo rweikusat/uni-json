@@ -15,7 +15,8 @@ enum {
     UJ_T_NUM,
     UJ_T_STR,
     UJ_T_ARY,
-    UJ_T_OBJ
+    UJ_T_OBJ,
+    UJ_T_UNK
 };
 
 #endif
