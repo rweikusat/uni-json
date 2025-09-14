@@ -113,7 +113,7 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
     if (binds->free_num_data) binds->free_num_data(val, &data);
 }
 
-static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
+stativoid ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
                        unsigned, int)
 {
     struct uj_data data;
@@ -127,6 +127,7 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
     binds->get_string_data(val, &data);
     s = p = data.s;
     e = p + data.len;
+
     while (p < e) {
         c = *p;
         if (c < 32 || c == '"' || c == '\\') {
@@ -144,6 +145,7 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
 
     if (p > s) outp(s, p - s, sink);
     outp("\"", 1, sink);
+    if (binds->free_string_data) binds->free_string_data(val, &data);
 }
 
 static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
