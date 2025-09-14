@@ -38,7 +38,7 @@ struct uni_json_s_binding {
     /*  arrays */
     void *(*start_array_traversal)(void *ary);
     void (*end_array_traversal)(void *aiter);
-    void (*next_value)(void *ary, void *aiter);
+    void *(*next_value)(void *ary, void *aiter);
 
     /*  "string data" types */
     void (*get_num_data)(void *num, struct uj_data *ndata);
