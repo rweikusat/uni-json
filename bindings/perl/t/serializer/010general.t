@@ -9,4 +9,5 @@ BEGIN {
     use_ok('JSON::Uni', 'serialize_json');
 }
 
-serialize_json('[1,2,3]', 0);
+my $d = serialize_json('[1,2,3]', 0);
+print STDERR ("$d\n");
