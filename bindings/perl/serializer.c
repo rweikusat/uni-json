@@ -32,7 +32,7 @@ static struct uni_json_s_binding binds = {
 static void output(uint8_t *data, size_t len, void *sink)
 {
     dTHX;
-    sv_catpvn_nomg(data, len, sink);
+    sv_catpvn_nomg(sink, data, len);
 }
 
 SV *serialize(SV *val, int fmt)
