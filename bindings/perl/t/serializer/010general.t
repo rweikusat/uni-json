@@ -3,11 +3,19 @@
 # general serializer tests
 #
 
-use Test::More tests => 1;
+use Test::More tests => 4;
 
 BEGIN {
     use_ok('JSON::Uni', 'json_serialize');
 }
 
-my $d = json_serialize('[1,2,3]', 0);
-print STDERR ("$d\n");
+my $x;
+
+$x = json_serialize(undef, 0);
+is($x, 'null', 'undef serializes to null');
+
+$x = json_serialize(!1, 0);
+is($x, 'false', 'boolean false serializes correclty');
+
+$x = json_serialize(!0, 0);
+is($x, 'true', 'boolean true serializes correclty');
