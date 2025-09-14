@@ -64,7 +64,7 @@ static void ser_bool(void *val, void *sink, struct uni_json_s_binding *binds,
 static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
                        unsigned, int)
 {
-    struct data data;
+    struct uj_data data;
 
     binds->get_num_data(val, &data);
     binds->output(data.s, data.len, sink);
