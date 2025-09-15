@@ -67,10 +67,14 @@ static int type_of(void *p)
 
     sv = p;
     if (SvROK(sv)) {
-        rtype = sv_reftype(sv, 0);
+        switch (SvTYPE(SvRV(sv))) {
+        case SVt_PVAV:
+            return UJ_T_ARY;
 
-        if (strcmp(rtype, "ARRAY") == 0) return UJ_T_ARY;
-        if (strcmp(rtype, "HASH") == 0) return UJ_T_OBJ;
+        case SVt_PVHV:
+            return UJ_T_OBJ;
+        }
+
         return UJ_T_UNK;
     }
 
