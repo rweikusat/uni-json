@@ -170,6 +170,8 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
     outp = binds->output;
     aiter = binds->start_array_traversal(ary);
 
+    outp("[", 1, sink);
+
     if (fmt == UJ_FMT_PRETTY) {
         sep = alloca(level + 2);
         *sep = ',';
@@ -177,12 +179,10 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
         sep_len = 2;
         do sep[sep_len] = '\t'; while (++sep_len < level + 2);
 
-        outp("[\n", 2, sink);
+        outp(sep + 1, sep_len - 1, sink);
     } else {
         sep = ",";
         sep_len = 1;
-
-        outp("[", 1, sink);
     }
 
     next_val = binds->next_value;
