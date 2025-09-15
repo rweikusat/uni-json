@@ -32,20 +32,20 @@ struct uni_json_s_binding {
 
     /*  objects */
     void *(*start_object_traversal)(void *obj);
-    void (*end_object_traversal)(void *obj, void *oiter);
-    int (*next_kv_pair)(void *obj, void *oiter, struct uj_kv_pair *kvp);
+    void (*end_object_traversal)(void *oiter);
+    int (*next_kv_pair)(void *oiter, struct uj_kv_pair *kvp);
 
     /*  arrays */
     void *(*start_array_traversal)(void *ary);
-    void (*end_array_traversal)(void *ary, void *aiter);
-    void *(*next_value)(void *ary, void *aiter);
+    void (*end_array_traversal)(void *aiter);
+    void *(*next_value)(void *aiter);
 
     /*  "string data" types */
     void (*get_num_data)(void *num, struct uj_data *ndata);
-    void (*free_num_data)(void *num, struct uj_data *ndata);
+    void (*free_num_data)(struct uj_data *ndata);
 
     void (*get_string_data)(void *str, struct uj_data *sdata);
-    void (*free_string_data)(void *str, struct uj_data *sdata);
+    void (*free_string_data)(struct uj_data *sdata);
 
     /*  bool */
     int (*get_bool_value)(void *boolean);
