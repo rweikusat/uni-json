@@ -7,6 +7,7 @@
 */
 
 /*  includes */
+#include <alloca.h>
 #include <stdio.h>
 
 #include "uni_json_types.h"
@@ -30,8 +31,11 @@ static void ser_number(void *, void *, struct uni_json_s_binding *,
 static void ser_string(void *, void *, struct uni_json_s_binding *,
                        unsigned, int);
 
-static void ser_arry(void *, void *, struct uni_json_s_binding *,
-                     unsigned, int);
+static void ser_array(void *, void *, struct uni_json_s_binding *,
+                      unsigned, int);
+
+static void serialize_value(void *, void *, struct uni_json_s_binding *,
+                            unsigned, int);
 
 /*  variables */
 static serialize_func *serers[] = {
@@ -114,7 +118,7 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
 
     binds->get_num_data(val, &data);
     binds->output(data.s, data.len, sink);
-    if (binds->free_num_data) binds->free_num_data(val, &data);
+    if (binds->free_num_data) binds->free_num_data(&data);
 }
 
 static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
@@ -150,7 +154,7 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
 
     if (p > s) outp(s, p - s, sink);
     outp("\"", 1, sink);
-    if (binds->free_string_data) binds->free_string_data(val, &data);
+    if (binds->free_string_data) binds->free_string_data(&data);
 }
 
 static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
@@ -179,17 +183,17 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
     }
 
     next_val = binds->next_value;
-    v = next_val(ary, aiter);
+    v = next_val(aiter);
     if (v) {
         serialize_value(v, sink, binds, level, fmt);
 
-        while (v = next_val(ary, aiter), v) {
+        while (v = next_val(aiter), v) {
             outp(sep, sep_len, sink);
             serialize_value(v, sink, binds, level, fmt);
         }
     }
 
-    if (binds->end_array_traversal) binds->end_array_traversal(ary, aiter);
+    if (binds->end_array_traversal) binds->end_array_traversal(aiter);
     outp("]", 1, sink);
 }
 
