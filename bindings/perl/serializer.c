@@ -17,7 +17,7 @@
 
 /*  constants */
 enum {
-    INIT_SIZE = 128
+    INIT_BUF_SIZE = 128
 };
 
 /*  prototypes */
@@ -103,7 +103,7 @@ SV *serialize(SV *val, int fmt)
     dTHX;
     SV *out;
 
-    out = newSV(INIT_SIZE);
+    out = newSV(INIT_BUF_SIZE);
     SvPOK_on(out);
     SvUTF8_on(out);
 
