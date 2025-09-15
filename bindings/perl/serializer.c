@@ -115,7 +115,7 @@ static void *next_value(void *p)
     if (aiter->p == aiter->e) return NULL;
 
     v = *aiter->p++;
-    return v ? v : &PL_sv_undef;
+    return v;
 }
 
 static void end_array_traversal(void *aiter)
