@@ -63,9 +63,9 @@ static int type_of(void *p)
 {
     dTHX;
     SV *sv;
-    char const *rtype;
 
     sv = p;
+
     if (SvROK(sv)) {
         switch (SvTYPE(SvRV(sv))) {
         case SVt_PVAV:
