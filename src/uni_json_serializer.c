@@ -277,7 +277,7 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
     do
         rc = next_kv_pair(oiter, kvp + ++kvp_ndx);
     while (rc);
-    qsort(kvp, sizeof(*kvp), kvp_ndx, key_cmp);
+    qsort(kvp, kvp_ndx, sizeof(*kvp), key_cmp);
 
     outp = binds->output;
     if (fmt == UJ_FMT_PRETTY) {
