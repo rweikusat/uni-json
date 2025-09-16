@@ -30,6 +30,7 @@ static void output(uint8_t *data, size_t len, void *sink);
 static int type_of(void *p);
 
 static void *start_object_traversal(void *);
+static size_t max_kv_pairs(void *);
 static int next_kv_pair(void *, struct uj_kv_pair *);
 
 static void *start_array_traversal(void *);
@@ -47,6 +48,7 @@ static struct uni_json_s_binding binds = {
     .type_of =			type_of,
 
     .start_object_traversal =	start_object_traversal,
+    .max_kv_pairs =		max_kv_pairs,
     .next_kv_pair =		next_kv_pair,
 
     .start_array_traversal =	start_array_traversal,
@@ -104,6 +106,12 @@ static void *start_object_traversal(void *obj)
     hv = (HV *)SvRV((SV *)obj);
     hv_iterinit(hv);
     return hv;
+}
+
+static size_t max_kv_pairs(void *obj)
+{
+    dTHX;
+    return hv_iterinit((HV *)SvRV((SV *)obj));
 }
 
 static void key_from_he(HE *he, struct uj_data *key)
