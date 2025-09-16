@@ -29,6 +29,9 @@ struct aiter {
 static void output(uint8_t *data, size_t len, void *sink);
 static int type_of(void *p);
 
+static void *start_object_traversal(void *);
+static int next_kv_pair(void *, struct uj_kv_pair *);
+
 static void *start_array_traversal(void *);
 static void *next_value(void *);
 static void end_array_traversal(void *);
@@ -42,6 +45,9 @@ static int get_bool_value(void *boolean);
 static struct uni_json_s_binding binds = {
     .output =			output,
     .type_of =			type_of,
+
+    .start_object_traversal =	start_object_traversal,
+    .next_kv_pair =		next_kv_pair,
 
     .start_array_traversal =	start_array_traversal,
     .next_value =		next_value,
@@ -88,6 +94,60 @@ static int type_of(void *p)
     if (SvPOK(sv)) return UJ_T_STR;
 
     return UJ_T_UNK;
+}
+
+static void *start_object_traversal(void *obj)
+{
+    dTHX;
+    HV *hv;
+
+    hv = (HV *)SvRV((SV *)obj);
+    hv_iterinit(hv);
+    return hv;
+}
+
+static void key_from_he(HE *he, struct uj_data *key)
+{
+    dTHX;
+    STRLEN len, ndx;
+    SV *sv;
+
+    key->s = HePV(he, len);
+
+    if (!HeUTF8(he)) {
+        ndx = 0;
+        while (ndx < len) {
+            if (key->s[ndx] > 127) {
+                sv = newSVhek(HeKEY_hek(he));
+                key->s = SvPVutf8(sv, len);
+                key->len = len;
+
+                sv_2mortal(sv);
+                return;
+            }
+
+            ++ndx;
+        }
+    }
+
+    key->len = len;
+}
+
+static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
+{
+    dTHX;
+    HV *hv;
+    HE *he;
+    STRLEN len;
+
+    hv = oiter;
+    he = hv_iternext(hv);
+    if (!he) return 0;
+
+    key_from_he(he, &kvp->key);
+    kvp->val = HeVAL(he);
+
+    return 1;
 }
 
 static void *start_array_traversal(void *ary)
