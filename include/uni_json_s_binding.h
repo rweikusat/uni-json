@@ -32,7 +32,7 @@ struct uni_json_s_binding {
 
     /*  objects */
     void *(*start_object_traversal)(void *obj);
-    size_t (*n_kv_pairs)(void *obj);
+    size_t (*max_kv_pairs)(void *obj);
     void (*end_object_traversal)(void *oiter);
     int (*next_kv_pair)(void *oiter, struct uj_kv_pair *kvp);
 
