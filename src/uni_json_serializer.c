@@ -285,7 +285,7 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
         kv_sep_len = 3;
 
         kvp_sep = alloca(level + 2);
-        kvp_sep = ",";
+        *kvp_sep = ',';
         kvp_sep[1] = '\n';
         kvp_sep_len = 2;
         do kvp_sep[kvp_sep_len] = '\t'; while (++kvp_sep_len < level + 2);
