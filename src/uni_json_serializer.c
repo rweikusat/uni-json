@@ -47,7 +47,7 @@ static serialize_func *serers[] = {
     [UJ_T_NUM] =	ser_number,
     [UJ_T_STR] =	ser_string,
     [UJ_T_ARY] =	ser_array,
-    [UJ_T_IBJ] =	ser_object,
+    [UJ_T_OBJ] =	ser_object,
     [UJ_T_UNK] =	ser_null
 };
 
@@ -125,7 +125,8 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
     if (binds->free_num_data) binds->free_num_data(&data);
 }
 
-static void ser_string_data(uint8_t *s, size_t len, void *sink)
+static void ser_string_data(uint8_t *s, size_t len, void *sink,
+                            struct uni_json_s_binding *binds)
 {
     typeof (binds->output) outp;
     uint8_t *p, *e, *esc;
@@ -162,7 +163,7 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
     struct uj_data data;
 
     binds->get_string_data(val, &data);
-    ser_string_data(data.s, data.len, sink);
+    ser_string_data(data.s, data.len, sink, binds);
     if (binds->free_string_data) binds->free_string_data(&data);
 }
 
@@ -218,17 +219,17 @@ static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *
     next_kvp = binds->next_kv_pair;
     if (!next_kvp(oiter, &kvp)) return;
 
-    ser_string_data(kvp.key.s, kvp.key.len, sink);
+    ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
     outp = binds->output;
     outp(":", 1, sink);
-    ser_value(kvp.val, sink, binds, 0, Uj_FMT_FAST);
+    ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
 
     while (next_kvp(oiter, &kvp)) {
         outp(",", 1, sink);
 
-        ser_string_data(kvp.key.s, kvp.key.len, sink);
+        ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
         outp(":", 1, sink);
-        ser_value(kvp.val, sink, binds, 0, Uj_FMT_FAST);
+        ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
     }
 }
 
