@@ -125,21 +125,17 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
     if (binds->free_num_data) binds->free_num_data(&data);
 }
 
-static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
-                       unsigned, int)
+static void ser_string_data(uint8_t *s, size_t len, void *sink)
 {
-    struct uj_data data;
-    uint8_t *s, *p, *e, *esc;
-    unsigned c, len;
     typeof (binds->output) outp;
+    uint8_t *p, *e, *esc;
+    unsigned c;
 
     outp = binds->output;
     outp("\"", 1, sink);
 
-    binds->get_string_data(val, &data);
-    s = p = data.s;
-    e = p + data.len;
-
+    p = s;
+    e = p + len;
     while (p < e) {
         c = *p;
 
@@ -158,6 +154,15 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
 
     if (p > s) outp(s, p - s, sink);
     outp("\"", 1, sink);
+}
+
+static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
+                       unsigned, int)
+{
+    struct uj_data data;
+
+    binds->get_string_data(val, &data);
+    ser_string_data(data.s, data.len, sink);
     if (binds->free_string_data) binds->free_string_data(&data);
 }
 
