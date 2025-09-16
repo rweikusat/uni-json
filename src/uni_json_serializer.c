@@ -34,6 +34,9 @@ static void ser_string(void *, void *, struct uni_json_s_binding *,
 static void ser_array(void *, void *, struct uni_json_s_binding *,
                       unsigned, int);
 
+static void ser_object(void *, void *, struct uni_json_s_binding *,
+                       unsigned, int);
+
 static void serialize_value(void *, void *, struct uni_json_s_binding *,
                             unsigned, int);
 
@@ -44,6 +47,7 @@ static serialize_func *serers[] = {
     [UJ_T_NUM] =	ser_number,
     [UJ_T_STR] =	ser_string,
     [UJ_T_ARY] =	ser_array,
+    [UJ_T_IBJ] =	ser_object,
     [UJ_T_UNK] =	ser_null
 };
 
@@ -198,6 +202,24 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
 
     if (binds->end_array_traversal) binds->end_array_traversal(aiter);
     outp("]", 1, sink);
+}
+
+static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
+                       unsigned level, int fmt)
+{
+    void *oiter;
+
+    binds->output("{", 1, sink);
+    oiter = binds->start_object_traversal(val);
+
+    switch (fmt) {
+    case UJ_FMT_FAST:
+        ser_object_fast(oiter, sink, binds, level);
+    }
+
+    if (binds->end_object_traversal)
+        binds->end_object_traversal(oiter);
+    binds->output("}", 1, sink);
 }
 
 static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
