@@ -262,12 +262,12 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
     typeof (binds->output) outp;
     uint8_t *kv_sep, *kvp_sep;
     struct uj_kv_pair *kvp;
-    size_t kvps, kv_sep_len, kvp_sep_len;
+    size_t kvp_ndx, kv_sep_len, kvp_sep_len;
     int rc;
 
     next_kv_pair = binds->next_kv_pair;
     kvp = malloc(sizeof(*kvp) * max_kvps);
-    kvps = 0;
+    kvp_ndx = 0;
     rc = next_kv_pair(oiter, kvp);
     if (!rc) {
         free(kvp);
@@ -275,9 +275,9 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
     }
 
     do
-        rc = next_kv_pair(oiter, kvp + ++kvps);
+        rc = next_kv_pair(oiter, kvp + ++kvp_ndx);
     while (rc);
-    qsort(kvp, sizeof(*kvp), kvps, key_cmp);
+    qsort(kvp, sizeof(*kvp), kvp_ndx, key_cmp);
 
     outp = binds->output;
     if (fmt == UJ_FMT_PRETTY) {
@@ -300,20 +300,20 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
         outp(",", 1, sink);
     }
 
-    --kvps;
-    ser_string_data(kvp[kvps].key.s, kvp[kvps].key.len,
+    --kvp_ndx;
+    ser_string_data(kvp[kvp_ndx].key.s, kvp[kvp_ndx].key.len,
                     sink, binds);
     outp(kv_sep, kv_sep_len, sink);
-    ser_value(kvp[kvps].val, sink, binds, level, fmt);
+    ser_value(kvp[kvp_ndx].val, sink, binds, level, fmt);
 
-    while (kvps) {
+    while (kvp_ndx) {
         outp(kvp_sep, kvp_sep_len, sink);
 
-        --kvps;
-        ser_string_data(kvp[kvps].key.s, kvp[kvps].key.len,
+        --kvp_ndx;
+        ser_string_data(kvp[kvp_ndx].key.s, kvp[kvp_ndx].key.len,
                         sink, binds);
         outp(kv_sep, kv_sep_len, sink);
-        ser_value(kvp[kvps].val, sink, binds, level, fmt);
+        ser_value(kvp[kvp_ndx].val, sink, binds, level, fmt);
     }
 
     free(kvp);
