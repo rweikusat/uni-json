@@ -37,7 +37,7 @@ static void ser_array(void *, void *, struct uni_json_s_binding *,
 static void ser_object(void *, void *, struct uni_json_s_binding *,
                        unsigned, int);
 
-static void serialize_value(void *, void *, struct uni_json_s_binding *,
+static void ser_value(void *, void *, struct uni_json_s_binding *,
                             unsigned, int);
 
 /*  variables */
@@ -192,16 +192,39 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
     next_val = binds->next_value;
     v = next_val(aiter);
     if (v) {
-        serialize_value(v, sink, binds, level, fmt);
+        ser_value(v, sink, binds, level, fmt);
 
         while (v = next_val(aiter), v) {
             outp(sep, sep_len, sink);
-            serialize_value(v, sink, binds, level, fmt);
+            ser_value(v, sink, binds, level, fmt);
         }
     }
 
     if (binds->end_array_traversal) binds->end_array_traversal(aiter);
     outp("]", 1, sink);
+}
+
+static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *binds)
+{
+    typeof (binds->output) outp;
+    typeof (binds->next_kv_pair) next_kvp;
+    struct uj_kv_pair kvp;
+
+    next_kvp = binds->next_kv_pair;
+    if (!next_kvp(oiter, &kvp)) return;
+
+    ser_string_data(kvp.key.s, kvp.key.len, sink);
+    outp = binds->output;
+    outp(":", 1, sink);
+    ser_value(kvp.val, sink, binds, 0, Uj_FMT_FAST);
+
+    while (next_kvp(oiter, &kvp)) {
+        outp(",", 1, sink);
+
+        ser_string_data(kvp.key.s, kvp.key.len, sink);
+        outp(":", 1, sink);
+        ser_value(kvp.val, sink, binds, 0, Uj_FMT_FAST);
+    }
 }
 
 static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
@@ -214,7 +237,7 @@ static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
 
     switch (fmt) {
     case UJ_FMT_FAST:
-        ser_object_fast(oiter, sink, binds, level);
+        ser_object_fast(oiter, sink, binds);
     }
 
     if (binds->end_object_traversal)
@@ -222,7 +245,7 @@ static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
     binds->output("}", 1, sink);
 }
 
-static void serialize_value(void *val, void *sink, struct uni_json_s_binding *binds,
+static void ser_value(void *val, void *sink, struct uni_json_s_binding *binds,
                             unsigned level, int fmt)
 {
     serers[binds->type_of(val)](val, sink, binds, level, fmt);
@@ -231,5 +254,5 @@ static void serialize_value(void *val, void *sink, struct uni_json_s_binding *bi
 void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
                         int fmt)
 {
-    serialize_value(val, sink, binds, 0, fmt);
+    ser_value(val, sink, binds, 0, fmt);
 }
