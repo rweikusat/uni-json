@@ -9,6 +9,8 @@
 /*  includes */
 #include <alloca.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "uni_json_types.h"
 #include "uni_json_s_binding.h"
@@ -233,10 +235,97 @@ static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *
     }
 }
 
+static int key_cmp(void const *p0, void const *p1)
+{
+    struct uj_kv_pair const *kvp0, *kvp1;
+    size_t kl0, kl1, cmp_len;
+    int rc;
+
+    kvp0 = p0;
+    kl0 = kvp0->key.len;
+    kvp1 = p1;
+    kl1 = kvp1->key.len;
+    if (kl0 < kl1) cmp_len = kl0;
+    else cmp_len = kl1;
+
+    rc = memcmp(kvp1->key.s, kvp0->key.s, cmp_len);
+    if (rc) return rc;
+    if (kl0 == kl1) return 0;
+    return kl1 < kl0 ? -1 : 1;
+}
+
+static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
+                           struct uni_json_s_binding *binds,
+                           unsigned level, int fmt)
+{
+    typeof (binds->next_kv_pair) next_kv_pair;
+    typeof (binds->output) outp;
+    uint8_t *kv_sep, *kvp_sep;
+    struct uj_kv_pair *kvp;
+    size_t kvps, kv_sep_len, kvp_sep_len;
+    int rc;
+
+    next_kv_pair = binds->next_kv_pair;
+    kvp = malloc(sizeof(*kvp) * max_kvps);
+    kvps = 0;
+    rc = next_kv_pair(oiter, kvp);
+    if (!rc) {
+        free(kvp);
+        return;
+    }
+
+    do
+        rc = next_kv_pair(oiter, kvp + ++kvps);
+    while (rc);
+    qsort(kvp, sizeof(*kvp), kvps, key_cmp);
+
+    outp = binds->output;
+    if (fmt == UJ_FMT_PRETTY) {
+        kv_sep = " : ";
+        kv_sep_len = 3;
+
+        kvp_sep = alloca(level + 2);
+        kvp_sep = ",";
+        kvp_sep[1] = '\n';
+        kvp_sep_len = 2;
+        do kvp_sep[kvp_sep_len] = '\t'; while (++kvp_sep_len < level + 2);
+        outp(kvp_sep + 1, kvp_sep_len -1, sink);
+    } else {
+        kv_sep = ":";
+        kv_sep_len = 1;
+
+        kvp_sep = ",";
+        kvp_sep_len = 1;
+
+        outp(",", 1, sink);
+    }
+
+    --kvps;
+    ser_string_data(kvp[kvps].key.s, kvp[kvps].key.len,
+                    sink, binds);
+    outp(kv_sep, kv_sep_len, sink);
+    ser_value(kvp[kvps].val, sink, binds, level, fmt);
+
+    while (kvps) {
+        outp(kvp_sep, kvp_sep_len, sink);
+
+        --kvps;
+        ser_string_data(kvp[kvps].key.s, kvp[kvps].key.len,
+                        sink, binds);
+        outp(kv_sep, kv_sep_len, sink);
+        ser_value(kvp[kvps].val, sink, binds, level, fmt);
+    }
+
+    free(kvp);
+}
+
 static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
                        unsigned level, int fmt)
 {
     void *oiter;
+    size_t max_kvps;
+
+    max_kvps = binds->max_kv_pairs(val);
 
     binds->output("{", 1, sink);
     oiter = binds->start_object_traversal(val);
@@ -244,6 +333,12 @@ static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
     switch (fmt) {
     case UJ_FMT_FAST:
         ser_object_fast(oiter, sink, binds);
+        break;
+
+    case UJ_FMT_DET:
+    case UJ_FMT_PRETTY:
+        if (max_kvps)
+            ser_object_det(oiter, max_kvps, sink, binds, level + 1, fmt);
     }
 
     if (binds->end_object_traversal)
