@@ -111,7 +111,7 @@ static void *start_object_traversal(void *obj)
 static size_t max_kv_pairs(void *obj)
 {
     dTHX;
-    return hv_iterinit((HV *)SvRV((SV *)obj));
+    return HvTOTALKEYS((HV *)SvRV((SV *)obj));
 }
 
 static void key_from_he(HE *he, struct uj_data *key)
