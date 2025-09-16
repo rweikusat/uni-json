@@ -20,3 +20,6 @@ ok($x eq '{"a":"b","c":45}' || $x eq '{"c":45,"a":"b"}', 'object with more than 
 $x = json_serialize({"a\xe4b" => 11 });
 $y = parse_json("\"a\xc3\xa4b\"");
 is($x, "{\"$y\":11}", 'object with latin1-char in key serializes correctly');
+
+$x = json_serialize({ zloty => [1,2,3, { d => 4 }], alpha => "beta", gamma => "delta", epsilon => 1}, 2);
+print($x, "\n");
