@@ -281,6 +281,7 @@ static struct uj_kv_pair *build_kvp_heap(void *oiter,
             kvps[at] = kvps[pre];
             at = pre;
         } while (at > 1);
+
         kvps[at] = kvp;
     }
 
