@@ -235,49 +235,89 @@ static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *
     }
 }
 
-static int key_cmp(void const *p0, void const *p1)
+static int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
 {
-    struct uj_kv_pair const *kvp0, *kvp1;
-    size_t kl0, kl1, cmp_len;
+    size_t kl0, kl1, cmp_len, ndx;
     int rc;
 
-    kvp0 = p0;
     kl0 = kvp0->key.len;
-    kvp1 = p1;
     kl1 = kvp1->key.len;
     if (kl0 < kl1) cmp_len = kl0;
     else cmp_len = kl1;
 
-    rc = memcmp(kvp1->key.s, kvp0->key.s, cmp_len);
-    if (rc) return rc;
+    ndx = 0;
+    while (ndx < cmp_len) {
+        rc = kvp0->key.s[ndx] - kvp1->key.s[ndx];
+        if (rc) return rc;
+
+        ++ndx;
+    }
+
     if (kl0 == kl1) return 0;
-    return kl1 < kl0 ? -1 : 1;
+    return kl0 < kl1 ? -1 : 1;
+}
+
+static struct uj_kv_pair *build_kvp_heap(void *oiter,
+                                         typeof ((struct uni_json_s_binding){0}.next_kv_pair) next_kv_pair,
+                                         size_t max_kvps,
+                                         size_t *kvp_last)
+{
+    struct uj_kv_pair *kvps, kvp;
+    size_t last, at, pre;
+
+    kvps = malloc(sizeof(*kvps) * (max_kvps + 1));
+    if (!next_kv_pair(oiter, kvps + 1)) {
+        free(kvps);
+        return 0;
+    }
+
+    last = 1;
+    while (next_kv_pair(oiter, &kvp)) {
+        at = ++last;
+
+        do {
+            pre = at / 2;
+            if (key_cmp(kvps + pre, &kvp) <= 0) break;
+
+            kvps[at] = kvps[pre];
+            at = pre;
+        } while (at > 1);
+        kvps[at] = kvp;
+    }
+
+    *kvp_last = last;
+    return kvps;
+}
+
+static void rm_kvps_root(struct uj_kv_pair *kvps, size_t last)
+{
+    size_t at, next;
+
+    at = 1;
+    while (next = at * 2, next < last) {
+        if (next + 1 < last && key_cmp(kvps + next, kvps + next + 1) > 0)
+            ++next;
+        if (key_cmp(kvps + next, kvps + last) >= 0) break;
+
+        kvps[at] = kvps[next];
+        at = next;
+    }
+
+    kvps[at] = kvps[last];
 }
 
 static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
                            struct uni_json_s_binding *binds,
                            unsigned level, int fmt)
 {
-    typeof (binds->next_kv_pair) next_kv_pair;
     typeof (binds->output) outp;
     uint8_t *kv_sep, *kvp_sep;
-    struct uj_kv_pair *kvp;
-    size_t kvp_ndx, kv_sep_len, kvp_sep_len;
-    int rc;
+    struct uj_kv_pair *kvps;
+    size_t kvps_last, kv_sep_len, kvp_sep_len;
 
-    next_kv_pair = binds->next_kv_pair;
-    kvp = malloc(sizeof(*kvp) * max_kvps);
-    kvp_ndx = 0;
-    rc = next_kv_pair(oiter, kvp);
-    if (!rc) {
-        free(kvp);
-        return;
-    }
-
-    do
-        rc = next_kv_pair(oiter, kvp + ++kvp_ndx);
-    while (rc);
-    qsort(kvp, kvp_ndx, sizeof(*kvp), key_cmp);
+    kvps = build_kvp_heap(oiter, binds->next_kv_pair, max_kvps,
+                          &kvps_last);
+    if (!kvps) return;
 
     outp = binds->output;
     if (fmt == UJ_FMT_PRETTY) {
@@ -300,23 +340,21 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
         outp(",", 1, sink);
     }
 
-    --kvp_ndx;
-    ser_string_data(kvp[kvp_ndx].key.s, kvp[kvp_ndx].key.len,
-                    sink, binds);
+    ser_string_data(kvps[1].key.s, kvps[1].key.len, sink, binds);
     outp(kv_sep, kv_sep_len, sink);
-    ser_value(kvp[kvp_ndx].val, sink, binds, level, fmt);
+    ser_value(kvps[1].val, sink, binds, level, fmt);
+    rm_kvps_root(kvps, kvps_last);
 
-    while (kvp_ndx) {
+    while (--kvps_last) {
         outp(kvp_sep, kvp_sep_len, sink);
 
-        --kvp_ndx;
-        ser_string_data(kvp[kvp_ndx].key.s, kvp[kvp_ndx].key.len,
-                        sink, binds);
+        ser_string_data(kvps[1].key.s, kvps[1].key.len, sink, binds);
         outp(kv_sep, kv_sep_len, sink);
-        ser_value(kvp[kvp_ndx].val, sink, binds, level, fmt);
+        ser_value(kvps[1].val, sink, binds, level, fmt);
+        rm_kvps_root(kvps, kvps_last);
     }
 
-    free(kvp);
+    free(kvps);
 }
 
 static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
