@@ -4,7 +4,7 @@
 #
 
 use Test::More tests => 6;
-use JSON::Uni	qw(parse_json json_serialize);
+use JSON::Uni	qw(parse_json json_serialize UJ_FMT_PRETTY UJ_FMT_DET);
 
 my ($x, $y);
 
@@ -38,10 +38,10 @@ TT
 $ser = substr($ser, 0, -1);
 $y = 1;
 for (0 .. 49) {
-    $x = json_serialize($d, 2);
+    $x = json_serialize($d, UJ_FMT_PRETTY);
     $y = 0, last unless $x eq $ser;
 }
 is($y, 1, 'pretty-printing a complex object worked 50 times in a row');
 
-$x = json_serialize({z => 0, b => 1, k => 2}, 1);
+$x = json_serialize({z => 0, b => 1, k => 2}, UJ_FMT_DET);
 is($x, '{"b":1,"k":2,"z":0}', 'deterministic serializer works');
