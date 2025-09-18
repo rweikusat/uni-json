@@ -324,8 +324,7 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
     uint8_t *kv_sep, *kvp_sep;
     size_t kv_sep_len, kvp_sep_len;
 
-    build_kvph(oiter, binds->next_kv_pair, max_kvps,
-               &kvph);
+    build_kvph(oiter, binds->next_kv_pair, max_kvps, &kvph);
     if (!kvph.last) return;
 
     outp = binds->output;
@@ -345,8 +344,6 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
 
         kvp_sep = ",";
         kvp_sep_len = 1;
-
-        outp(",", 1, sink);
     }
 
     ser_string_data(kvph.h[1].key.s, kvph.h[1].key.len, sink, binds);
