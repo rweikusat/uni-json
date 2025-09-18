@@ -15,12 +15,36 @@
 #include "uni_json_parser.h"
 #include "uni_json_serializer.h"
 
+/*  types */
+struct a_const {
+    char *n;
+    uint64_t v;
+};
+
 /*  prototypes */
 void *parse(uint8_t *, size_t);
 SV *serialize(SV *, int);
 
+/*  variables */
+static struct a_const fmt_consts[] = {
+#define n_(x) { .n = #x, .v = x }
+
+    n_(UJ_FMT_FAST),
+    n_(UJ_FMT_DET),
+    n_(UJ_FMT_PRETTY)
+
+#undef n_
+};
+
 /*  XS code */
 MODULE = JSON::Uni PACKAGE = JSON::Uni
+
+SV *
+fmt_consts()
+CODE:
+	RETVAL = newSVpv((void *)fmt_consts, sizeof(fmt_consts));
+OUTPUT:
+	RETVAL
 
 SV *
 parse_json(data)
