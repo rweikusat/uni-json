@@ -7,14 +7,22 @@
 #
 package JSON::Uni;
 
-use version; our $VERSION = version->declare('v0.1.0');
 
-require DynaLoader;
-our @ISA = 'DynaLoader';
-__PACKAGE__->bootstrap();
+BEGIN {
+    use version; our $VERSION = version->declare('v0.1.0');
+
+    require DynaLoader;
+    our @ISA = 'DynaLoader';
+    __PACKAGE__->bootstrap();
+
+    my %fc = unpack('(pQ)*', fmt_consts());
+    require constant;
+    constant->import(\%fc);
+}
 
 use Exporter	'import';
-our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting json_serialize);
+our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting json_serialize
+                    UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY);
 
 # Ach ja
 1;
