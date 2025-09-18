@@ -291,12 +291,13 @@ static struct uj_kv_pair *build_kvp_heap(void *oiter,
 
 static void rm_kvps_root(struct uj_kv_pair *kvps, size_t last)
 {
-    size_t at, next;
+    size_t at, next, r_next;
 
     at = 1;
     while (next = at * 2, next < last) {
-        if (next + 1 < last && key_cmp(kvps + next, kvps + next + 1) > 0)
-            ++next;
+        r_next = next + 1;
+        if (r_next  < last && key_cmp(kvps + next, kvps + r_next) > 0)
+            next = r_next;
         if (key_cmp(kvps + next, kvps + last) >= 0) break;
 
         kvps[at] = kvps[next];
