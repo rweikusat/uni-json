@@ -21,7 +21,7 @@ BEGIN {
 }
 
 use Exporter	'import';
-our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting json_serialize
+our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting json_serialize json_ec_2_msg
                     UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY);
 
 # Ach ja
