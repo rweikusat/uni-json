@@ -34,6 +34,17 @@ management scheme to "avoid recursion."
 What's There So Far?
 ====================
 
+,----
+| Undocumented (so far) additions after 0.1:
+| ------------------------------------------
+| 	- complete serializer & perl bindings for that (JSON::Uni:json_serialize)
+| 	- UJ_E constants can be imported from JSON::Uni
+|       - error code -> error msg mapper routine (JSON::Uni::json_ec_2_msg)
+|       - a Perl error handler (sub name or code ref) can be passed to
+|         parse_json as optional second argument
+`----
+          
+
 A complete parser core, a simple set of bindings for Perl and a test
 suite believed to be complete in the sense that it actually exercised
 all code paths.
