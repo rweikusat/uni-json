@@ -103,7 +103,7 @@ OUTPUT:
 	RETVAL
 
 char *
-ec_2_msg(ec)
+json_ec_2_msg(ec)
 	UV ec
 CODE:
 	RETVAL = uni_json_ec_2_msg(ec);
