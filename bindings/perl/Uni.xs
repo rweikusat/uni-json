@@ -98,7 +98,7 @@ CODE:
                 binds = &default_perl_uj_parser_bindings;
 	}
 
-        RETVAL = uni_json_parse(d, len, binds, NULL);
+        RETVAL = uni_json_parse(d, len, binds, err_p);
 OUTPUT:
 	RETVAL
 
