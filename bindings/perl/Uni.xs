@@ -12,6 +12,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "uni_json_p_binding.h"
 #include "uni_json_parser.h"
 #include "uni_json_serializer.h"
 
@@ -44,6 +45,25 @@ static struct a_const fmt_consts[] = {
 #undef n_
 };
 
+static void invoke_error_handler(unsigned code, size_t pos, void *p)
+{
+    dSP;
+
+    ENTER;
+    SAVETEMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSVuv(code)));
+    PUSHs(sv_2mortal(newSVuv(pos)));
+    PUTBACK;
+
+    call_sv((SV *)p, G_DISCARD);
+
+    FREETEMPS;
+    LEAVE;
+}
+
 /*  XS code */
 MODULE = JSON::Uni PACKAGE = JSON::Uni
 
@@ -55,14 +75,29 @@ OUTPUT:
 	RETVAL
 
 SV *
-parse_json(data)
+parse_json(data, on_error = &PL_sv_undef)
 	SV * data
+        SV * on_error
 PREINIT:
+	struct uni_json_p_binding ours, *binds;
+        void *err_p;
 	uint8_t *d;
         STRLEN len;
 CODE:
 	d = SvPV(data, len);
-        RETVAL = uni_json_parse(d, len, &default_perl_uj_parser_bindings, NULL);
+
+	if (SvOK(on_error)) {
+		err_p = on_error;
+
+		ours = default_perl_uj_parser_bindings;
+                ours.on_error = invoke_error_handler;
+                binds = &ours;
+	} else {
+		err_p = NULL;
+                binds = &default_perl_uj_parser_bindings;
+	}
+
+        RETVAL = uni_json_parse(d, len, binds, NULL);
 OUTPUT:
 	RETVAL
 
