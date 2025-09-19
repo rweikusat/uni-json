@@ -47,10 +47,11 @@ static struct a_const fmt_consts[] = {
 
 static void invoke_error_handler(unsigned code, size_t pos, void *p)
 {
+    dTHX;
     dSP;
 
     ENTER;
-    SAVETEMPS;
+    SAVETMPS;
 
     PUSHMARK(SP);
     EXTEND(SP, 2);
@@ -60,7 +61,7 @@ static void invoke_error_handler(unsigned code, size_t pos, void *p)
 
     call_sv((SV *)p, G_DISCARD);
 
-    FREETEMPS;
+    FREETMPS;
     LEAVE;
 }
 
