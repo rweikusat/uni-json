@@ -62,7 +62,7 @@ PREINIT:
         STRLEN len;
 CODE:
 	d = SvPV(data, len);
-        RETVAL = uni_json_parse(d, len, &default_perl_uj_parser_bindings);
+        RETVAL = uni_json_parse(d, len, &default_perl_uj_parser_bindings, NULL);
 OUTPUT:
 	RETVAL
 

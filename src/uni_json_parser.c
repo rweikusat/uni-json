@@ -160,13 +160,14 @@ char *uni_json_ec_2_msg(unsigned ec)
     return "not implemented";
 }
 
-void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds)
+void *uni_json_parse(uint8_t *data, size_t len,
+                     struct uni_json_p_binding *binds, void *err_p)
 {
     struct pstate pstate;
     void *v;
 
     if (!len) {
-        binds->on_error(UJ_E_NO_VAL, 0);
+        binds->on_error(UJ_E_NO_VAL, 0, err_p);
         return NULL;
     }
 
@@ -177,18 +178,18 @@ void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds
     v = parse_value(&pstate, binds);
 
     if (!v) {
-        binds->on_error(pstate.err.code, pstate.err.pos - data);
+        binds->on_error(pstate.err.code, pstate.err.pos - data, err_p);
         return NULL;
     }
 
     if ((int *)v == &no_value) {
-        binds->on_error(UJ_E_NO_VAL, 0);
+        binds->on_error(UJ_E_NO_VAL, 0, err_p);
         return NULL;
     }
 
     if (pstate.p != pstate.e) {
         free_obj(pstate.last_type, v, binds);
-        binds->on_error(UJ_E_GARBAGE, pstate.p - data);
+        binds->on_error(UJ_E_GARBAGE, pstate.p - data, err_p);
         return NULL;
     }
 
