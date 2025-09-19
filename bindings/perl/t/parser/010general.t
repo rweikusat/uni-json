@@ -6,7 +6,7 @@
 use Test::More tests => 5;
 
 BEGIN {
-    use_ok('JSON::Uni', qw(parse_json json_ec_2_msg));
+    use_ok('JSON::Uni', qw(parse_json json_ec_2_msg UJ_E_NO_VAL));
 }
 
 eval {
@@ -27,4 +27,4 @@ isnt($@, '', 'non-start-char errors');
 eval {
     parse_json('', sub { die([@_]) });
 };
-is_deeply($@, [1, 0], 'custom perl error handler works');
+is_deeply($@, [UJ_E_NO_VAL, 0], 'custom perl error handler works');
