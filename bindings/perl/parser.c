@@ -15,7 +15,7 @@
 #include <uni_json_parser.h>
 
 /*  prototypes */
-static void on_error(unsigned, size_t);
+static void on_error(unsigned, size_t, void *);
 
 static void *make_bool(int);
 static void *make_null(void);
@@ -56,7 +56,7 @@ struct uni_json_p_binding default_perl_uj_parser_bindings = {
 };
 
 /*  routines */
-static void on_error(unsigned code, size_t pos)
+static void on_error(unsigned code, size_t pos, void *)
 {
     croak_nocontext("%s (%u) at %zu", uni_json_ec_2_msg(code), code, pos);
 }
