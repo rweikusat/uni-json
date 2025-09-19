@@ -15,14 +15,28 @@ BEGIN {
     our @ISA = 'DynaLoader';
     __PACKAGE__->bootstrap();
 
-    my %fc = unpack('(pQ)*', fmt_consts());
+    my %h;
+
+    %h = unpack('(pQ)*', err_consts());
     require constant;
-    constant->import(\%fc);
+    constant->import(\%h);
+
+    %h = unpack('(pQ)*', fmt_consts());
+    require constant;
+    constant->import(\%h);
 }
 
 use Exporter	'import';
 our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting json_serialize json_ec_2_msg
-                    UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY);
+
+                    UJ_E_INV UJ_E_NO_VAL UJ_E_INV_LIT
+                    UJ_E_GARBAGE UJ_E_EOS UJ_E_INV_IN
+                    UJ_E_ADD UJ_E_LEADZ UJ_E_NO_DGS
+                    UJ_E_INV_CHAR UJ_E_INV_UTF8 UJ_E_INV_ESC
+                    UJ_E_INV_KEY UJ_E_NO_KEY UJ_E_TOO_DEEP
+
+                    UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY
+                  );
 
 # Ach ja
 1;

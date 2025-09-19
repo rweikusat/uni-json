@@ -35,15 +35,33 @@ SV *serialize(SV *, int);
 extern struct uni_json_p_binding default_perl_uj_parser_bindings;
 extern struct uni_json_s_binding default_perl_uj_serializer_bindings;
 
-static struct a_const fmt_consts[] = {
 #define n_(x) { .n = #x, .v = x }
 
+static struct a_const err_consts[] = {
+    n_(UJ_E_INV),
+    n_(UJ_E_NO_VAL),
+    n_(UJ_E_INV_LIT),
+    n_(UJ_E_GARBAGE),
+    n_(UJ_E_EOS),
+    n_(UJ_E_INV_IN),
+    n_(UJ_E_ADD),
+    n_(UJ_E_LEADZ),
+    n_(UJ_E_NO_DGS),
+    n_(UJ_E_INV_CHAR),
+    n_(UJ_E_INV_UTF8),
+    n_(UJ_E_INV_ESC),
+    n_(UJ_E_INV_KEY),
+    n_(UJ_E_NO_KEY),
+    n_(UJ_E_TOO_DEEP)
+};
+
+static struct a_const fmt_consts[] = {
     n_(UJ_FMT_FAST),
     n_(UJ_FMT_DET),
     n_(UJ_FMT_PRETTY)
+};
 
 #undef n_
-};
 
 static void invoke_error_handler(unsigned code, size_t pos, void *p)
 {
@@ -67,6 +85,13 @@ static void invoke_error_handler(unsigned code, size_t pos, void *p)
 
 /*  XS code */
 MODULE = JSON::Uni PACKAGE = JSON::Uni
+
+SV *
+err_consts()
+CODE:
+	RETVAL = newSVpv((void *)err_consts, sizeof(err_consts));
+OUTPUT:
+	RETVAL
 
 SV *
 fmt_consts()
