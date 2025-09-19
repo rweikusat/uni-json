@@ -33,7 +33,7 @@ static int add_2_hv(void *, void *, void *);
 static void free_obj(void *);
 
 /*  variables */
-static struct uni_json_p_binding binding = {
+struct uni_json_p_binding default_perl_uj_parser_bindings = {
     .on_error =			on_error,
 
     .make_bool =		make_bool,
@@ -154,9 +154,4 @@ static void free_obj(void *obj)
 {
     dTHX;
     SvREFCNT_dec_NN(obj);
-}
-
-void *parse(uint8_t *data, size_t len)
-{
-    return uni_json_parse(data, len, &binding);
 }

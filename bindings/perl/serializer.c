@@ -43,7 +43,7 @@ static void get_string_data(void *str, struct uj_data *data);
 static int get_bool_value(void *boolean);
 
 /*  variables */
-static struct uni_json_s_binding binds = {
+struct uni_json_s_binding default_perl_uj_serializer_bindings = {
     .output =			output,
     .type_of =			type_of,
 
@@ -218,18 +218,4 @@ static int get_bool_value(void *boolean)
 {
     dTHX;
     return SvIV((SV *)boolean) != 0;
-}
-
-SV *serialize(SV *val, int fmt)
-{
-    dTHX;
-    SV *out;
-
-    out = newSV(INIT_BUF_SIZE);
-    SvPOK_on(out);
-    SvUTF8_on(out);
-
-    uni_json_serialize(val, out, &binds, fmt);
-
-    return out;
 }

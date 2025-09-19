@@ -15,6 +15,11 @@
 #include "uni_json_parser.h"
 #include "uni_json_serializer.h"
 
+/*  constants */
+enum {
+    INIT_BUF_SIZE = 128
+};
+
 /*  types */
 struct a_const {
     char *n;
@@ -26,6 +31,9 @@ void *parse(uint8_t *, size_t);
 SV *serialize(SV *, int);
 
 /*  variables */
+extern struct uni_json_p_binding default_perl_uj_parser_bindings;
+extern struct uni_json_s_binding default_perl_uj_serializer_bindings;
+
 static struct a_const fmt_consts[] = {
 #define n_(x) { .n = #x, .v = x }
 
@@ -54,7 +62,7 @@ PREINIT:
         STRLEN len;
 CODE:
 	d = SvPV(data, len);
-        RETVAL = parse(d, len);
+        RETVAL = uni_json_parse(d, len, &default_perl_uj_parser_bindings);
 OUTPUT:
 	RETVAL
 
@@ -72,10 +80,18 @@ CODE:
 	uni_json_max_nesting = max;
 
 SV *
-json_serialize(data, fmt = UJ_FMT_FAST)
-	SV * data;
-        int fmt
+json_serialize(val, fmt = UJ_FMT_FAST)
+	SV * val;
+        int fmt;
+PREINIT:
+        SV * out;
 CODE:
-	RETVAL = serialize(data, fmt);
+	out = newSV(INIT_BUF_SIZE);
+	SvPOK_on(out);
+	SvUTF8_on(out);
+
+	uni_json_serialize(val, out, &default_perl_uj_serializer_bindings, fmt);
+
+	RETVAL = out;
 OUTPUT:
 	RETVAL
