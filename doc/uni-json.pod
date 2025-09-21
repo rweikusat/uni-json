@@ -9,7 +9,8 @@ uni-json - A C JSON parser designed to be usable in any runtime environment
     extern unsigned uni_json_max_nesting;
 
     char *uni_json_ec_2_msg(unsigned ec);
-    void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds);
+    void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds,
+                         void *err_p);
 
 =head1 DESCRIPTION
 
@@ -29,13 +30,14 @@ particular construct by doing a table-lookup of its first character..
 
 =over
 
-=item * C<void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds)>
+=item * C<void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds, void *err_p)>
 
 Parse C<len> bytes of JSON text starting at C<data> using the parser bindings passed
 via C<binds> for object creation and management. Returns a pointer to a data object
 representing the JSON value found in the text or C<NULL> on error. For the latter case,
 the C<on_error> handler passed via C<binds> will be invoked with an error code and the
-position of the error in the input text.
+position of the error in the input text. The C<err_p> argument is passed through to
+error handling routine.
 
 B<The text pointed to by C<data> is not expected to be a valid C string. Embedded null bytes
 will be handled correctly, that is, flagged as JSON syntax errors.>
