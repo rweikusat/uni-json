@@ -216,8 +216,8 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
         }
     }
 
-    if (binds->end_array_traversal) binds->end_array_traversal(aiter);
     outp("]", 1, sink);
+    if (binds->end_array_traversal) binds->end_array_traversal(aiter);
 }
 
 /**  objects */
