@@ -265,6 +265,48 @@ static int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
     return kl0 < kl1 ? -1 : 1;
 }
 
+/*
+  Determinisic and pretty-printed object serialization uses a
+  heap-based priority queue to always output key-value pairs in the
+  same order.
+
+  A heap is a binary tree with the property that the root
+  element of each subtree is always <= all other elements in it. This
+  binary tree is stored in array starting at position 1. If n is
+  the position of an element, the left and right successor nodes of it
+  will be stored at positions 2*n and 2*n+1.
+
+  To add an element to a non-empty heap, a tenative insert position at
+  is set to 1 past the current end of the heap. Then, the element at
+  position at / 2 is compared with the new element. If it's > than the
+  new element, the old element is moved to position at and at set to
+  at / 2. This continues until at has become 1 or an old element <=
+  the new element has been found. The new element is then inserted at
+  position at and the size of the heap increased by 1.
+
+  Assuming a heap has been created, the next element which should come
+  out of the priority queue will be the element at position 1. This
+  leaves a hole at position 1 which needs to be filled with another
+  element while maintaining the heap condition. The last element of
+  the heap will eventually be used to plug the hole. Before this can
+  be done, the hole must be moved down in the heap to ensure that the
+  heap condition will remain intact. If at is the current position of
+  the hole, the algorithm for this is:
+
+      1. Compare the elements are positon at*2 and at*2+1 to determine
+         the smaller of both.
+      2. Compare the last element with this element. If it's <=,
+         insert the last element at position at. Otherwise, move the
+         element compared to the last element to position at and set
+         at to its former position, goto 1.
+
+  If no element > the last element was found, the loop terminates once
+  at * 2 is beyond the end of the heap.
+
+  As the height of a binary tree with n nodes will be log₂(n), both
+  insertion and removal are O(log₂(n)).
+*/
+
 static void build_kvph(void *oiter,
                        size_t max_kvps,
                        struct kvp_heap *kvph,
