@@ -389,9 +389,8 @@ static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
             ser_object_det(oiter, max_kvps, sink, binds, level + 1, fmt);
     }
 
-    if (binds->end_object_traversal)
-        binds->end_object_traversal(oiter);
     binds->output("}", 1, sink);
+    if (binds->end_object_traversal) binds->end_object_traversal(oiter);
 }
 
 /**  top-level */
