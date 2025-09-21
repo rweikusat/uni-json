@@ -29,6 +29,8 @@ struct uni_json_s_binding {
     /*  general */
     void (*output)(uint8_t *data, size_t len, void *sink);
     int (*type_of)(void *p);
+    void *(*alloc)(size_t);
+    void (*dealloc)(void *);
 
     /*  objects */
     void *(*start_object_traversal)(void *obj);
