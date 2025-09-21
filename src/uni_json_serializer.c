@@ -97,6 +97,7 @@ static uint8_t escs[][8] = {
 };
 
 /*  routines */
+/**  simple types */
 static void ser_null(void *, void *sink, struct uni_json_s_binding *binds,
                      unsigned, int)
 {
@@ -132,6 +133,7 @@ static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
     if (binds->free_num_data) binds->free_num_data(&data);
 }
 
+/**  strings */
 static void ser_string_data(uint8_t *s, size_t len, void *sink,
                             struct uni_json_s_binding *binds)
 {
@@ -174,6 +176,7 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
     if (binds->free_string_data) binds->free_string_data(&data);
 }
 
+/**  arrays */
 static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
                       unsigned level, int fmt)
 {
@@ -217,6 +220,7 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
     outp("]", 1, sink);
 }
 
+/**  objects */
 static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *binds)
 {
     typeof (binds->output) outp;
@@ -262,16 +266,18 @@ int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
 }
 
 static void build_kvph(void *oiter,
-                       typeof ((struct uni_json_s_binding){0}.next_kv_pair) next_kv_pair,
                        size_t max_kvps,
-                       struct kvp_heap *kvph)
+                       struct kvp_heap *kvph,
+                       struct uni_json_s_binding *binds)
 {
+    typeof (binds->next_kv_pair) next_kv_pair;
     struct uj_kv_pair *kvps, kvp;
     size_t last, at, pre;
 
-    kvps = kvph->h = malloc(sizeof(*kvps) * (max_kvps + 1));
+    next_kv_pair = binds->next_kv_pair;
+    kvps = kvph->h = binds->alloc(sizeof(*kvps) * (max_kvps + 1));
     if (!next_kv_pair(oiter, kvps + 1)) {
-        free(kvps);
+        binds->dealloc(kvps);
         return;
     }
 
@@ -324,7 +330,7 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
     uint8_t *kv_sep, *kvp_sep;
     size_t kv_sep_len, kvp_sep_len;
 
-    build_kvph(oiter, binds->next_kv_pair, max_kvps, &kvph);
+    build_kvph(oiter, max_kvps, &kvph, binds);
     if (!kvph.last) return;
 
     outp = binds->output;
@@ -358,7 +364,7 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
         ser_value(kvph.h[1].val, sink, binds, level, fmt);
     }
 
-    free(kvph.h);
+    binds->dealloc(kvph.h);
 }
 
 static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
@@ -388,6 +394,7 @@ static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
     binds->output("}", 1, sink);
 }
 
+/**  top-level */
 static void ser_value(void *val, void *sink, struct uni_json_s_binding *binds,
                             unsigned level, int fmt)
 {
