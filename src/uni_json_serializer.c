@@ -229,9 +229,9 @@ static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *
 
     next_kv_pai = binds->next_kv_pair;
     if (!next_kv_pair(oiter, &kvp)) return;
+    outp = binds->output;
 
     ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
-    outp = binds->output;
     outp(":", 1, sink);
     ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
 
