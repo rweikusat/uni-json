@@ -244,7 +244,7 @@ static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *
     }
 }
 
-int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
+static int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
 {
     size_t kl0, kl1, cmp_len, ndx;
     int rc;
