@@ -46,6 +46,8 @@ static int get_bool_value(void *boolean);
 struct uni_json_s_binding default_perl_uj_serializer_bindings = {
     .output =			output,
     .type_of =			type_of,
+    .alloc =			safemalloc,
+    .dealloc =			safefree,
 
     .start_object_traversal =	start_object_traversal,
     .max_kv_pairs =		max_kv_pairs,
