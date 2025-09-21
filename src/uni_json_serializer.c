@@ -224,18 +224,18 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
 static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *binds)
 {
     typeof (binds->output) outp;
-    typeof (binds->next_kv_pair) next_kvp;
+    typeof (binds->next_kv_pair) next_kv_pair;
     struct uj_kv_pair kvp;
 
-    next_kvp = binds->next_kv_pair;
-    if (!next_kvp(oiter, &kvp)) return;
+    next_kv_pai = binds->next_kv_pair;
+    if (!next_kv_pair(oiter, &kvp)) return;
 
     ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
     outp = binds->output;
     outp(":", 1, sink);
     ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
 
-    while (next_kvp(oiter, &kvp)) {
+    while (next_kv_pair(oiter, &kvp)) {
         outp(",", 1, sink);
 
         ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
