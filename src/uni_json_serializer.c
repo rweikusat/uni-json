@@ -227,7 +227,7 @@ static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *
     typeof (binds->next_kv_pair) next_kv_pair;
     struct uj_kv_pair kvp;
 
-    next_kv_pai = binds->next_kv_pair;
+    next_kv_pair = binds->next_kv_pair;
     if (!next_kv_pair(oiter, &kvp)) return;
     outp = binds->output;
 
