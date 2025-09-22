@@ -115,7 +115,7 @@ or I<pretty-printed> output format.
 The first two affect only serialization of objects/
 hashes. When using the I<fast> format, key-value pairs will be serialized in
 the order they're returned by the L<perlapi(1)> equivalent of C<each> (C<hv_iternext>). In
-particular, this means the order of key in the ouput will be random for each individual
+particular, this means the order of keys in the ouput will be random for each individual
 object and very likely different for different objects containing the same keys. For the
 I<deterministic> output format, keys will appear sorted by locale-blind codepoint
 comparisons.
@@ -126,14 +126,15 @@ humans.
 
 =back
 
-=head2 Error Handling
+=head2 Default Parser Error Handling
 
-In case of any kind of parsing error, the parser routine will C<die> with a
-message including the standard message for the error in question, the numeric
-error code and the position in the input string where the error was encountered.
+In case of a parsing error, when the optional second argument to C<parse_json> wasn't provided,
+the parser will C<die> with a message including the standard message for error which occurred, the
+numeric error code and the position in the input string where the error was
+encountered.
 
 =head1 SEE ALSO
 
-L<uni-json(3)>, L<uni-json-parser-bindings(5)>
+L<uni-json(3)>, L<uni-json-parser-bindings(3)>, L<uni-json-serializer-bindings(3)>
 
 =cut
