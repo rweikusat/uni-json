@@ -45,19 +45,31 @@ __END__
 
 =head1 NAME
 
-JSON::Uni - Perl interface to uni-json parser
+JSON::Uni - Perl interface to uni-json parser and serializer
 
 =head1 SYNOPSIS
 
- use JSON::Uni	qw(parse_json max_nesting set_max_nesting);
+ use JSON::Uni	qw(parse_json max_nesting set_max_nesting json_serialize
 
- my $obj = parse_json('<JSON string>');
+                   UJ_E_INV UJ_E_NO_VAL UJ_E_INV_LIT
+                   UJ_E_GARBAGE UJ_E_EOS UJ_E_INV_IN
+                   UJ_E_ADD UJ_E_LEADZ UJ_E_NO_DGS
+                   UJ_E_INV_CHAR UJ_E_INV_UTF8 UJ_E_INV_ESC
+                   UJ_E_INV_KEY UJ_E_NO_KEY UJ_E_TOO_DEEP
+
+                   UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY);
+
+ my $obj = parse_json('<JSON string>' [,<error handler>]);
+
  my $nesting = max_nesting();
  set_max_nesting(<max nesting level);
 
+ my $str = json_serialize(<perl object> [,<format spec>]);
+
 =head1 DESCRIPTION
 
-This modue provides the default Perl interface to the uni-json JSON parser.
+This modue provides the default Perl interface to the uni-json JSON
+parser and serializer.
 
 =head2 Exportable Functions
 
@@ -67,8 +79,20 @@ The module can export the following functions:
 
 =item * C<parse_json>
 
-Parses a JSON string and returns an equivalent Perl data structure based on a straight-forward
-mapping of JSON value types to Perl constructs.
+Parses a JSON string and returns an equivalent Perl data structure
+based on a straight-forward mapping of JSON value types to Perl
+constructs.
+
+The optional I<error handler> argument should either be the name of a
+subroutine or a refence to one. In case of a parsing error, it'll be
+invoked with the error code as first argument and the position of the
+error in the input string as second. The various C<UJ_E_...> constants are
+the symbolic names of these error codes, a detailed description of them
+is in L<uni-json(3)>.
+
+It's safe to call C<die> or an equivalent from this handler as all
+memory allocated during parsing will have been free before it's
+invoked.
 
 =item * C<max nesting>
 
