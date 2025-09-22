@@ -59,12 +59,12 @@ JSON::Uni - Perl interface to uni-json parser and serializer
 
                    UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY);
 
- my $obj = parse_json('<JSON string>' [,<error handler>]);
+ my $obj = parse_json('<JSON string>'[, <error handler>]);
 
  my $nesting = max_nesting();
  set_max_nesting(<max nesting level);
 
- my $str = json_serialize(<perl object> [,<format spec>]);
+ my $str = json_serialize(<perl object>[, <format spec>]);
 
 =head1 DESCRIPTION
 
@@ -105,6 +105,24 @@ Change the I<max nesting> parameter. JSON constructs which are more deeply neste
 permits will cause an error when trying to parse them. This can be used to limit the maximum
 depth to which the parser will descend into nested structures to guard against DoS-attacks
 when processing data from untrusted sources.
+
+=item * C<json_serialize>
+
+Serialize a Perl object to a JSON string. The optional second argument can be one of
+C<UJ_FMT_FAST>, C<UJ_FMT_DET> or C<UJ_FMT_PRETTY> to select I<fast>, I<deterministic>
+or I<pretty-printed> output format.
+
+The first two affect only serialization of objects/
+hashes. When using the I<fast> format, key-value pairs will be serialized in
+the order they're returned by the L<perlapi(1)> equivalent of C<each> (C<hv_iternext>). In
+particular, this means the order of key in the ouput will be random for each individual
+object and very likely different for different objects containing the same keys. For the
+I<deterministic> output format, keys will appear sorted by locale-blind codepoint
+comparisons.
+
+The I<pretty-printed> output format is semantically identical to the C<deterministic>
+format but includes redundant whitespace to make the output more easily readable by
+humans.
 
 =back
 
