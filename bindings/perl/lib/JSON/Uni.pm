@@ -68,7 +68,7 @@ JSON::Uni - Perl interface to uni-json parser and serializer
 
 =head1 DESCRIPTION
 
-This modue provides the default Perl interface to the uni-json JSON
+This module provides the default Perl interface to the uni-json JSON
 parser and serializer.
 
 =head2 Exportable Functions
@@ -110,7 +110,8 @@ when processing data from untrusted sources.
 
 Serialize a Perl object to a JSON string. The optional second argument can be one of
 C<UJ_FMT_FAST>, C<UJ_FMT_DET> or C<UJ_FMT_PRETTY> to select I<fast>, I<deterministic>
-or I<pretty-printed> output format.
+or I<pretty-printed> output format, with I<fast> being the default if no second argument
+was provided.
 
 The first two affect only serialization of objects/
 hashes. When using the I<fast> format, key-value pairs will be serialized in
@@ -120,9 +121,31 @@ object and very likely different for different objects containing the same keys.
 I<deterministic> output format, keys will appear sorted by locale-blind codepoint
 comparisons.
 
-The I<pretty-printed> output format is semantically identical to the I<deterministic>
-format but includes redundant whitespace to make the output more easily readable by
-humans.
+The I<pretty-printed> output format will include redundant whitespace in arrays and
+objects to make the resulting text easier to read for humans. For objects, it uses the same
+key-sorting algorithm as the I<deterministic> format.
+
+B<Example Output>
+
+The output C<< json_serialize([{a => b, c => d}, {a => b, c => d}]) >> can either be
+C<[{"c":"d","a":"b"},{"c":"d","a":"b"}]> or C<[{"a":"b","c":"d"},{"c":"d","a":"b"}]> (or
+any other possible combination).
+
+For C<< json_serialize([{a => b, c => d}, {a => b, c => d}], UJ_FMT_DET) >>, it will always
+be C<[{"a":"b","c":"d"},{"a":"b","c":"d"}]>.
+
+Using C<< json_serialize([{a => b, c => d}, {a => b, c => d}], UJ_FMT_PRETTY) >> will produce
+
+C<[
+        {
+                "a" : "b",
+                "c" : "d"},
+        {
+                "a" : "b",
+                "c" : "d"}]>
+
+using tabs (ASCII 09) for indentation. This is to avoid creating extremely huge output strings
+containing mostly space characters when serializing large structures.
 
 =back
 
