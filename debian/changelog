@@ -1,3 +1,9 @@
+uni-json (0.2) experimental; urgency=medium
+
+  * 
+
+ --
+
 uni-json (0.1) experimental; urgency=medium
 
   * Initial release: parser with simple Perl bindings
