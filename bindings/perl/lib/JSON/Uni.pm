@@ -94,7 +94,7 @@ It's safe to call C<die> or an equivalent from this handler as all
 memory allocated during parsing will have been free before it's
 invoked.
 
-=item * C<max nesting>
+=item * C<max_nesting>
 
 Returns the current value of the I<max nesting> parameter (default 0xffffffff, ie
 unlimited).
