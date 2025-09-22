@@ -120,7 +120,7 @@ object and very likely different for different objects containing the same keys.
 I<deterministic> output format, keys will appear sorted by locale-blind codepoint
 comparisons.
 
-The I<pretty-printed> output format is semantically identical to the C<deterministic>
+The I<pretty-printed> output format is semantically identical to the I<deterministic>
 format but includes redundant whitespace to make the output more easily readable by
 humans.
 
