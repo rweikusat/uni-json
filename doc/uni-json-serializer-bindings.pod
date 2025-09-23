@@ -107,7 +107,7 @@ C<alloc> call.
 
 Called by the serializer to communicate that it wants to serialize
 the object C<obj> next. The return value should be some kind of iterator
-for this object. The argument will be a pointer a priori call to
+for this object. The argument will be a pointer a prior call to
 C<type_of> return a value of C<UJ_T_BJ> for. The iterator must remain
 valid until passed to C<end_object_traversal> regardless of any
 calls to other binding routines in between.
@@ -140,5 +140,32 @@ same C<oiter> pointer.
 
 The function won't be called again with a specific C<oiter> argument after it
 returned 0 for it once.
+
+=back
+
+=head3 Array Serialization
+
+=over
+
+=item * C<start_array_traversal(void *ary)>
+
+Called when the serializer wants to start traversing the array C<ary>. The argument will
+be a pointer an earlier C<type_of> call returned C<UJ_T_ARY> for. The return value
+must be some kind of iterator for this array. It must remain valid until passed to
+C<end_array_traversal> regardess of calls to other binding routines in between.
+
+=item * C<end_arry_traversal(void *aiter)>
+
+Called when the array C<aiter> refers to has been completely serialized. The argument
+will be a pointer returned by an earlier C<start_array_traversal> call.
+
+=item * C<void *next_value(void *aiter)>
+
+Called to determine the next value of the array identified by C<aiter>. Should return a pointer
+to this value or C<NULL> to signal that all values have been processed. A returned value pointer
+must remain valid until the next call to C<next_value> for this C<aiter> argument.
+
+The function won't be called again for a specific C<aiter> after it returned C<NULL>
+for it once.
 
 =back
