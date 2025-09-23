@@ -44,3 +44,8 @@ uni-json-serializer-bindings - object management and helper functions for uni-js
      /*  bool */
      int (*get_bool_value)(void *boolean);
  };
+
+=head1 DESCRIPTION
+
+Structure containing pointers to the functions which need to be provided to the uni-json
+serializer to use it in particular runtime environment.
