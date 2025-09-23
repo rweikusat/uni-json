@@ -86,7 +86,7 @@ C<UJ_T_NULL> - C<UJ_T_UNK> will likely cause a crash or other memory corruption.
 =item * C<void *alloc(size_t len)>
 
 Allocate a memory area of size C<len> for use by the serializer. This is only
-used for I<deterministc> or I<pretty-printed> (see L<uni-json-serializer(3)) output
+used for I<deterministc> or I<pretty-printed> (see L<uni-json-serializer(3)>) output
 of objects. Only one such area will be needed at any given time. C<dealloc> will
 be called with the returned pointer as argument before C<alloc> will be called
 for another time.
@@ -96,5 +96,49 @@ for another time.
 Called by the serializer to communicate that the memory area pointed to by
 C<p> won't be used anymore. The argument will be a pointer returned by an earlier
 C<alloc> call.
+
+=back
+
+=head3 Object Serialization
+
+=over
+
+=item * C<void *start_object_traversal(void *obj)>
+
+Called by the serializer to communicate that it wants to serialize
+the object C<obj> next. The return value should be some kind of iterator
+for this object. The argument will be a pointer a priori call to
+C<type_of> return a value of C<UJ_T_BJ> for. The iterator must remain
+valid until passed to C<end_object_traversal> regardless of any
+calls to other binding routines in between.
+
+=item * C<size_t max_kv_pairs(void *obj)>
+
+Called to determine an upper bound for the number of key-value pairs
+stored in the object C<obj>. The argument will be a pointer C<type_of>
+returned C<UJ_T_OBJ> for earlier. The return value must be E<gt>= the actual
+number of key value pairs in the object. It'll be used to calculated
+the C<len> argument to pass to a future call to C<alloc> when serializing
+objects in I<deterministic> or I<pretty-printed> format (see L<uni-json-serializer(3)>).
+
+=item * C(void end_object_traversal(void *oiter)>
+
+Called by the serializer when it's done with serializing an object. The argument will be
+a pointer returned by an earlier C<start_object_traversal> call.
+
+=item * C<int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)>
+
+Called to determine information about the next key-value pair from some object
+identified by the object iterator C<oiter>. The value will be a pointer returned
+by an earlier C<start_object_traversal> call. Should return 0 if all key-value
+pairs for this object were already returned, otherwise 1 and set C<kvp> suitably.
+C<< kvp->key.s >> must be an UTF8-string representing the key text, C<< kvp->key.len >>
+the length of this string. The pointer C<< kvp->val >> must point to the corresponding
+value. All key and value pointers returned by calls to C<next_kv_pair> for a certain
+C<oiter> must remain valid until C<end_object_traversal> has been called for the
+same C<oiter> pointer.
+
+The function won't be called again with a specific C<oiter> argument after it
+returned 0 for it once.
 
 =back
