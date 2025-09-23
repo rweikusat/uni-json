@@ -56,13 +56,13 @@ Map the error code passeed as C<ec> to a standard (English) text message.
 
 Serialize the object C<val> to the ouput sink C<sink> using the callbacks specified in the
 structure C<binds> points to. The C<fmt> argument can be used to select one of three
-different output formats for objects (holding key-value pairs) and arrays. UJ_FMT_FAST, the
+different output formats for objects (holding key-value pairs) and arrays. C<UJ_FMT_FAST>, the
 default, serializes objects and arrays with no additional processing or formatting just
 as the corresponding callbacks return their content values or content key-value pairs.
-UJ_FMT_DET uses I<deterministic> serialization for objects. The keys are sorted using
-locale-blind codepoint comparions before serialization and key-value pairs will thus
+C<UJ_FMT_DET> uses I<deterministic> serialization for objects. The keys are sorted using
+locale-blind codepoint comparions before serialization. Key-value pairs will thus
 always be serialized in the same order regardless of the order they were returned in
-by the object traveral callback. The UJ_FMT_PRETTY format adds redundant whitespace
+by the object traversal callback. The C<UJ_FMT_PRETTY> format adds redundant whitespace
 when serializing object and arrays to make the resulting text easier to read for
 humans.
 
