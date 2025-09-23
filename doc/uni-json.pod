@@ -52,7 +52,7 @@ will be handled correctly, that is, flagged as JSON syntax errors.>
 
 Map the error code passeed as C<ec> to a standard (English) text message.
 
-=item * C(void json_serialize(void *val, void *sink, struct uni_json_s_binding *binds, int fmt)>
+=item * C<void json_serialize(void *val, void *sink, struct uni_json_s_binding *binds, int fmt)>
 
 Serialize the object C<val> to the ouput sink C<sink> using the callbacks specified in the
 structure C<binds> points to. The C<fmt> argument can be used to select one of three
