@@ -59,7 +59,7 @@ JSON::Uni - Perl interface to uni-json parser and serializer
 
                    UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY);
 
- my $obj = parse_json('<JSON string>'[, <error handler>]);
+ my $obj = parse_json(<JSON string>[, <error handler>]);
 
  my $nesting = max_nesting();
  set_max_nesting(<max nesting level);
