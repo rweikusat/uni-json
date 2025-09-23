@@ -1,0 +1,3 @@
+=head1 NAME
+
+uni-json-serializer-bindings - object management and helper functions for uni-json serializer
