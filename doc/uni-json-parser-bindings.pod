@@ -44,7 +44,7 @@ uni-json-parser-bindings - object creation and management functions for uni-json
 =head1 DESCRIPTION
 
 Structure containing pointers to the functions which need to be provided to the uni-json parser
-to use it in particular runtime environment.
+to use it in a particular runtime environment.
 
 =head2 Binding Functions
 
