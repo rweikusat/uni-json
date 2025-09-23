@@ -127,7 +127,7 @@ key-sorting algorithm as the I<deterministic> format.
 
 B<Example Output>
 
-The output C<< json_serialize([{a => b, c => d}, {a => b, c => d}]) >> can either be
+The output of C<< json_serialize([{a => b, c => d}, {a => b, c => d}]) >> can either be
 C<[{"c":"d","a":"b"},{"c":"d","a":"b"}]> or C<[{"a":"b","c":"d"},{"c":"d","a":"b"}]> (or
 any other possible combination).
 
