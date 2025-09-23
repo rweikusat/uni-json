@@ -4,7 +4,18 @@ uni-json-serializer-bindings - object management and helper functions for uni-js
 
 =head1 SYNOPSIS
 
+ #include <uni_json_types.h)
  #include <uni_json_s_binding.h>
+
+ enum {
+     UJ_T_NULL,
+     UJ_T_BOOL,
+     UJ_T_NUM,
+     UJ_T_STR,
+     UJ_T_ARY,
+     UJ_T_OBJ,
+     UJ_T_UNK
+ };
 
  struct uj_data {
      uint8_t *s;
@@ -48,4 +59,4 @@ uni-json-serializer-bindings - object management and helper functions for uni-js
 =head1 DESCRIPTION
 
 Structure containing pointers to the functions which need to be provided to the uni-json
-serializer to use it in particular runtime environment.
+serializer to use it in a particular runtime environment.
