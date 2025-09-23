@@ -81,7 +81,7 @@ untrusted sources.
 
 =back
 
-=head2 Error Codes
+=head2 Parser Error Codes
 
 =over
 
