@@ -16,7 +16,7 @@ SRCS :=		$(shell ls src/*.c)
 OBJS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.o)))
 DEPS :=		$(OBJS:.o=.d)
 HDRS :=		$(addprefix include/, uni_json_parser.h uni_json_p_binding.h)
-MANS :=		$(addprefix doc/, uni-json.3 uni-json-parser-bindings.3
+MANS :=		$(addprefix doc/, uni-json.3 uni-json-parser-bindings.3 \
 	uni-json-serializer-bindings.3)
 
 #**  library
