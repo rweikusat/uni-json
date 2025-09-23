@@ -1,6 +1,6 @@
 =head1 NAME
 
-uni-json - A C JSON parser designed to be usable in any runtime environment
+uni-json - A C JSON parser and serializer designed to be usable in any runtime environment
 
 =head1 SYNOPSIS
 
@@ -12,14 +12,18 @@ uni-json - A C JSON parser designed to be usable in any runtime environment
  void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds,
                       void *err_p);
 
+ #include <uni_json_serializer.h>
 
+ void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
+                        int fmt);
 
 =head1 DESCRIPTION
 
-Uni-json (for "universal") is a JSON parsing library written in C that's designed to be
-independent of (and thus, usable in) any particular execution environment by delegating
-the task of creating and manageing actual objects representing particular JSON constructs
-to "someone else" via a set of callbacks (see L<uni-json-parser-bindings(3)> for details.
+Uni-json (for "universal") is a JSON parsing and serializing library written in C that's
+designed to be independent of (and thus, usable in) any particular execution environment
+by delegating all memory and object management tasks to "someonew else" via a set
+of callbacks implementing defined, abstract actions. See L<uni-json-parser-bindings(3)> and
+L<uni-json-serialize-bindings(3)> for details.
 
 Further design goals are simplicity  and speed, in that order. The code should be easy
 enough to understand that one can be reasonably confident that it actually works instead
@@ -47,6 +51,20 @@ will be handled correctly, that is, flagged as JSON syntax errors.>
 =item * C<char *uni_json_ec_2_msg(unsigned ec)>
 
 Map the error code passeed as C<ec> to a standard (English) text message.
+
+=item * C(void json_serialize(void *val, void *sink, struct uni_json_s_binding *binds, int fmt)>
+
+Serialize the object C<val> to the ouput sink C<sink> using the callbacks specified in the
+structure C<binds> points to. The C<fmt> argument can be used to select one of three
+different output formats for objects (holding key-value pairs) and arrays. UJ_FMT_FAST, the
+default, serializes objects and arrays with no additional processing or formatting just
+as the corresponding callbacks return their content values or content key-value pairs.
+UJ_FMT_DET uses I<deterministic> serialization for objects. The keys are sorted using
+locale-blind codepoint comparions before serialization and key-value pairs will thus
+always be serialized in the same order regardless of the order they were returned in
+by the object traveral callback. The UJ_FMT_PRETTY format adds redundant whitespace
+when serializing object and arrays to make the resulting text easier to read for
+humans.
 
 =back
 
