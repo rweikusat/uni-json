@@ -185,7 +185,7 @@ has again been released via C<free_num_data>.
 
 B<The returned string will be copied literally into the output.>
 
-=item * C<void free_num_data(struct uj_data *ndata>
+=item * C<void free_num_data(struct uj_data *ndata)>
 
 Called when the string representation of a number returned by C<get_num_data> won't
 be needed anymore.
