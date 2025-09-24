@@ -168,6 +168,8 @@ must remain valid until the next call to C<next_value> for this C<aiter> argumen
 The function won't be called again for a specific C<aiter> after it returned C<NULL>
 for it once.
 
+=back
+
 =head3 Numbers and Strings
 
 =over
@@ -198,9 +200,25 @@ individual characters as necessary to conform to JSON string syntax.
 No other serializer binding routines will be called until the returned string
 has again been released via C<free_string_data>.
 
-=tiem * C<void free_string_data(struct uj_data *sdata>)
+=item * C<void free_string_data(struct uj_data *sdata>)
 
 Called when a string representation returned by a prior call to C<get_string_data>
 isn't needed anymore.
+
+=back
+
+=head3 Simple Types
+
+=over
+
+=item * C<int get_bool_value(void *boolean)>
+
+Called to obtain the value of the boolean object pointed to be C<boolean>. The
+return value will be interpreted according to the usual C convention for that: C<0> meaning
+I<false> and  anything else I<true>.
+
+=item * Null Values
+
+Objects of type C<UJ_T_NULL> will be serialized as the string I<null>.
 
 =back
