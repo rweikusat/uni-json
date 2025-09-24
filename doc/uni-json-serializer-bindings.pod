@@ -80,7 +80,7 @@ by C<p>. Must return one of the C<UJ_T...> constants. The effect of returning C<
 (for I<unknown>) is identical to returning C<UJ_T_NULL>.
 
 B<The return value is used to determine the type-specific serializer function to
-use for C<p> and it's validity is not checked. Returning a value outside of
+use for C<p> via table lookup and its validity is not checked. Returning a value outside of
 C<UJ_T_NULL> - C<UJ_T_UNK> will likely cause a crash or other memory corruption.>
 
 =item * C<void *alloc(size_t len)>
