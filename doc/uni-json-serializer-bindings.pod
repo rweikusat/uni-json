@@ -133,7 +133,7 @@ identified by the object iterator C<oiter>. The value will be a pointer returned
 by an earlier C<start_object_traversal> call. Should return 0 if all key-value
 pairs for this object were already returned, otherwise 1 and set C<kvp> suitably.
 C<< kvp->key.s >> must be an UTF8-string representing the key text, C<< kvp->key.len >>
-the length of this string. The pointer C<< kvp->val >> must point to the corresponding
+the length of this string in bytes. The pointer C<< kvp->val >> must point to the corresponding
 value. All key and value pointers returned by calls to C<next_kv_pair> for a certain
 C<oiter> must remain valid until C<end_object_traversal> has been called for the
 same C<oiter> pointer.
