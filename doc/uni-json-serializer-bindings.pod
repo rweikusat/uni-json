@@ -168,4 +168,39 @@ must remain valid until the next call to C<next_value> for this C<aiter> argumen
 The function won't be called again for a specific C<aiter> after it returned C<NULL>
 for it once.
 
+=head3 Numbers and Strings
+
+=over
+
+=item * C<void get_num_data(void *num, struct uj_data *ndata>
+
+Called to convert the number object pointed-to by C<num> to a string. Must set
+C<< data->s >> to the start of a string conforming to JSON number syntax
+(see L<RFC8259|https://datatracker.ietf.org/doc/html/rfc8259>) of length C<< data->len >>.
+
+No other serializer binding routines will be called until the returned string
+has again been released via C<free_num_data>.
+
+B<The returned string will be copied literally into the output.>
+
+=item * C<void free_num_data(struct uj_data *ndata>
+
+Called when the string representation of a number returned by C<get_num_data> won't
+be needed anymore.
+
+=item * C<void get_string_data(void *str, struct uj_data *sdata)>
+
+Called to obtain access to the raw string data of the string object pointed to
+by C<str>. On return, C<< data->s >> must point to a valid UTF-8 representation
+of the string C<str> of length C<< data->len >>. The serializer will escape
+individual characters as necessary to conform to JSON string syntax.
+
+No other serializer binding routines will be called until the returned string
+has again been released via C<free_string_data>.
+
+=tiem * C<void free_string_data(struct uj_data *sdata>)
+
+Called when a string representation returned by a prior call to C<get_string_data>
+isn't needed anymore.
+
 =back
