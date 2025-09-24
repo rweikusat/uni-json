@@ -174,7 +174,7 @@ for it once.
 
 =over
 
-=item * C<void get_num_data(void *num, struct uj_data *ndata>
+=item * C<void get_num_data(void *num, struct uj_data *ndata)>
 
 Called to convert the number object pointed-to by C<num> to a string. Must set
 C<< data->s >> to the start of a string conforming to JSON number syntax
