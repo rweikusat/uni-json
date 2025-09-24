@@ -4,7 +4,7 @@ uni-json-serializer-bindings - object management and helper functions for uni-js
 
 =head1 SYNOPSIS
 
- #include <uni_json_types.h)
+ #include <uni_json_types.h>
  #include <uni_json_s_binding.h>
 
  enum {
