@@ -147,14 +147,14 @@ returned 0 for it once.
 
 =over
 
-=item * C<start_array_traversal(void *ary)>
+=item * C<void start_array_traversal(void *ary)>
 
 Called when the serializer wants to start traversing the array C<ary>. The argument will
 be a pointer an earlier C<type_of> call returned C<UJ_T_ARY> for. The return value
 must be some kind of iterator for this array. It must remain valid until passed to
 C<end_array_traversal> regardess of calls to other binding routines in between.
 
-=item * C<end_arry_traversal(void *aiter)>
+=item * C<void end_arry_traversal(void *aiter)>
 
 Called when the array C<aiter> refers to has been completely serialized. The argument
 will be a pointer returned by an earlier C<start_array_traversal> call.
