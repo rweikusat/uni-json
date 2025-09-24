@@ -194,8 +194,8 @@ be needed anymore.
 
 Called to obtain access to the raw string data of the string object pointed to
 by C<str>. On return, C<< data->s >> must point to a valid UTF-8 representation
-of the string C<str> of length C<< data->len >>. The serializer will escape
-individual characters as necessary to conform to JSON string syntax.
+of the string C<str> with a length of C<< data->len >> bytes. The serializer will escape
+individual characters as necessary on output to conform to JSON string syntax.
 
 No other serializer binding routines will be called until the returned string
 has again been released via C<free_string_data>.
