@@ -1,8 +1,11 @@
 uni-json (0.2) experimental; urgency=medium
 
-  * 
+  * support for serializing objects to JSON
+  * Perl bindings for that
+  * the Perl parser now support using a Perl subroutine as
+    error handling callback
 
- --
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Wed, 24 Sep 2025 19:15:14 +0100
 
 uni-json (0.1) experimental; urgency=medium
 
