@@ -219,6 +219,6 @@ I<false> and  anything else I<true>.
 
 =item * Null Values
 
-Objects of type C<UJ_T_NULL> will be serialized as the string I<null>.
+Objects of type C<UJ_T_NULL> will be serialized as I<null>.
 
 =back
