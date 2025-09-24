@@ -22,15 +22,13 @@ uni-json - A C JSON parser and serializer designed to be usable in any runtime e
 Uni-json (for "universal") is a JSON parsing and serializing library written in C that's
 designed to be independent of (and thus, usable in) any particular execution environment
 by delegating all memory and object management tasks to "someonew else" via a set
-of callbacks implementing defined, abstract actions. See L<uni-json-parser-bindings(3)> and
-L<uni-json-serialize-bindings(3)> for details.
-
-Further design goals are simplicity  and speed, in that order. The code should be easy
-enough to understand that one can be reasonably confident that it actually works instead
+of callbacks implementing defined, abstract actions (see L<uni-json-parser-bindings(3)> and
+L<uni-json-serialize-bindings(3)> for details). Further design goals are simplicity  and speed, in that order.
+The code should be easy enough to understand that one can be reasonably confident that it actually works instead
 of trying to shave off every couple of nanoseconds which could be saved somewhere. In
-particular, this means it's a recursive-descent parser based on handling each individual
-syntactic construct with a dedicated function and selecting the function to parse a
-particular construct by doing a table-lookup of its first character.
+particular, this means both parser and serializer utilize recursive descent for nested structures and
+utilize table-lookups to call functions dedicated to handling particular syntactical constructs
+indirectly.
 
 =head2 Functions
 
