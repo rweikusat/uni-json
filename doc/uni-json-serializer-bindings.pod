@@ -117,7 +117,7 @@ calls to other binding routines in between.
 Called to determine an upper bound for the number of key-value pairs
 stored in the object C<obj>. The argument will be a pointer C<type_of>
 returned C<UJ_T_OBJ> for earlier. The return value must be E<gt>= the actual
-number of key value pairs in the object. It'll be used to calculated
+number of key-value pairs in the object. It'll be used to calculated
 the C<len> argument to pass to a future call to C<alloc> when serializing
 objects in I<deterministic> or I<pretty-printed> format (see L<uni-json-serializer(3)>).
 
