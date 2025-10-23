@@ -1,3 +1,11 @@
+python branch
+=============
+
+Development branch for Python bindings. Currently, this contains a
+dummy parser routine which prints it's s# argument to stderr via
+fprintf.
+
+
 Universal Json
 ==============
 
