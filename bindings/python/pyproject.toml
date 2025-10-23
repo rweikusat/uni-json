@@ -8,7 +8,7 @@ authors = [
     { name = "Rainer Weikusat", email = "rweikusat@talktalk.net" }
 ]
 description = "Interface to uni-json JSON parser/ serialize"
-license = "MIT"
+license = { text = "MIT" }
 version = "0.1"
 
 [tool.setuptools]
