@@ -36,7 +36,7 @@ static PyObject *parse_json(PyObject *, PyObject *args)
     int rc;
 
     rc = PyArg_ParseTuple(args, "s#", &data, &len);
-    if (rc) fprintf(stderr, "%.*s\n", (int)len, data);
+    if (rc) fprintf(stderr, "It was '%.*s'\n", (int)len, data);
 
     Py_RETURN_NONE;
 }
