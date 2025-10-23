@@ -15,4 +15,3 @@ version = "0.1"
 ext-modules = [
     { name = "UniJson", sources = ["parser.c"] }
 ]    
-    
