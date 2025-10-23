@@ -17,7 +17,7 @@ static PyObject *parse_json(PyObject *, PyObject *);
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 
 static PyMethodDef meths[] = {
-    {"parse_json", parse_json, METH_VARGS, "Parse a JSON string."},
+    {"parse_json", parse_json, METH_VARARGS, "Parse a JSON string."},
     {0}
 };
 
@@ -25,7 +25,7 @@ static PyModuleDef module = {
     .m_base =		PyModuleDef_HEAD_INIT,
     .m_name =		"UniJson",
     .m_doc =		mod_doc,
-    .m_methods =	&meths,
+    .m_methods =	meths,
 };
 
 /*  routines */
