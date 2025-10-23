@@ -14,9 +14,18 @@
 static PyObject *parse_json(PyObject *, PyObject *);
 
 /*  variables */
+PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
+
 static PyMethodDef meths[] = {
     {"parse_json", parse_json, METH_VARGS, "Parse a JSON string."},
     {0}
+};
+
+static PyModuleDef module = {
+    .m_base =		PyModuleDef_HEAD_INIT,
+    .m_name =		"UniJson",
+    .m_doc =		mod_doc,
+    .m_methods =	&meths,
 };
 
 /*  routines */
@@ -30,4 +39,9 @@ static PyObject *parse_json(PyObject *, PyObject *args)
     if (rc) fprintf(stderr, "%.*s\n", (int)len, data);
 
     Py_RETURN_NONE;
+}
+
+PyMODINIT_FUNC PyInit_UniJson(void)
+{
+    return PyModule_Create(&module);
 }
