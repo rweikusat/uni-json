@@ -1,17 +1,3 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
-
-[project]
-name = "UniJson"
-authors = [
-    { name = "Rainer Weikusat", email = "rweikusat@talktalk.net" }
-]
-description = "Interface to uni-json JSON parser/ serialize"
-license = { text = "MIT" }
-version = "0.1"
-
-[tool.setuptools]
-ext-modules = [
-    { name = "UniJson", sources = ["parser.c"] }
-]    
