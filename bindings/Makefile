@@ -3,7 +3,7 @@
 
 PRE_FILE :=	../PREFIX
 
-.PHONY: all perl install clean
+.PHONY: all perl python install clean
 
 all: perl python
 
@@ -25,10 +25,8 @@ clean-perl:
 
 #*  Python bindings
 #
-python: python/.built
+python:
+	$(MAKE) -C python
 
-clean-python:
-	cd python && git clean -dfx
-
-python/.built: python/src/parser.c
-	( cd python && pip wheel --no-build-isolation . ) && touch $@
+%-python:
+	$(MAKE) -C python $*
