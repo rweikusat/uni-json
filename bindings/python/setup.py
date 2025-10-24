@@ -5,7 +5,7 @@ setup(
     #
     name = "UniJson",
     version = "0.1",
-    description = "Interface to uni-json JSON parser/ serialize",
+    description = "Interface to uni-json JSON parser/ serializer",
     license = "MIT",
     author = "Rainer Weikusat",
     author_email = "rweikusat@talktalk.net",
