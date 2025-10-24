@@ -1,11 +1,16 @@
 from setuptools import setup, Extension
 
 setup(
+    #*  meta
+    #
     name = "UniJson",
-    author = "Rainer Weikusat",
-    author_email = "rweikusat@talktalk.net",
+    version = "0.1",
     description = "Interface to uni-json JSON parser/ serialize",
     license = "MIT",
-    ext_modules = [Extension('UniJson', ['src/parser.c'])],
-    version = "0.1"
+    author = "Rainer Weikusat",
+    author_email = "rweikusat@talktalk.net",
+
+    #*  build info
+    #
+    ext_modules = [Extension('UniJson', ['src/parser.c'])]
 )
