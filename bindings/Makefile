@@ -5,13 +5,15 @@ PRE_FILE :=	../PREFIX
 
 .PHONY: all perl install clean
 
-all: perl
+all: perl python
 
 install: perl
 	$(MAKE) -C perl install
 
-clean: clean-perl
+clean: clean-perl clean-python
 
+#*  Perl bindings
+#
 perl: perl/Makefile
 	$(MAKE) -C perl
 
@@ -20,3 +22,13 @@ perl/Makefile: perl/Makefile.PL $(PRE_FILE)
 
 clean-perl:
 	test -f perl/Makefile && $(MAKE) -C perl clean || true
+
+#*  Python bindings
+#
+python: python/.built
+
+clean-python:
+	cd python && git clean -dfx
+
+python/.built: python/src/parser.c
+	( cd python && pip wheel --no-build-isolation . ) && touch $@
