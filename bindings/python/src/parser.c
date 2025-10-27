@@ -18,7 +18,7 @@ static PyObject *parse_json(PyObject *, PyObject *);
 
 static void on_error(unsigned, size_t, void *);
 
-static void nop_free(void *);
+static void free_obj(void *);
 static void *make_null(void);
 static void *make_bool(int);
 
@@ -29,10 +29,10 @@ static struct uni_json_p_binding binds = {
     .on_error =		on_error,
 
     .make_null =	make_null,
-    .free_null =	nop_free,
+    .free_null =	free_obj,
 
     .make_bool =	make_bool,
-    .free_bool =	nop_free
+    .free_bool =	free_obj
 };
 
 static PyMethodDef meths[] = {
@@ -57,8 +57,10 @@ static void on_error(unsigned code, size_t pos, void *)
     PyErr_SetString(PyExc_ValueError, buf);
 }
 
-static void nop_free(void *)
-{}
+static void free_obj(void *obj)
+{
+    Py_DECREF(obj);
+}
 
 static void *make_null(void)
 {
@@ -67,7 +69,11 @@ static void *make_null(void)
 
 static void *make_bool(int true_false)
 {
-    return true_false ? Py_True : Py_False;
+    PyObject *obj;
+
+    obj = true_false ? Py_True : Py_False;
+    Py_INCREF(obj);
+    return obj;
 }
 
 static PyObject *parse_json(PyObject *, PyObject *args)
