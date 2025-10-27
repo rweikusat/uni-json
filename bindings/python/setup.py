@@ -13,6 +13,8 @@ setup(
     #*  build info
     #
     ext_modules = [Extension('UniJson', ['src/parser.c'],
-                             include_dirs = ['../../include']
+                             include_dirs = ['../../include'],
+                             library_dirs = ['../../bin'],
+                             libraries = ['uni-json']
                              )]
 )
