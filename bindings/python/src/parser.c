@@ -57,7 +57,7 @@ static void on_error(unsigned code, size_t pos, void *)
     PyErr_SetString(PyExc_ValueError, buf);
 }
 
-static void nop_free_null(void *)
+static void nop_free(void *)
 {}
 
 static void *make_null(void)
