@@ -11,12 +11,15 @@
 #include <Python.h>
 
 #include "uni_json_p_binding.h"
+#include "uni_json_parser.h"
 
 /*  prototypes */
 static PyObject *parse_json(PyObject *, PyObject *);
 
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
+
+static struct uni_json_p_binding binds;
 
 static PyMethodDef meths[] = {
     {"parse_json", parse_json, METH_VARARGS, "Parse a JSON string."},
@@ -34,13 +37,17 @@ static PyModuleDef module = {
 static PyObject *parse_json(PyObject *, PyObject *args)
 {
     uint8_t *data;
+    void *obj;
     Py_ssize_t len;
     int rc;
 
     rc = PyArg_ParseTuple(args, "s#", &data, &len);
-    if (rc) fprintf(stderr, "It is '%.*s'\n", (int)len, data);
+    if (!rc) Py_RETURN_NONE;
 
-    Py_RETURN_NONE;
+    obj = uni_json_parse(data, len, &binds, NULL);
+    if (!obj) Py_RETURN_NONE;
+
+    return obj;
 }
 
 PyMODINIT_FUNC PyInit_UniJson(void)
