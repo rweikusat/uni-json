@@ -1,6 +1,8 @@
 # uni-json Python bindings Makefile
 #
 
+SO_PATH :=	$(dir $(shell find build -name '*.so'))
+
 .PHONY: all clean test
 
 all: .built
@@ -12,4 +14,4 @@ clean:
 	pip wheel --no-build-isolation . && touch $@
 
 test: all
-	PYTHONPATH=$(dir $(shell find build -name '*.so')) python -m unittest discover -s t
+	PYTHONPATH=$(SO_PATH) python -m unittest discover -s t
