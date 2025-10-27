@@ -17,12 +17,15 @@
 static PyObject *parse_json(PyObject *, PyObject *);
 
 static void on_error(unsigned, size_t, void *);
+static void *make_null(void);
 
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 
 static struct uni_json_p_binding binds = {
-    .on_error = on_error
+    .on_error =		on_error,
+
+    .make_null =	make_null
 };
 
 static PyMethodDef meths[] = {
@@ -40,24 +43,28 @@ static PyModuleDef module = {
 /*  routines */
 static void on_error(unsigned code, size_t pos, void *)
 {
-    fprintf(stderr, "error handler called, code %u, pos %zu\n",
-            code, pos);
+    char buf[1024];
+
+    sprintf(buf, "%s (%u) at %zu",
+            uni_json_ec_2_msg(code), code, pos);
+    PyErr_SetString(PyExc_ValueError, buf);
+}
+
+static void *make_null(void)
+{
+    Py_RETURN_NONE;
 }
 
 static PyObject *parse_json(PyObject *, PyObject *args)
 {
     uint8_t *data;
-    void *obj;
     Py_ssize_t len;
     int rc;
 
     rc = PyArg_ParseTuple(args, "s#", &data, &len);
     if (!rc) Py_RETURN_NONE;
 
-    obj = uni_json_parse(data, len, &binds, NULL);
-    if (!obj) Py_RETURN_NONE;
-
-    return obj;
+    return uni_json_parse(data, len, &binds, NULL);
 }
 
 PyMODINIT_FUNC PyInit_UniJson(void)
