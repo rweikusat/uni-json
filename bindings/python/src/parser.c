@@ -33,7 +33,7 @@ static struct uni_json_p_binding binds = {
     .free_null =	free_obj,
 
     .make_bool =	make_bool,
-    .free_bool =	free_obj
+    .free_bool =	free_obj,
 
     .make_number =	make_number,
     .free_number =	free_obj
@@ -82,7 +82,7 @@ static void *make_bool(int true_false)
 
 static void *make_number(uint8_t *data, size_t len, unsigned flags)
 {
-    PyObject *s_obj, *_obj;
+    PyObject *s_obj, *n_obj;
     char *s;
 
     if (flags & UJ_NF_INT) {
@@ -93,7 +93,7 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
         return PyLong_FromString(s, NULL, 10);
     }
 
-    s_obj = PyByteArray_FromStringAndSize(data, len);
+    s_obj = PyByteArray_FromStringAndSize((char *)data, len);
     n_obj = PyFloat_FromString(s_obj);
     Py_DECREF(s_obj);
 
