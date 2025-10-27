@@ -20,6 +20,11 @@ class TestParserBindings(unittest.TestCase):
         x = uj.parse_json('false')
         self.assertIs(x, False)
 
+    def test_num(self):
+        x = uj.parse_json('1234');
+        self.assertEqual(x, 1234)
+        x = uj.parse_json('1.23E2')
+        self.assertEqual(x, 1.23E2)
 
 if __name__ == '__main__':
     unittest.main()
