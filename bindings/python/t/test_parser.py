@@ -10,5 +10,9 @@ class TestParserBindings(unittest.TestCase):
         with self.assertRaises(ValueError):
             uj.parse_json('')
 
+    def test_null(self):
+        x = uj.parse_json('null')
+        self.assertIsNone(x)
+
 if __name__ == '__main__':
     unittest.main()
