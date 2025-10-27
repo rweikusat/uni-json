@@ -16,10 +16,14 @@
 /*  prototypes */
 static PyObject *parse_json(PyObject *, PyObject *);
 
+static void on_error(unsigned, size_t, void *);
+
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 
-static struct uni_json_p_binding binds;
+static struct uni_json_p_binding binds = {
+    .on_erro = on_error
+};
 
 static PyMethodDef meths[] = {
     {"parse_json", parse_json, METH_VARARGS, "Parse a JSON string."},
@@ -34,6 +38,12 @@ static PyModuleDef module = {
 };
 
 /*  routines */
+static void on_error(unsigned code, size_t pos, void *)
+{
+    fprintf(stderr, "error handler called, code %u, pos %zu\n",
+            code, pos);
+}
+
 static PyObject *parse_json(PyObject *, PyObject *args)
 {
     uint8_t *data;
