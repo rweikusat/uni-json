@@ -14,5 +14,12 @@ class TestParserBindings(unittest.TestCase):
         x = uj.parse_json('null')
         self.assertIsNone(x)
 
+    def test_bool(self):
+        x = uj.parse_json('true')
+        self.assertIs(x, True)
+        x = uj.parse_json('false')
+        self.assertIs(x, False)
+
+
 if __name__ == '__main__':
     unittest.main()
