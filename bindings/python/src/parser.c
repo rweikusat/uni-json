@@ -17,7 +17,10 @@
 static PyObject *parse_json(PyObject *, PyObject *);
 
 static void on_error(unsigned, size_t, void *);
+
+static void nop_free(void *);
 static void *make_null(void);
+static void *make_bool(int);
 
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
@@ -25,7 +28,11 @@ PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 static struct uni_json_p_binding binds = {
     .on_error =		on_error,
 
-    .make_null =	make_null
+    .make_null =	make_null,
+    .free_null =	nop_free,
+
+    .make_bool =	make_bool,
+    .free_bool =	nop_free
 };
 
 static PyMethodDef meths[] = {
@@ -50,9 +57,17 @@ static void on_error(unsigned code, size_t pos, void *)
     PyErr_SetString(PyExc_ValueError, buf);
 }
 
+static void nop_free_null(void *)
+{}
+
 static void *make_null(void)
 {
     Py_RETURN_NONE;
+}
+
+static void *make_bool(int true_false)
+{
+    return true_false ? Py_True : Py_False;
 }
 
 static PyObject *parse_json(PyObject *, PyObject *args)
