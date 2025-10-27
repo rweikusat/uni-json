@@ -22,7 +22,7 @@ static void on_error(unsigned, size_t, void *);
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 
 static struct uni_json_p_binding binds = {
-    .on_erro = on_error
+    .on_error = on_error
 };
 
 static PyMethodDef meths[] = {
