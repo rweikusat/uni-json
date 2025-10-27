@@ -10,6 +10,8 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#include "uni_json_p_bindings.h"
+
 /*  prototypes */
 static PyObject *parse_json(PyObject *, PyObject *);
 
