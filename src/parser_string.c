@@ -469,6 +469,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
 
 void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
+    typeof (binds->finalize_string) finalize;
     void *str;
     int rc;
 
@@ -484,6 +485,16 @@ void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
     if (rc == -1) {
         binds->free_string(str);
         return NULL;
+    }
+
+    finalize = binds->finalize_string;
+    if (finalize) {
+        str = finalize(str);
+        if (!str) {
+            pstate->err.code = UJ_E_MAKE;
+            pstate->err.pos = pstate->p;
+            return NULL;
+        }
     }
 
     pstate->last_type = UJ_T_STR;
