@@ -480,5 +480,5 @@ void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
     if (!obj) binds->free_work_string(str);
 
     pstate->last_type = UJ_T_STR;
-    return str;
+    return obj;
 }
