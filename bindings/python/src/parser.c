@@ -101,6 +101,7 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
     }
 
     s_obj = PyByteArray_FromStringAndSize((char *)data, len);
+    if (!s_obj) return NULL;
     n_obj = PyFloat_FromString(s_obj);
     Py_DECREF(s_obj);
 
