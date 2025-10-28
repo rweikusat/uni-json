@@ -47,33 +47,57 @@ static int skip_literal(struct pstate *pstate, uint8_t *want)
 
 void *parse_false(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
+    void *obj;
     int rc;
 
     rc = skip_literal(pstate, "false");
     if (rc == -1) return NULL;
 
     pstate->last_type = UJ_T_BOOL;
-    return binds->make_bool(0);
+
+    obj = binds->make_bool(0);
+    if (!obj) {
+        pstate->err.code = UJ_E_MAKE;
+        pstate->err.pos = pstate->p;
+    }
+
+    return obj;
 }
 
 void *parse_null(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
+    void *obj;
     int rc;
 
     rc = skip_literal(pstate, "null");
     if (rc == -1) return NULL;
 
     pstate->last_type = UJ_T_NULL;
-    return binds->make_null();
+
+    obj = binds->make_null();
+    if (!obj) {
+        pstate->err.code = UJ_E_MAKE;
+        pstate->err.pos = pstate->p;
+    }
+
+    return obj;
 }
 
 void *parse_true(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
+    void *obj;
     int rc;
 
     rc = skip_literal(pstate, "true");
     if (rc == -1) return NULL;
 
     pstate->last_type = UJ_T_BOOL;
-    return binds->make_bool(1);
+
+    obj = binds->make_bool(1);
+    if (!obj) {
+        pstate->err.code = UJ_E_MAKE;
+        pstate->err.pos = pstate->p;
+    }
+
+    return obj;
 }

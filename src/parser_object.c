@@ -104,6 +104,12 @@ void *parse_object(struct pstate *pstate, struct uni_json_p_binding *binds)
     }
 
     obj = binds->make_object();
+    if (!obj) {
+        pstate->err.code = UJ_E_MAKE;
+        pstate->err.pos = pstate->p;
+        return NULL;
+    }
+
     ++pstate->p;
 
     rc = parse_object_content(pstate, binds, obj);

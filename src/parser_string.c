@@ -473,6 +473,11 @@ void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
     int rc;
 
     str = binds->make_string();
+    if (!str) {
+        pstate->err.code = UJ_E_MAKE;
+        pstate->err.pos = pstate->p;
+        return NULL;
+    }
 
     ++pstate->p;
     rc = parse_string_content(pstate, binds, str);

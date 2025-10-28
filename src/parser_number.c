@@ -45,6 +45,7 @@ void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     uint8_t *s, *dig_0;
     unsigned flags;
+    void *obj;
     int rc;
 
     dig_0 = s = pstate->p;
@@ -103,5 +104,12 @@ void *parse_number(struct pstate *pstate, struct uni_json_p_binding *binds)
 
 done:
     pstate->last_type = UJ_T_NUM;
-    return binds->make_number(s, pstate->p - s, flags);
+
+    obj = binds->make_number(s, pstate->p - s, flags);
+    if (!obj) {
+        pstate->err.code = UJ_E_MAKE;
+        pstate->err.pos = pstate->p;
+    }
+
+    return obj;
 }

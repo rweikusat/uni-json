@@ -86,7 +86,8 @@ static char *ec_msg_map[] = {
     [UJ_E_INV_ESC] =	"illegal escape sequence",
     [UJ_E_INV_KEY] =	"object key is no string",
     [UJ_E_NO_KEY] =	"missing key in object",
-    [UJ_E_TOO_DEEP] =	"too many levels of nesting"
+    [UJ_E_TOO_DEEP] =	"too many levels of nesting",
+    [UJ_E_MAKE] =	"failed to create object"
 };
 
 /* parse_value returns &no_value if no value was found */

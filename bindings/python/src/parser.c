@@ -17,17 +17,24 @@
 static PyObject *parse_json(PyObject *, PyObject *);
 
 static void on_error(unsigned, size_t, void *);
-
 static void free_obj(void *);
+
 static void *make_null(void);
 static void *make_bool(int);
 static void *make_number(uint8_t *, size_t, unsigned);
+
+static void *make_string(void);
+static int add_to_string(uint8_t *, size_t, void *);
 
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 
 static struct uni_json_p_binding binds = {
     .on_error =		on_error,
+
+    .make_string =	make_string,
+    .free_string =	free_obj,
+    .add_2_string =	add_to_string,
 
     .make_null =	make_null,
     .free_null =	free_obj,
@@ -98,6 +105,11 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
     Py_DECREF(s_obj);
 
     return n_obj;
+}
+
+static void *make_string(void)
+{
+
 }
 
 static PyObject *parse_json(PyObject *, PyObject *args)

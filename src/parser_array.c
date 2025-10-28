@@ -73,6 +73,12 @@ void *parse_array(struct pstate *pstate, struct uni_json_p_binding *binds)
     }
 
     ary = binds->make_array();
+    if (!ary) {
+        pstate->err.code = UJ_E_MAKE;
+        pstate->err.pos = pstate->p;
+        return NULL;
+    }
+
     ++pstate->p;
 
     rc = parse_array_content(pstate, binds, ary);
