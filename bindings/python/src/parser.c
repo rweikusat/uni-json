@@ -175,10 +175,11 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
             if (!rc) return NULL;
         }
 
-        obj = PyUnicode_FromStringAndSize((char *)ws->s, ws->p - ws->s);
-    } else {
-        obj = PyUnicode_FromStringAndSize((char *)data, len);
+        data = ws->s;
+        len = ws->p - ws->s;
     }
+
+    obj = PyUnicode_FromStringAndSize((char *)data, len);
 
     free_work_string(ws);
     return obj;
