@@ -120,7 +120,7 @@ static PyObject *parse_json(PyObject *, PyObject *args)
     int rc;
 
     rc = PyArg_ParseTuple(args, "s#", &data, &len);
-    if (!rc) Py_RETURN_NONE;
+    if (!rc) NULL;
 
     return uni_json_parse(data, len, &binds, NULL);
 }
