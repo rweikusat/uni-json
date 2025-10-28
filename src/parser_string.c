@@ -470,7 +470,7 @@ void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
     void *str, *obj;
     int rc;
 
-    str = binds->make_string();
+    str = binds->make_work_string();
     if (!str) {
         pstate->err.code = UJ_E_MAKE;
         pstate->err.pos = pstate->p;
