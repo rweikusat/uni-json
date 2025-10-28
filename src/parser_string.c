@@ -466,9 +466,7 @@ static void *parse_string_content(struct pstate *pstate, struct uni_json_p_bindi
 
 void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
-    typeof (binds->finalize_string) finalize;
     void *str, *obj;
-    int rc;
 
     str = binds->make_work_string();
     if (!str) {
