@@ -14,15 +14,19 @@ class TestParserBindings(unittest.TestCase):
         x = uj.parse_json('null')
         self.assertIsNone(x)
 
-    def test_bool(self):
+    def test_true(self):
         x = uj.parse_json('true')
         self.assertIs(x, True)
+
+    def test_false(self)
         x = uj.parse_json('false')
         self.assertIs(x, False)
 
-    def test_num(self):
+    def test_int(self):
         x = uj.parse_json('1234');
         self.assertEqual(x, 1234)
+
+     def test_float(self)
         x = uj.parse_json('1.23E2')
         self.assertEqual(x, 1.23E2)
 
