@@ -400,8 +400,8 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
 }
 
 /**  string handling proper */
-static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
-                                void *str)
+static void *parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
+                                  void *str)
 {
     uint8_t *p, *pp, *e, *s;
     unsigned c;
@@ -417,13 +417,13 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
                 if (!rc) {
                     pstate->err.code = UJ_E_ADD;
                     pstate->err.pos = p;
-                    return -1;
+                    return NULL;
                 }
             }
 
             pstate->p = p + 1;
             rc = parse_esc(pstate, binds, str);
-            if (rc == -1) return -1;
+            if (rc == -1) return NULL;
 
             s = p = pstate->p;
             continue;
@@ -432,7 +432,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
         if (c < MIN_LEGAL) {
             pstate->err.code = UJ_E_INV_CHAR;
             pstate->err.pos = p;
-            return -1;
+            return NULL;
         }
 
         if (c & 0x80) {
@@ -440,7 +440,7 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
             if (!pp) {
                 pstate->err.code = UJ_E_INV_UTF8;
                 pstate->err.pos = p;
-                return -1;
+                return NULL;
             }
 
             p = pp;
@@ -451,26 +451,23 @@ static int parse_string_content(struct pstate *pstate, struct uni_json_p_binding
     if (p == e) {
         pstate->err.code = UJ_E_EOS;
         pstate->err.pos = p;
-        return -1;
+        return NULL;
     }
 
-    if (p > s) {
-        rc = binds->add_2_string(s, p - s, str);
-        if (!rc) {
-            pstate->err.code = UJ_E_ADD;
+    str = binds->finalize_string(str, s, p - s);
+    if (!str) {
+            pstate->err.code = UJ_E_MAKE;
             pstate->err.pos = p;
-            return -1;
-        }
     }
 
     pstate->p = p + 1;
-    return 0;
+    return str;
 }
 
 void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
     typeof (binds->finalize_string) finalize;
-    void *str;
+    void *str, *obj;
     int rc;
 
     str = binds->make_string();
@@ -481,21 +478,8 @@ void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
     }
 
     ++pstate->p;
-    rc = parse_string_content(pstate, binds, str);
-    if (rc == -1) {
-        binds->free_work_string(str);
-        return NULL;
-    }
-
-    finalize = binds->finalize_string;
-    if (finalize) {
-        str = finalize(str);
-        if (!str) {
-            pstate->err.code = UJ_E_MAKE;
-            pstate->err.pos = pstate->p;
-            return NULL;
-        }
-    }
+    obj = parse_string_content(pstate, binds, str);
+    if (!obj) binds->free_work_string(str);
 
     pstate->last_type = UJ_T_STR;
     return str;
