@@ -21,8 +21,9 @@ static void *make_bool(int);
 static void *make_null(void);
 static void *make_number(uint8_t *, size_t, unsigned);
 
-static void *make_string(void);
+static void *make_work_string(void);
 static int add_2_string(uint8_t *, size_t, void *);
+static void *finalize_string(void *str, uint8_t *, size_t);
 
 static void *make_av(void);
 static int add_2_av(void *, void *);
@@ -42,7 +43,7 @@ struct uni_json_p_binding default_perl_uj_parser_bindings = {
     .make_number =		make_number,
     .free_number =		free_obj,
 
-    .make_string =		make_string,
+    .make_work_string =		make_work_string,
     .free_string =		free_obj,
     .add_2_string =		add_2_string,
     .free_work_string =		free_obj,
@@ -107,7 +108,7 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
     return newSVnv(my_atof(tmp));
 }
 
-static void *make_string(void)
+static void *make_work_string(void)
 {
     dTHX;
     return newSVpvn_utf8("", 0, 1);
@@ -118,6 +119,13 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
     dTHX;
     sv_catpvn_nomg(str, data, len);
     return 1;
+}
+
+static void *finalize_string(void *str, uint8_t *data, size_t len)
+{
+    dTHX;
+    if (len) sv_catpvn(str, data, len);
+    return str;
 }
 
 static void *make_av(void)
