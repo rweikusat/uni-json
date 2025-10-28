@@ -189,7 +189,7 @@ static void free_work_string(void *str)
     struct work_string *ws;
 
     ws = str;
-    free(ws->s);
+    if (ws->s) free(ws->s);
     free(ws);
 }
 
