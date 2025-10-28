@@ -33,10 +33,10 @@ static void *make_null(void);
 static void *make_bool(int);
 static void *make_number(uint8_t *, size_t, unsigned);
 
-static void *make_string(void);
-static int add_2_string(uint8_t *, size_t, void *);
-static void *finalize_string(void *);
+static void *make_work_string(void);
 static void free_work_string(void *);
+static int add_2_string(uint8_t *, size_t, void *);
+static void *finalize_string(void *, uint8_t *, size_t);
 
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
@@ -44,11 +44,11 @@ PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 static struct uni_json_p_binding binds = {
     .on_error =		on_error,
 
-    .make_string =	make_string,
+    .make_work_string =	make_work_string,
+    .free_work_string =	free_work_string,
     .free_string =	free_obj,
     .add_2_string =	add_2_string,
     .finalize_string =	finalize_string,
-    .free_work_string =	free_work_string,
 
     .make_null =	make_null,
     .free_null =	free_obj,
@@ -122,22 +122,14 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
     return n_obj;
 }
 
-static void *make_string(void)
+static void *make_work_string(void)
 {
     struct work_string *ws;
-    uint8_t *buf;
-
-    buf = malloc(WS_INITIAL);
-    if (!buf) return NULL;
 
     ws = malloc(sizeof(*ws));
-    if (!ws) {
-        free(buf);
-        return NULL;
-    }
+    if (!ws) return NULL;
+    ws->s = ws->p = ws->e = NULL;
 
-    ws->s = ws->p = buf;
-    ws->e = buf + WS_INITIAL;
     return ws;
 }
 
@@ -148,9 +140,14 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
     size_t in_ws, total;
 
     ws = str;
-    if (ws->e - ws->p < (ptrdiff_t)len) {
-        in_ws = ws->p - ws->s;
-        total = ws->e - ws->s;
+    if (!ws->s || ws->e - ws->p < (ptrdiff_t)len) {
+        if (ws->s) {
+            in_ws = ws->p - ws->s;
+            total = ws->e - ws->s;
+        } else {
+            in_ws = 0;
+            total = WS_INITIAL;
+        }
         while (total - in_ws < len) total *= 2;
 
         tmp = realloc(ws->s, total);
@@ -165,15 +162,25 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
     return 1;
 }
 
-static void *finalize_string(void *str)
+static void *finalize_string(void *str, uint8_t *data, size_t len)
 {
     struct work_string *ws;
     void *obj;
+    int rc;
 
     ws = str;
-    obj = PyUnicode_FromStringAndSize((char *)ws->s, ws->p - ws->s);
-    free_work_string(ws);
+    if (ws->s) {
+        if (len) {
+            rc = add_2_string(data, len, ws);
+            if (!rc) return NULL;
+        }
 
+        obj = PyUnicode_FromStringAndSize((char *)ws->s, ws->p - ws->s);
+    } else {
+        obj = PyUnicode_FromStringAndSize((char *)data, len);
+    }
+
+    free_work_string(ws);
     return obj;
 }
 
