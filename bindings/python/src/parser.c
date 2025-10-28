@@ -13,6 +13,16 @@
 #include "uni_json_p_binding.h"
 #include "uni_json_parser.h"
 
+/*  constants */
+enum {
+    WS_INITIAL =	32
+};
+
+/*  types */
+struct work_string {
+    uint8_t *s, *p, *e;
+};
+
 /*  prototypes */
 static PyObject *parse_json(PyObject *, PyObject *);
 
@@ -24,7 +34,9 @@ static void *make_bool(int);
 static void *make_number(uint8_t *, size_t, unsigned);
 
 static void *make_string(void);
-static int add_to_string(uint8_t *, size_t, void *);
+static int add_2_string(uint8_t *, size_t, void *);
+static void *finalize_string(void *);
+static void free_work_string(void *);
 
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
@@ -34,7 +46,9 @@ static struct uni_json_p_binding binds = {
 
     .make_string =	make_string,
     .free_string =	free_obj,
-    .add_2_string =	add_to_string,
+    .add_2_string =	add_2_string,
+    .finalize_string =	finalize_string,
+    .free_work_string =	free_work_string,
 
     .make_null =	make_null,
     .free_null =	free_obj,
@@ -110,7 +124,66 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
 
 static void *make_string(void)
 {
+    struct work_string *ws;
+    uint8_t *buf;
 
+    buf = malloc(WS_INITIAL);
+    if (!buf) return NULL;
+
+    ws = malloc(sizeof(*ws));
+    if (!ws) {
+        free(buf);
+        return NULL;
+    }
+
+    ws->s = ws->p = buf;
+    ws->e = buf + WS_INITIAL;
+    return ws;
+}
+
+static int add_2_string(uint8_t *data, size_t len, void *str)
+{
+    struct work_string *ws;
+    uint8_t *tmp;
+    size_t in_ws, total;
+
+    ws = str;
+    if (ws->e - ws->p < (ptrdiff_t)len) {
+        in_ws = ws->p - ws->s;
+        total = ws->e - ws->s;
+        while (total - in_ws < len) total *= 2;
+
+        tmp = realloc(ws->s, total);
+        if (!tmp) return 0;
+        ws->s = tmp;
+        ws->p = tmp + in_ws;
+        ws->e = tmp + total;
+    }
+
+    memcpy(ws->p, data, len);
+    ws->p += len;
+    return 1;
+}
+
+static void *finalize_string(void *str)
+{
+    struct work_string *ws;
+    void *obj;
+
+    ws = str;
+    obj = PyUnicode_FromStringAndSize((char *)ws->s, ws->p - ws->s);
+    free_work_string(ws);
+
+    return obj;
+}
+
+static void free_work_string(void *str)
+{
+    struct work_string *ws;
+
+    ws = str;
+    free(ws->s);
+    free(ws);
 }
 
 static PyObject *parse_json(PyObject *, PyObject *args)
