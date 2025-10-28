@@ -3,6 +3,9 @@
 
 SO_PATH :=	$(dir $(shell find build -name '*.so'))
 
+SRCS :=		$(shell ls src/*.c)
+DEPS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.d)))
+
 .PHONY: all clean test
 
 all: .built
@@ -15,6 +18,8 @@ clean:
 
 test: all
 	LD_LIBRARY_PATH=../../bin PYTHONPATH=$(SO_PATH) python -m unittest discover -s t -v
+
+include $(DEPS)
 
 tmp/%.d: src/%.c
 	$(CC) -I ../../include -MM $< | perl -pe 's|$*\.o|$@|' >$@
