@@ -45,6 +45,7 @@ struct uni_json_p_binding default_perl_uj_parser_bindings = {
     .make_string =		make_string,
     .free_string =		free_obj,
     .add_2_string =		add_2_string,
+    .free_work_string =		free_obj,
 
     .make_array =		make_av,
     .free_array =		free_obj,
