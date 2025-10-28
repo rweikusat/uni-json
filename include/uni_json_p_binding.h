@@ -38,6 +38,7 @@ struct uni_json_p_binding {
     void *(*make_string)(void);
     void (*free_string)(void *str);
     int (*add_2_string)(uint8_t *data, size_t len, void *str);
+    void *(*finalize_string)(void *str);
 
     /*  simple types */
     void *(*make_null)(void);
