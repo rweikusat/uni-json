@@ -31,8 +31,8 @@ class TestParserBindings(unittest.TestCase):
         self.assertEqual(x, 1.23E2)
 
     def test_string(self):
-        x = uj.parse_json('"12345678901234567890123456789012345678äx"')
-        self.assertEqual(x,  '12345678901234567890123456789012345678äx')
+        x = uj.parse_json('"123456789012345\\n67890123456789012345678äx"')
+        self.assertEqual(x,  '123456789012345\n67890123456789012345678äx')
 
 if __name__ == '__main__':
     unittest.main()
