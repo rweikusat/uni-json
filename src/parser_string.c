@@ -483,7 +483,7 @@ void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
     ++pstate->p;
     rc = parse_string_content(pstate, binds, str);
     if (rc == -1) {
-        binds->free_string(str);
+        binds->free_work_string(str);
         return NULL;
     }
 
