@@ -44,9 +44,10 @@ struct uni_json_p_binding default_perl_uj_parser_bindings = {
     .free_number =		free_obj,
 
     .make_work_string =		make_work_string,
-    .free_string =		free_obj,
-    .add_2_string =		add_2_string,
     .free_work_string =		free_obj,
+    .add_2_string =		add_2_string,
+    .finalize_string =		finalize_string,
+    .free_string =		free_obj,
 
     .make_array =		make_av,
     .free_array =		free_obj,
@@ -124,7 +125,7 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
 static void *finalize_string(void *str, uint8_t *data, size_t len)
 {
     dTHX;
-    if (len) sv_catpvn(str, data, len);
+    if (len) sv_catpvn_nomg(str, data, len);
     return str;
 }
 
