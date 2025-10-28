@@ -35,11 +35,11 @@ struct uni_json_p_binding {
     int (*add_2_array)(void *value, void *ary);
 
     /*  strings */
-    void *(*make_string)(void);
-    void (*free_string)(void *str);
+    void *(*make_work_string)(void);
+    void (*free_work_string)(void *str);
     int (*add_2_string)(uint8_t *data, size_t len, void *str);
     void *(*finalize_string)(void *str, uint8_t *data, size_t len);
-    void (*free_work_string)(void *str);
+    void (*free_string)(void *str);
 
     /*  simple types */
     void *(*make_null)(void);
