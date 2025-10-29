@@ -1,5 +1,5 @@
 /*
-  uni-json parser bindings for Python
+  uni-json bindings for Python -- parser
 
   Copyright (C) 2025 Rainer Weikusat, rweikusat@talktalk.net
 
