@@ -38,11 +38,18 @@ static void free_work_string(void *);
 static int add_2_string(uint8_t *, size_t, void *);
 static void *finalize_string(void *, uint8_t *, size_t);
 
+static void *make_array(void);
+static int add_2_array(void *, void *);
+
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 
 static struct uni_json_p_binding binds = {
     .on_error =		on_error,
+
+    .make_array =	make_array,
+    .free_array =	free_obj,
+    .add_2_array =	add_2_array,
 
     .make_work_string =	make_work_string,
     .free_work_string =	free_work_string,
@@ -196,6 +203,24 @@ static void free_work_string(void *str)
     ws = str;
     if (ws->s) free(ws->s);
     free(ws);
+}
+
+static void *make_array(void)
+{
+    return PyList_New(0);
+}
+
+static int add_2_array(void *obj, void *ary)
+{
+    int rc;
+
+    rc = PyList_Append(ary, obj);
+    if (rc == -1) {
+        PyErr_Clear();
+        return 0;
+    }
+
+    return 1;
 }
 
 static PyObject *parse_json(PyObject *, PyObject *args)
