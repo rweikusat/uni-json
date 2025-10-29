@@ -18,7 +18,7 @@ all: .built
 clean:
 	git clean -dfx
 
-.built: tmp/parser.d
+.built: $(DEPS)
 	pip wheel -v --no-build-isolation . && touch $@
 
 test: all
