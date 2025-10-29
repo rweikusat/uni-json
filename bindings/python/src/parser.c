@@ -87,6 +87,7 @@ static PyModuleDef module = {
 };
 
 /*  routines */
+/**  general */
 static void on_error(unsigned code, size_t pos, void *)
 {
     char buf[1024];
@@ -101,6 +102,7 @@ static void free_obj(void *obj)
     Py_DECREF(obj);
 }
 
+/**  simple types */
 static void *make_null(void)
 {
     Py_RETURN_NONE;
@@ -136,6 +138,7 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
     return n_obj;
 }
 
+/**  string */
 static void *make_work_string(void)
 {
     struct work_string *ws;
@@ -212,6 +215,7 @@ static void free_work_string(void *str)
     free(ws);
 }
 
+/**  array */
 static void *make_array(void)
 {
     return PyList_New(0);
@@ -230,6 +234,7 @@ static int add_2_array(void *obj, void *ary)
     return 1;
 }
 
+/**  object */
 static void *make_object(void)
 {
     return PyDict_New();
@@ -248,6 +253,7 @@ static int add_2_object(void *k, void *v, void *obj)
     return 1;
 }
 
+/**  entry point */
 static PyObject *parse_json(PyObject *, PyObject *args)
 {
     uint8_t *data;
