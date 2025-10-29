@@ -15,7 +15,7 @@
 
 /*  constants */
 enum {
-    WS_INITIAL =	32
+    WS_MIN =	32
 };
 
 /*  types */
@@ -137,24 +137,28 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
 {
     struct work_string *ws;
     uint8_t *tmp;
-    size_t in_ws, total;
+    size_t in_ws, have, want;
 
     ws = str;
     if (!ws->s || ws->e - ws->p < (ptrdiff_t)len) {
         if (ws->s) {
             in_ws = ws->p - ws->s;
-            total = ws->e - ws->s;
+
+            have = ws->e - ws->s;
+            if (have > len) want = have * 2;
+            else want = in_ws + len * 2;
         } else {
             in_ws = 0;
-            total = WS_INITIAL;
-        }
-        while (total - in_ws < len) total *= 2;
 
-        tmp = realloc(ws->s, total);
+            want = len * 2;
+            if (want < WS_MIN) want = WS_MIN;
+        }
+
+        tmp = realloc(ws->s, want);
         if (!tmp) return 0;
         ws->s = tmp;
         ws->p = tmp + in_ws;
-        ws->e = tmp + total;
+        ws->e = tmp + want;
     }
 
     memcpy(ws->p, data, len);
