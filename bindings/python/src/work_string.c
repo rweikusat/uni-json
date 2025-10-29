@@ -7,7 +7,16 @@
 */
 
 /*  includes */
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "work_string.h"
+
+/*  constants */
+enum {
+    WS_MIN =	32
+};
 
 /*  routines */
 void *make_work_string(void)

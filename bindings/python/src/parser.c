@@ -13,16 +13,7 @@
 #include "compiler.h"
 #include "uni_json_p_binding.h"
 #include "uni_json_parser.h"
-
-/*  constants */
-enum {
-    WS_MIN =	32
-};
-
-/*  types */
-struct work_string {
-    uint8_t *s, *p, *e;
-};
+#include "work_string.h"
 
 /*  prototypes */
 static void on_error(unsigned, size_t, void *);
@@ -32,9 +23,6 @@ static void *make_null(void);
 static void *make_bool(int);
 static void *make_number(uint8_t *, size_t, unsigned);
 
-static void *make_work_string(void);
-static void free_work_string(void *);
-static int add_2_string(uint8_t *, size_t, void *);
 static void *finalize_string(void *, uint8_t *, size_t);
 
 static void *make_array(void);
@@ -58,7 +46,7 @@ static struct uni_json_p_binding binds = {
     .make_work_string =	make_work_string,
     .free_work_string =	free_work_string,
     .free_string =	free_obj,
-    .add_2_string =	add_2_string,
+    .add_2_string =	add_2_work_string,
     .finalize_string =	finalize_string,
 
     .make_null =	make_null,
@@ -125,50 +113,6 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
 }
 
 /**  string */
-static void *make_work_string(void)
-{
-    struct work_string *ws;
-
-    ws = malloc(sizeof(*ws));
-    if (!ws) return NULL;
-    ws->s = ws->p = ws->e = NULL;
-
-    return ws;
-}
-
-static int add_2_string(uint8_t *data, size_t len, void *str)
-{
-    struct work_string *ws;
-    uint8_t *tmp;
-    size_t in_ws, have, want;
-
-    ws = str;
-    if (!ws->s || ws->e - ws->p < (ptrdiff_t)len) {
-        if (ws->s) {
-            in_ws = ws->p - ws->s;
-
-            have = ws->e - ws->s;
-            if (have > len) want = have * 2;
-            else want = in_ws + len * 2;
-        } else {
-            in_ws = 0;
-
-            want = len * 2;
-            if (want < WS_MIN) want = WS_MIN;
-        }
-
-        tmp = realloc(ws->s, want);
-        if (!tmp) return 0;
-        ws->s = tmp;
-        ws->p = tmp + in_ws;
-        ws->e = tmp + want;
-    }
-
-    memcpy(ws->p, data, len);
-    ws->p += len;
-    return 1;
-}
-
 static void *finalize_string(void *str, uint8_t *data, size_t len)
 {
     struct work_string *ws;
@@ -178,7 +122,7 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
     ws = str;
     if (ws->s) {
         if (len) {
-            rc = add_2_string(data, len, ws);
+            rc = add_2_work_string(data, len, ws);
             if (!rc) return NULL;
         }
 
@@ -192,14 +136,6 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
     return obj;
 }
 
-static void free_work_string(void *str)
-{
-    struct work_string *ws;
-
-    ws = str;
-    if (ws->s) free(ws->s);
-    free(ws);
-}
 
 /**  array */
 static void *make_array(void)
