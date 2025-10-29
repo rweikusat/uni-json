@@ -38,5 +38,9 @@ class TestParserBindings(unittest.TestCase):
         x = uj.parse_json('"abcdefg"')
         self.assertEqual(x, 'abcdefg')
 
+    def test_array(self):
+        x = uj.parse_json('[1, 2, [1, 2]]')
+        self.assertEqual(x, [1, 2, [1, 2]])
+
 if __name__ == '__main__':
     unittest.main()
