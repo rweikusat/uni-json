@@ -29,4 +29,4 @@ include $(DEPS)
 #*  %-rules
 #
 tmp/%.d: src/%.c
-	$(CC) -I ../../include -MM $< | perl -pe 's|$*\.o|$@|' >$@
+	gcc -I ../../include -MM $< | perl -pe 's|$*\.o|$@|' >$@
