@@ -45,8 +45,6 @@ static void *make_object(void);
 static int add_2_object(void *, void *, void *);
 
 /*  variables */
-PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
-
 static struct uni_json_p_binding binds = {
     .on_error =		on_error,
 
@@ -74,17 +72,6 @@ static struct uni_json_p_binding binds = {
     .free_number =	free_obj
 };
 
-static PyMethodDef meths[] = {
-    {"parse_json", parse_json, METH_VARARGS, "Parse a JSON string."},
-    {0}
-};
-
-static PyModuleDef module = {
-    .m_base =		PyModuleDef_HEAD_INIT,
-    .m_name =		"UniJson",
-    .m_doc =		mod_doc,
-    .m_methods =	meths,
-};
 
 /*  routines */
 /**  general */
@@ -254,7 +241,7 @@ static int add_2_object(void *k, void *v, void *obj)
 }
 
 /**  entry point */
-static PyObject *parse_json(PyObject *, PyObject *args)
+PyObject *parse_json(PyObject *, PyObject *args)
 {
     uint8_t *data;
     Py_ssize_t len;
@@ -264,9 +251,4 @@ static PyObject *parse_json(PyObject *, PyObject *args)
     if (!rc) NULL;
 
     return uni_json_parse(data, len, &binds, NULL);
-}
-
-PyMODINIT_FUNC PyInit_UniJson(void)
-{
-    return PyModule_Create(&module);
 }
