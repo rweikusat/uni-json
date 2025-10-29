@@ -12,12 +12,14 @@
 
 /*  prototypes */
 PyObject *parse_json(PyObject *, PyObject *);
+PyObject *json_serialize(PyObject *, PyObject *);
 
 /*  variables */
 PyDoc_STRVAR(mod_doc, "uni-json JSON parser/ serializer");
 
 static PyMethodDef meths[] = {
     {"parse_json", parse_json, METH_VARARGS, "Parse a JSON string."},
+    {"json_serialize", json_serialize, METH_VARARGS, "Serialize an object to a JSON string."},
     {0}
 };
 
