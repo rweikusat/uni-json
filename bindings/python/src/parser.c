@@ -41,11 +41,18 @@ static void *finalize_string(void *, uint8_t *, size_t);
 static void *make_array(void);
 static int add_2_array(void *, void *);
 
+static void *make_object(void);
+static int add_2_object(void *, void *, void *);
+
 /*  variables */
 PyDoc_STRVAR(mod_doc, "JSON parser/ serializer");
 
 static struct uni_json_p_binding binds = {
     .on_error =		on_error,
+
+    .make_object =	make_object,
+    .free_object =	free_obj,
+    .add_2_object =	add_2_object,
 
     .make_array =	make_array,
     .free_array =	free_obj,
@@ -219,6 +226,24 @@ static int add_2_array(void *obj, void *ary)
         PyErr_Clear();
         return 0;
     }
+
+    return 1;
+}
+
+static void *make_object(void)
+{
+    return PyDict_New();
+}
+
+static int add_2_object(void *k, void *v, void *obj)
+{
+    int rc;
+
+    rc = PyDict_SetItem(obj, k, v);
+    if (rc == -1) return 0;
+
+    Py_DECREF(k);
+    Py_DECREF(v);
 
     return 1;
 }
