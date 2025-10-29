@@ -12,8 +12,9 @@ setup(
 
     #*  build info
     #
-    ext_modules = [Extension('UniJson', ['src/module.c', 'src/parser.c', 'src/serializer.c'],
-                             include_dirs = ['../../include'],
+    ext_modules = [Extension('UniJson', ['src/module.c', 'src/parser.c',
+                                         'src/serializer.c', 'src/work_string.c'],
+                             include_dirs = ['../../include', 'src'],
                              library_dirs = ['../../bin'],
                              libraries = ['uni-json']
                              )]
