@@ -1,11 +1,16 @@
 # uni-json Python bindings Makefile
 #
 
+
+#*  macros
+#
 SO_PATH :=	$(dir $(shell find build -name '*.so'))
 
 SRCS :=		$(shell ls src/*.c)
 DEPS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.d)))
 
+#*  targets
+#
 .PHONY: all clean test
 
 all: .built
@@ -21,5 +26,7 @@ test: all
 
 include $(DEPS)
 
+#*  %-rules
+#
 tmp/%.d: src/%.c
 	$(CC) -I ../../include -MM $< | perl -pe 's|$*\.o|$@|' >$@
