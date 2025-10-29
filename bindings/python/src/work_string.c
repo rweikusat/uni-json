@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "compiler.h"
 #include "work_string.h"
 
 /*  constants */
@@ -19,7 +20,7 @@ enum {
 };
 
 /*  routines */
-void *make_work_string(void)
+void _hidden_ *make_work_string(void)
 {
     struct work_string *ws;
 
@@ -30,7 +31,7 @@ void *make_work_string(void)
     return ws;
 }
 
-int add_2_work_string(uint8_t *data, size_t len, void *str)
+int _hidden_ add_2_work_string(uint8_t *data, size_t len, void *str)
 {
     struct work_string *ws;
     uint8_t *tmp;
@@ -63,7 +64,7 @@ int add_2_work_string(uint8_t *data, size_t len, void *str)
     return 1;
 }
 
-void free_work_string(void *str)
+void _hidden_ free_work_string(void *str)
 {
     struct work_string *ws;
 
