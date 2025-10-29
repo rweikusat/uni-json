@@ -15,7 +15,7 @@
 #include "uni_json_serializer.h"
 
 /*  routines */
-PyObject * _hidden_ json_serialize(PyObject *, PyObject *args)
+PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
 {
     fputs("Ha!\n", stderr);
     Py_RETURN_NONE;
