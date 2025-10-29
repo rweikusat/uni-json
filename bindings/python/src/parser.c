@@ -10,6 +10,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#include "compiler.h"
 #include "uni_json_p_binding.h"
 #include "uni_json_parser.h"
 
@@ -24,8 +25,6 @@ struct work_string {
 };
 
 /*  prototypes */
-static PyObject *parse_json(PyObject *, PyObject *);
-
 static void on_error(unsigned, size_t, void *);
 static void free_obj(void *);
 
@@ -241,7 +240,7 @@ static int add_2_object(void *k, void *v, void *obj)
 }
 
 /**  entry point */
-PyObject *parse_json(PyObject *, PyObject *args)
+PyObject _hidden_ *parse_json(PyObject *, PyObject *args)
 {
     uint8_t *data;
     Py_ssize_t len;
