@@ -33,5 +33,5 @@ PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
         PyErr_SetString(PyExc_ValueError, "wrong value for format argument");
     }
 
-    return PyUniCode_FromString("");
+    return PyUnicode_FromString("");
 }
