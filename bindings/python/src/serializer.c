@@ -91,8 +91,11 @@ static void *start_array_traversal(void *ary)
     struct aiter *aiter;
 
     aiter = malloc(sizeof(*aiter));
+    aiter->ary = ary;
     aiter->len = PyList_GET_SIZE(ary);
     aiter->pos = 0;
+
+    return aiter;
 }
 
 static void end_array_traversal(void *aiter)
