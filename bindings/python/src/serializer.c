@@ -13,8 +13,22 @@
 #include "compiler.h"
 #include "uni_json_s_binding.h"
 #include "uni_json_serializer.h"
+#include "work_string.h"
+
+/*  prototypes */
+static void output(uint8_t *, size_t, void *);
+
+/*  variables */
+static struct uni_json_s_binding binds = {
+    .output =		output
+};
 
 /*  routines */
+static void output(uint8_t *data, size_t len, void *sink)
+{
+    add_2_work_string(data, len, sink);
+}
+
 PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
 {
     PyObject *obj;
