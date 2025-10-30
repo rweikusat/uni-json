@@ -31,6 +31,7 @@ PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
 
     default:
         PyErr_SetString(PyExc_ValueError, "wrong value for format argument");
+        return NULL;
     }
 
     return PyUnicode_FromString("");
