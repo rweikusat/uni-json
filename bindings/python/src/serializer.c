@@ -20,6 +20,8 @@
 static void output(uint8_t *, size_t, void *);
 static int type_of(void *);
 
+static void get_num_data(void *, struct uj_data *);
+static void free_num_data(struct uj_data *);
 static void get_string_data(void *, struct uj_data *);
 static int get_bool_value(void *);
 
@@ -27,6 +29,9 @@ static int get_bool_value(void *);
 static struct uni_json_s_binding binds = {
     .output =		output,
     .type_of =		type_of,
+
+    .get_num_data =	get_num_data,
+    .free_num_data =	free_num_data,
 
     .get_string_data =	get_string_data,
     .get_bool_value =	get_bool_value
@@ -64,6 +69,27 @@ static int type_of(void *obj)
     }
 
     return UJ_T_UNK;
+}
+
+static void get_num_data(void *num, struct uj_data *ndata)
+{
+    PyObject *str;
+    Py_ssize_t len;
+    char *s;
+
+
+    str = PyObject_Str(num);
+    s = PyUnicode_AsUTF8AndSize(str, &len);
+
+    ndata->s = malloc(len);
+    memcpy(ndata->s, s, len);
+
+    Py_DECREF(str);
+}
+
+static void free_num_data(struct uj_data *ndata)
+{
+    free(ndata->s);
 }
 
 static void get_string_data(void *str, struct uj_data *sdata)
