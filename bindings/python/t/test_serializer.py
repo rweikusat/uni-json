@@ -36,5 +36,9 @@ class TestSerializerBindings(unittest.TestCase):
         s = uj.json_serialize('abc')
         self.assertEqual(s, '"abc"')
 
+    def test_num(self):
+        s = uj.json_serialize(1234)
+        self.assertEqual(s, '1234')
+
 if __name__ == '__main__':
     unittest.main()
