@@ -20,10 +20,14 @@
 static void output(uint8_t *, size_t, void *);
 static int type_of(void *);
 
+static int get_bool_value(void *);
+
 /*  variables */
 static struct uni_json_s_binding binds = {
     .output =		output,
-    .type_of =		type_of
+    .type_of =		type_of,
+
+    .get_bool_value =	get_bool_value
 };
 
 /*  routines */
@@ -46,6 +50,11 @@ static int type_of(void *obj)
     if (tp == &PyDict_Type) return UJ_T_OBJ;
 
     return UJ_T_UNK;
+}
+
+static int get_bool_value(void *boolean)
+{
+    return (PyObject *)boolean == Py_True;
 }
 
 PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
