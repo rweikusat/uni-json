@@ -17,6 +17,21 @@
 /*  routines */
 PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
 {
-    fputs("Ha!\n", stderr);
-    Py_RETURN_NONE;
+    PyObject *obj;
+    int fmt, rc;
+
+    fmt = UJ_FMT_FAST;
+    rc = PyArg_ParseTuple(args, "O|i", &obj, &fmt);
+    if (!rc) return NULL;
+    switch (fmt) {
+    case UJ_FMT_FAST:
+    case UJ_FMT_DET:
+    case UJ_FMT_PRETTY:
+        break;
+
+    default:
+        PyErr_SetString(PyExc_ValueError, "wrong value for format argument");
+    }
+
+    return PyUniCode_FromString("");
 }
