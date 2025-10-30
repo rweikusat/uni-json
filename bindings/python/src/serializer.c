@@ -77,12 +77,12 @@ static void get_num_data(void *num, struct uj_data *ndata)
     Py_ssize_t len;
     char const *s;
 
-
     str = PyObject_Str(num);
     s = PyUnicode_AsUTF8AndSize(str, &len);
 
     ndata->s = malloc(len);
     memcpy(ndata->s, s, len);
+    ndata->len = len;
 
     Py_DECREF(str);
 }
