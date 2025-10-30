@@ -40,6 +40,10 @@ static int type_of(void *obj)
 
     tp = Py_TYPE(obj);
     if (tp == &PyBool_Type) return UJ_T_BOOL;
+    if (tp == &PyLong_Type || tp == &PyFloat_Type) return UJ_T_NUM;
+    if (tp == &PyUnicode_Type) return UJ_T_STR;
+    if (tp == &PyList_Type) return UJ_T_ARY;
+    if (tp == &PyDict_Type) return UJ_T_OBJ;
 
     return UJ_T_UNK;
 }
