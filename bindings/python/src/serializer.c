@@ -41,15 +41,27 @@ static void output(uint8_t *data, size_t len, void *sink)
 static int type_of(void *obj)
 {
     PyTypeObject *tp;
+    double d;
 
     if ((PyObject *)obj == Py_None) return UJ_T_NULL;
 
     tp = Py_TYPE(obj);
     if (tp == &PyBool_Type) return UJ_T_BOOL;
-    if (tp == &PyLong_Type || tp == &PyFloat_Type) return UJ_T_NUM;
+    if (tp == &PyLong_Type) return UJ_T_NUM;
     if (tp == &PyUnicode_Type) return UJ_T_STR;
     if (tp == &PyList_Type) return UJ_T_ARY;
     if (tp == &PyDict_Type) return UJ_T_OBJ;
+
+    if (tp == &PyFloat_Type) {
+        d = PyFloat_AsDouble(obj);
+        switch (fpclassify(d)) {
+        case FP_NAN:
+        case FP_INFINITE:
+            return UJ_T_UNK;
+        }
+
+        return UJ_T_NUM;
+    }
 
     return UJ_T_UNK;
 }
