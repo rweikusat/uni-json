@@ -45,11 +45,11 @@ static struct uni_json_s_binding binds = {
     .end_array_traversal =	end_array_traversal,
     .next_value =		next_value,
 
-    .get_num_data =	get_num_data,
-    .free_num_data =	free_num_data,
+    .get_num_data =		get_num_data,
+    .free_num_data =		free_num_data,
 
-    .get_string_data =	get_string_data,
-    .get_bool_value =	get_bool_value
+    .get_string_data =		get_string_data,
+    .get_bool_value =		get_bool_value
 };
 
 /*  routines */
