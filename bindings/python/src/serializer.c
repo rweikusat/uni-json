@@ -75,7 +75,7 @@ static void get_num_data(void *num, struct uj_data *ndata)
 {
     PyObject *str;
     Py_ssize_t len;
-    char *s;
+    char const *s;
 
 
     str = PyObject_Str(num);
@@ -96,7 +96,7 @@ static void get_string_data(void *str, struct uj_data *sdata)
 {
     Py_ssize_t len;
 
-    sdata->s = (char *)PyUnicode_AsUTF8AndSize(str, &len);
+    sdata->s = (uint8_t *)PyUnicode_AsUTF8AndSize(str, &len);
     sdata->len = len;
 }
 
