@@ -75,7 +75,7 @@ PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
     }
 
     uni_json_serialize(obj, ws, &binds, fmt);
-    obj = PyUnicode_FromStringAndSize(ws->s, ws->p - ws->s);
+    obj = PyUnicode_FromStringAndSize((char *)ws->s, ws->p - ws->s);
     free_work_string(ws);
 
     return obj;
