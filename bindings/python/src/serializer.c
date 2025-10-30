@@ -51,6 +51,7 @@ static int type_of(void *obj)
 PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
 {
     PyObject *obj;
+    struct work_string *ws;
     int fmt, rc;
 
     fmt = UJ_FMT_FAST;
@@ -67,5 +68,15 @@ PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
         return NULL;
     }
 
-    return PyUnicode_FromString("");
+    ws = make_work_string();
+    if (!ws) {
+        PyErr_SetString(PyExc_MemoryError, "failed to create work string");
+        return NULL;
+    }
+
+    uni_json_serialize(obj, ws, &binds, fmt);
+    obj = PyUnicode_FromStringAndSize(ws->s, ws->p - ws->s);
+    free_work_string(ws);
+
+    return obj;
 }
