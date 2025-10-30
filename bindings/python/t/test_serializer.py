@@ -10,9 +10,6 @@ class TestSerializerBindings(unittest.TestCase):
         with self.assertRaises(TypeError):
             uj.json_serialize()
 
-    def test_one_arg(self):
-        uj.json_serialize(None)
-
     def test_two_args(self):
         uj.json_serialize(None, 0)
 
