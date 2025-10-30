@@ -20,6 +20,7 @@
 static void output(uint8_t *, size_t, void *);
 static int type_of(void *);
 
+static void get_string_data(void *, struct uj_data *);
 static int get_bool_value(void *);
 
 /*  variables */
@@ -27,6 +28,7 @@ static struct uni_json_s_binding binds = {
     .output =		output,
     .type_of =		type_of,
 
+    .get_string_data =	get_string_data,
     .get_bool_value =	get_bool_value
 };
 
@@ -50,6 +52,14 @@ static int type_of(void *obj)
     if (tp == &PyDict_Type) return UJ_T_OBJ;
 
     return UJ_T_UNK;
+}
+
+static void get_string_data(void *str, struct uj_data *sdata)
+{
+    Py_ssize_t len;
+
+    sdata->s = PyUnicode_AsUTF8AndSize(str, &len);
+    sdata->len = len;
 }
 
 static int get_bool_value(void *boolean)
