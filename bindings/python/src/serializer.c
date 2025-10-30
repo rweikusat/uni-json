@@ -58,7 +58,7 @@ static void get_string_data(void *str, struct uj_data *sdata)
 {
     Py_ssize_t len;
 
-    sdata->s = PyUnicode_AsUTF8AndSize(str, &len);
+    sdata->s = (char *)PyUnicode_AsUTF8AndSize(str, &len);
     sdata->len = len;
 }
 
