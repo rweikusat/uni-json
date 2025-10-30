@@ -7,7 +7,7 @@ import unittest
 
 class TestSerializerBindings(unittest.TestCase):
     def test_no_args(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             uj.json_serialize()
 
 if __name__ == '__main__':
