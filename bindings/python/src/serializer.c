@@ -16,19 +16,34 @@
 #include "uni_json_types.h"
 #include "work_string.h"
 
+/*  types */
+struct aiter {
+    void *ary;
+    size_t len, pos;
+};
+
 /*  prototypes */
 static void output(uint8_t *, size_t, void *);
 static int type_of(void *);
 
+static void *start_array_traversal(void *ary);
+static void end_array_traversal(void *aiter);
+static void *next_value(void *aiter);
+
 static void get_num_data(void *, struct uj_data *);
 static void free_num_data(struct uj_data *);
+
 static void get_string_data(void *, struct uj_data *);
 static int get_bool_value(void *);
 
 /*  variables */
 static struct uni_json_s_binding binds = {
-    .output =		output,
-    .type_of =		type_of,
+    .output =			output,
+    .type_of =			type_of,
+
+    .start_array_traversal =	start_array_traversal,
+    .end_array_traversal =	end_array_traversal,
+    .next_value =		next_value,
 
     .get_num_data =	get_num_data,
     .free_num_data =	free_num_data,
@@ -69,6 +84,34 @@ static int type_of(void *obj)
     }
 
     return UJ_T_UNK;
+}
+
+static void *start_array_traversal(void *ary)
+{
+    struct aiter *aiter;
+
+    aiter = malloc(sizeof(*aiter));
+    aiter->len = PyList_GET_SIZE(ary);
+    aiter->pos = 0;
+}
+
+static void end_array_traversal(void *aiter)
+{
+    free(aiter);
+}
+
+static void *next_value(void *aiter)
+{
+    struct aiter *ai;
+    void *v;
+
+    ai = aiter;
+    if (ai->pos == ai->len) return NULL;
+
+    v = PyList_GET_ITEM(ai->ary, ai->pos);
+    ++ai->pos;
+
+    return v;
 }
 
 static void get_num_data(void *num, struct uj_data *ndata)
