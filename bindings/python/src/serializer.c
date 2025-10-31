@@ -149,7 +149,7 @@ static int get_bool_value(void *boolean)
     return (PyObject *)boolean == Py_True;
 }
 
-PyObject _hidden_ * json_serialize(PyObject *, PyObject *args)
+PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
 {
     PyObject *obj;
     struct work_string *ws;
