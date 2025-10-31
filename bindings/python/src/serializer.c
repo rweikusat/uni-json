@@ -16,9 +16,20 @@
 #include "uni_json_types.h"
 #include "work_string.h"
 
+/*  types */
+struct oiter {
+    PyObject *dict;
+    Py_ssize_t pos;
+};
+
 /*  prototypes */
 static void output(uint8_t *, size_t, void *);
 static int type_of(void *);
+
+static void *start_object_traversal(void *);
+static void end_object_traversal(void *);
+static size_t max_kv_pairs(void *);
+static int next_kv_pair(void *oiter, struct uj_kv_pair *);
 
 static void get_array_info(void *ary, struct uj_ary_info *);
 static void *array_at(void *, size_t);
@@ -33,6 +44,11 @@ static int get_bool_value(void *);
 static struct uni_json_s_binding binds = {
     .output =			output,
     .type_of =			type_of,
+
+    .start_object_traversal =	start_object_traversal,
+    .end_object_traversal =	end_object_traversal,
+    .max_kv_pairs =		max_kv_pairs,
+    .next_kv_pair =		next_kv_pair,
 
     .get_array_info =		get_array_info,
     .array_at =			array_at,
@@ -76,6 +92,45 @@ static int type_of(void *obj)
     }
 
     return UJ_T_UNK;
+}
+
+static void *start_object_traversal(void *obj)
+{
+    struct oiter *oiter;
+
+    oiter = malloc(sizeof(*oiter));
+    oiter->dict = obj;
+    oiter->pos = 0;
+
+    return oiter;
+}
+
+static void end_object_traversal(void *oiter)
+{
+    free(oiter);
+}
+
+static size_t max_kv_pairs(void *obj)
+{
+    return PyDict_Size(obj);
+}
+
+static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
+{
+    struct oiter *oi;
+    PyObject *k, *v;
+    Py_ssize_t k_len;
+    int rc;
+
+    oi = oiter;
+    rc = PyDict_Next(oi->dict, &oi->pos, &k, &v);
+    if (!rc) return 0;
+
+    kvp->key.s = (uint8_t *)PyUnicode_AsUTF8AndSize(k, &k_len);
+    kvp->key.len = k_len;
+    kvp->val = v;
+
+    return 0;
 }
 
 static void get_array_info(void *ary, struct uj_ary_info *ainfo)
