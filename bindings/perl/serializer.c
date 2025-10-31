@@ -38,8 +38,8 @@ static void *next_value(void *);
 static void end_array_traversal(void *);
 
 
-static void get_num_data(void *num, struct uj_data *data);
-static void get_string_data(void *str, struct uj_data *data);
+static void get_num_data(void *num, struct uj_num_data *data);
+static void get_string_data(void *str, struct uj_str_data *data);
 static int get_bool_value(void *boolean);
 
 /*  variables */
@@ -116,7 +116,7 @@ static size_t max_kv_pairs(void *obj)
     return HvTOTALKEYS((HV *)SvRV((SV *)obj));
 }
 
-static void key_from_he(HE *he, struct uj_data *key)
+static void key_from_he(HE *he, struct uj_str_data *key)
 {
     dTHX;
     STRLEN len, ndx;
@@ -194,26 +194,26 @@ static void end_array_traversal(void *aiter)
     Safefree(aiter);
 }
 
-static void get_num_data(void *num, struct uj_data *data)
+static void get_num_data(void *num, struct uj_num_data *ndata)
 {
     dTHX;
     char *pv;
     STRLEN len;
 
     pv = SvPV((SV *)num, len);
-    data->s = pv;
-    data->len = len;
+    ndata->rep.s = pv;
+    ndata->rep.len = len;
 }
 
-static void get_string_data(void *str, struct uj_data *data)
+static void get_string_data(void *str, struct uj_str_data *sdata)
 {
     dTHX;
     char *pv;
     STRLEN len;
 
     pv = SvPVutf8((SV *)str, len);
-    data->s = pv;
-    data->len = len;
+    sdata->s = pv;
+    sdata->len = len;
 }
 
 static int get_bool_value(void *boolean)

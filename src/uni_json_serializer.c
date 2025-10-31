@@ -126,11 +126,11 @@ static void ser_bool(void *val, void *sink, struct uni_json_s_binding *binds,
 static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
                        unsigned, int)
 {
-    struct uj_data data;
+    struct uj_num_data ndata;
 
-    binds->get_num_data(val, &data);
-    binds->output(data.s, data.len, sink);
-    if (binds->free_num_data) binds->free_num_data(&data);
+    binds->get_num_data(val, &ndata);
+    binds->output(ndata.rep.s, ndata.rep.len, sink);
+    if (binds->free_num_data) binds->free_num_data(&ndata);
 }
 
 /**  strings */
@@ -169,11 +169,11 @@ static void ser_string_data(uint8_t *s, size_t len, void *sink,
 static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
                        unsigned, int)
 {
-    struct uj_data data;
+    struct uj_str_data sdata;
 
-    binds->get_string_data(val, &data);
-    ser_string_data(data.s, data.len, sink, binds);
-    if (binds->free_string_data) binds->free_string_data(&data);
+    binds->get_string_data(val, &sdata);
+    ser_string_data(sdata.s, sdata.len, sink, binds);
+    if (binds->free_string_data) binds->free_string_data(&sdata);
 }
 
 /**  arrays */

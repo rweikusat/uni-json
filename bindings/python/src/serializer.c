@@ -30,10 +30,10 @@ static void *start_array_traversal(void *ary);
 static void end_array_traversal(void *aiter);
 static void *next_value(void *aiter);
 
-static void get_num_data(void *, struct uj_data *);
-static void free_num_data(struct uj_data *);
+static void get_num_data(void *, struct uj_num_data *);
+static void free_num_data(struct uj_num_data *);
 
-static void get_string_data(void *, struct uj_data *);
+static void get_string_data(void *, struct uj_str_data *);
 static int get_bool_value(void *);
 
 /*  variables */
@@ -117,7 +117,7 @@ static void *next_value(void *aiter)
     return v;
 }
 
-static void get_num_data(void *num, struct uj_data *ndata)
+static void get_num_data(void *num, struct uj_num_data *ndata)
 {
     PyObject *str;
     Py_ssize_t len;
@@ -126,19 +126,17 @@ static void get_num_data(void *num, struct uj_data *ndata)
     str = PyObject_Str(num);
     s = PyUnicode_AsUTF8AndSize(str, &len);
 
-    ndata->s = malloc(len);
-    memcpy(ndata->s, s, len);
-    ndata->len = len;
-
-    Py_DECREF(str);
+    ndata->rep.s = (uint8_t *)s;
+    ndata->rep.len = len;
+    ndata->p = str;
 }
 
-static void free_num_data(struct uj_data *ndata)
+static void free_num_data(struct uj_num_data *ndata)
 {
-    free(ndata->s);
+    Py_DECREF(ndata->p);
 }
 
-static void get_string_data(void *str, struct uj_data *sdata)
+static void get_string_data(void *str, struct uj_str_data *sdata)
 {
     Py_ssize_t len;
 

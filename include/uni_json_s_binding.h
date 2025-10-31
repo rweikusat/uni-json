@@ -14,13 +14,18 @@
 
 /*  types */
 /**  auxiliary */
-struct uj_data {
+struct uj_str_data {
     uint8_t *s;
     size_t len;
 };
 
+struct uj_num_data {
+    struct uj_str_data rep;
+    void *p;
+};
+
 struct uj_kv_pair {
-    struct uj_data key;
+    struct uj_str_data key;
     void *val;
 };
 
@@ -44,11 +49,11 @@ struct uni_json_s_binding {
     void *(*next_value)(void *aiter);
 
     /*  "string data" types */
-    void (*get_num_data)(void *num, struct uj_data *ndata);
-    void (*free_num_data)(struct uj_data *ndata);
+    void (*get_num_data)(void *num, struct uj_num_data *ndata);
+    void (*free_num_data)(struct uj_num_data *ndata);
 
-    void (*get_string_data)(void *str, struct uj_data *sdata);
-    void (*free_string_data)(struct uj_data *sdata);
+    void (*get_string_data)(void *str, struct uj_str_data *sdata);
+    void (*free_string_data)(struct uj_str_data *sdata);
 
     /*  bool */
     int (*get_bool_value)(void *boolean);
