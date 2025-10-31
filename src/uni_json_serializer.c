@@ -180,44 +180,45 @@ static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
 static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
                       unsigned level, int fmt)
 {
+    struct uj_ary_info ainfo;
+    size_t ndx;
     uint8_t *sep;
     unsigned sep_len;
-    void *aiter, *v;
     typeof (binds->output) outp;
-    typeof (binds->next_value) next_val;
+    typeof (binds->array_at) array_at;
 
     ++level;
     outp = binds->output;
-    aiter = binds->start_array_traversal(ary);
+    binds->start_array_traversal(ary, &ainfo);
 
     outp("[", 1, sink);
 
-    if (fmt == UJ_FMT_PRETTY) {
-        sep = alloca(level + 2);
-        *sep = ',';
-        sep[1] = '\n';
-        sep_len = 2;
-        do sep[sep_len] = '\t'; while (++sep_len < level + 2);
+    if (ainfo.len) {
+        if (fmt == UJ_FMT_PRETTY) {
+            sep = alloca(level + 2);
+            *sep = ',';
+            sep[1] = '\n';
+            sep_len = 2;
+            do sep[sep_len] = '\t'; while (++sep_len < level + 2);
 
-        outp(sep + 1, sep_len - 1, sink);
-    } else {
-        sep = ",";
-        sep_len = 1;
-    }
+            outp(sep + 1, sep_len - 1, sink);
+        } else {
+            sep = ",";
+            sep_len = 1;
+        }
 
-    next_val = binds->next_value;
-    v = next_val(aiter);
-    if (v) {
-        ser_value(v, sink, binds, level, fmt);
+        array_at = binds->array_at;
+        ser_value(array_at(ainfo.p, 0), sink, binds, level, fmt);
 
-        while (v = next_val(aiter), v) {
+        ndx = 0;
+        while (++ndx < ainfo.len) {
             outp(sep, sep_len, sink);
-            ser_value(v, sink, binds, level, fmt);
+            ser_value(array_at(ainfo.p, ndx), sink, binds, level, fmt);
         }
     }
 
     outp("]", 1, sink);
-    if (binds->end_array_traversal) binds->end_array_traversal(aiter);
+    if (binds->end_array_traversal) binds->end_array_traversal(ainfo.p);
 }
 
 /**  objects */

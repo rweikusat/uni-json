@@ -20,11 +20,6 @@ enum {
     INIT_BUF_SIZE = 128
 };
 
-/*  types */
-struct aiter {
-    SV **p, **e;
-};
-
 /*  prototypes */
 static void output(uint8_t *data, size_t len, void *sink);
 static int type_of(void *p);
@@ -33,9 +28,8 @@ static void *start_object_traversal(void *);
 static size_t max_kv_pairs(void *);
 static int next_kv_pair(void *, struct uj_kv_pair *);
 
-static void *start_array_traversal(void *);
-static void *next_value(void *);
-static void end_array_traversal(void *);
+static void *start_array_traversal(void *, struct uj_ary_info *);
+static void *array_at(void *, size_t);
 
 
 static void get_num_data(void *num, struct uj_num_data *data);
@@ -54,8 +48,7 @@ struct uni_json_s_binding default_perl_uj_serializer_bindings = {
     .next_kv_pair =		next_kv_pair,
 
     .start_array_traversal =	start_array_traversal,
-    .next_value =		next_value,
-    .end_array_traversal =	end_array_traversal,
+    .array_at =			array_at,
 
     .get_num_data =		get_num_data,
     .get_string_data =		get_string_data,
@@ -160,38 +153,19 @@ static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
     return 1;
 }
 
-static void *start_array_traversal(void *ary)
+static void *start_array_traversal(void *ary, struct uj_ary_info *ainfo)
 {
     dTHX;
-    struct aiter *aiter;
     AV *av;
 
     av = (AV *)SvRV((SV *)ary);
-
-    aiter = safemalloc(sizeof(*aiter));
-    aiter->p = AvARRAY(av);
-    aiter->e = aiter->p + av_count(av);
-
-    return aiter;
+    ainfo->p = AvARRAY(av);
+    ainfo->len = av_count(av);
 }
 
-static void *next_value(void *p)
+static void *array_at(void *p, size_t ndx)
 {
-    dTHX;
-    struct aiter *aiter;
-    void *v;
-
-    aiter = p;
-    if (aiter->p == aiter->e) return NULL;
-
-    v = *aiter->p++;
-    return v;
-}
-
-static void end_array_traversal(void *aiter)
-{
-    dTHX;
-    Safefree(aiter);
+    return ((SV **)p)[ndx];
 }
 
 static void get_num_data(void *num, struct uj_num_data *ndata)

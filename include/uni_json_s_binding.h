@@ -14,6 +14,11 @@
 
 /*  types */
 /**  auxiliary */
+struct uj_ary_info {
+    void *p;
+    size_t len;
+};
+
 struct uj_str_data {
     uint8_t *s;
     size_t len;
@@ -44,9 +49,9 @@ struct uni_json_s_binding {
     int (*next_kv_pair)(void *oiter, struct uj_kv_pair *kvp);
 
     /*  arrays */
-    void *(*start_array_traversal)(void *ary);
-    void (*end_array_traversal)(void *aiter);
-    void *(*next_value)(void *aiter);
+    void (*start_array_traversal)(void *ary, struct uj_ary_info *ainfo);
+    void (*end_array_traversal)(void *p);
+    void *(*array_at)(void *p, size_t ndx);
 
     /*  "string data" types */
     void (*get_num_data)(void *num, struct uj_num_data *ndata);
