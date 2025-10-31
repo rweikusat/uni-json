@@ -17,9 +17,15 @@
 #include "work_string.h"
 
 /*  types */
+struct key_string {
+    struct key_string *p;
+    PyObject *s;
+};
+
 struct oiter {
     PyObject *dict;
     Py_ssize_t pos;
+    struct key_string *k_strs;
 };
 
 /*  prototypes */
@@ -44,6 +50,8 @@ static int get_bool_value(void *);
 static struct uni_json_s_binding binds = {
     .output =			output,
     .type_of =			type_of,
+    .alloc =			malloc,
+    .dealloc =			free,
 
     .start_object_traversal =	start_object_traversal,
     .end_object_traversal =	end_object_traversal,
@@ -96,17 +104,30 @@ static int type_of(void *obj)
 
 static void *start_object_traversal(void *obj)
 {
-    struct oiter *oiter;
+    struct oiter *oi;
 
-    oiter = malloc(sizeof(*oiter));
-    oiter->dict = obj;
-    oiter->pos = 0;
+    oi = malloc(sizeof(*oi));
+    oi->dict = obj;
+    oi->pos = 0;
+    oi->k_strs = NULL;
 
-    return oiter;
+    return oi;
 }
 
 static void end_object_traversal(void *oiter)
 {
+    struct key_string *cur, *next;
+    struct oiter *oi;
+
+    oi = oiter;
+    next = oi->k_strs;
+    while (cur = next, cur) {
+        next = next->p;
+
+        Py_DECREF(cur->s);
+        free(cur);
+    }
+
     free(oiter);
 }
 
@@ -118,6 +139,7 @@ static size_t max_kv_pairs(void *obj)
 static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
 {
     struct oiter *oi;
+    struct key_string *k_str;
     PyObject *k, *v;
     Py_ssize_t k_len;
     int rc;
@@ -126,11 +148,19 @@ static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
     rc = PyDict_Next(oi->dict, &oi->pos, &k, &v);
     if (!rc) return 0;
 
+    if (type_of(k) != UJ_T_STR) {
+        k_str = malloc(sizeof(*k_str));
+        k_str->p = oi->k_strs;
+        oi->k_strs = k_str;
+
+        k = k_str->s = PyObject_Str(k);
+    }
+
     kvp->key.s = (uint8_t *)PyUnicode_AsUTF8AndSize(k, &k_len);
     kvp->key.len = k_len;
     kvp->val = v;
 
-    return 0;
+    return 1;
 }
 
 static void get_array_info(void *ary, struct uj_ary_info *ainfo)
