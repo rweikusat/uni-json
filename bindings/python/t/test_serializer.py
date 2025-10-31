@@ -41,10 +41,13 @@ class TestSerializerBindings(unittest.TestCase):
         s = uj.json_serialize([1, 2, ['affe']])
         self.assertEqual(s, '[1,2,["affe"]]')
 
-    def test_obj(self):
-        s = uj.json_serialize({ "a" : 1, "b" : 7 })
-        print("XXX", s)
-        self.assertTrue(True)
+    def test_string_key_dict(self):
+        s = uj.json_serialize({ "b" : 1, "a" : 7 }, 1)
+        self.assertEqual(s, '{"a":7,"b":1}')
+
+    def test_non_string_key_dict(self):
+        s = uj.json_serialize({ (1,2) : 3, 4711 : "Emil", None : 'bla' }, 1)
+        self.assertEqual(s, '{"(1, 2)":3,"4711":"Emil","None":"bla"}')
 
 if __name__ == '__main__':
     unittest.main()
