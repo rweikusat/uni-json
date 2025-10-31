@@ -20,7 +20,7 @@
 static void output(uint8_t *, size_t, void *);
 static int type_of(void *);
 
-static void *start_array_traversal(void *ary, struct uj_ary_info *);
+static void get_array_info(void *ary, struct uj_ary_info *);
 static void *array_at(void *, size_t);
 
 static void get_num_data(void *, struct uj_num_data *);
@@ -34,7 +34,7 @@ static struct uni_json_s_binding binds = {
     .output =			output,
     .type_of =			type_of,
 
-    .start_array_traversal =	start_array_traversal,
+    .get_array_info =		get_array_info,
     .array_at =			array_at,
 
     .get_num_data =		get_num_data,
@@ -78,7 +78,7 @@ static int type_of(void *obj)
     return UJ_T_UNK;
 }
 
-static void *start_array_traversal(void *ary, struct uj_ary_info *ainfo)
+static void get_array_info(void *ary, struct uj_ary_info *ainfo)
 {
     ainfo->p = ary;
     ainfo->len = PyList_GET_SIZE(ary);

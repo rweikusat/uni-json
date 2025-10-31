@@ -49,8 +49,8 @@ struct uni_json_s_binding {
     int (*next_kv_pair)(void *oiter, struct uj_kv_pair *kvp);
 
     /*  arrays */
-    void (*start_array_traversal)(void *ary, struct uj_ary_info *ainfo);
-    void (*end_array_traversal)(void *p);
+    void (*get_array_info)(void *ary, struct uj_ary_info *ainfo);
+    void (*free_array_info)(void *p);
     void *(*array_at)(void *p, size_t ndx);
 
     /*  "string data" types */

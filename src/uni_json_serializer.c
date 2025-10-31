@@ -189,7 +189,7 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
 
     ++level;
     outp = binds->output;
-    binds->start_array_traversal(ary, &ainfo);
+    binds->get_array_info(ary, &ainfo);
 
     outp("[", 1, sink);
 
@@ -218,7 +218,7 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
     }
 
     outp("]", 1, sink);
-    if (binds->end_array_traversal) binds->end_array_traversal(ainfo.p);
+    if (binds->free_array_info) binds->free_array_info(ainfo.p);
 }
 
 /**  objects */

@@ -28,9 +28,8 @@ static void *start_object_traversal(void *);
 static size_t max_kv_pairs(void *);
 static int next_kv_pair(void *, struct uj_kv_pair *);
 
-static void *start_array_traversal(void *, struct uj_ary_info *);
+static void get_array_info(void *, struct uj_ary_info *);
 static void *array_at(void *, size_t);
-
 
 static void get_num_data(void *num, struct uj_num_data *data);
 static void get_string_data(void *str, struct uj_str_data *data);
@@ -47,7 +46,7 @@ struct uni_json_s_binding default_perl_uj_serializer_bindings = {
     .max_kv_pairs =		max_kv_pairs,
     .next_kv_pair =		next_kv_pair,
 
-    .start_array_traversal =	start_array_traversal,
+    .get_array_info =		get_array_info,
     .array_at =			array_at,
 
     .get_num_data =		get_num_data,
@@ -153,7 +152,7 @@ static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
     return 1;
 }
 
-static void *start_array_traversal(void *ary, struct uj_ary_info *ainfo)
+static void get_array_info(void *ary, struct uj_ary_info *ainfo)
 {
     dTHX;
     AV *av;
