@@ -255,7 +255,7 @@ static int ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *b
     int rc;
 
     next_kv_pair = binds->next_kv_pair;
-    if (!next_kv_pair(oiter, &kvp)) return;
+    if (!next_kv_pair(oiter, &kvp)) return 0;
     outp = binds->output;
 
     rc = ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
