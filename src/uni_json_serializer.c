@@ -17,7 +17,7 @@
 #include "uni_json_serializer.h"
 
 /*  types */
-typedef void serialize_func(void *val, void *sink, struct uni_json_s_binding *binds,
+typedef int serialize_func(void *val, void *sink, struct uni_json_s_binding *binds,
                             unsigned level, int fmt);
 
 struct kvp_heap {
@@ -26,26 +26,26 @@ struct kvp_heap {
 };
 
 /*  prototypes */
-static void ser_null(void *, void *, struct uni_json_s_binding *,
-                     unsigned, int);
+static int ser_null(void *, void *, struct uni_json_s_binding *,
+                    unsigned, int);
 
-static void ser_bool(void *, void *, struct uni_json_s_binding *,
-                     unsigned, int);
+static int ser_bool(void *, void *, struct uni_json_s_binding *,
+                    unsigned, int);
 
-static void ser_number(void *, void *, struct uni_json_s_binding *,
-                       unsigned, int);
-
-static void ser_string(void *, void *, struct uni_json_s_binding *,
-                       unsigned, int);
-
-static void ser_array(void *, void *, struct uni_json_s_binding *,
+static int ser_number(void *, void *, struct uni_json_s_binding *,
                       unsigned, int);
 
-static void ser_object(void *, void *, struct uni_json_s_binding *,
-                       unsigned, int);
+static int ser_string(void *, void *, struct uni_json_s_binding *,
+                      unsigned, int);
 
-static void ser_value(void *, void *, struct uni_json_s_binding *,
-                            unsigned, int);
+static int ser_array(void *, void *, struct uni_json_s_binding *,
+                     unsigned, int);
+
+static int ser_object(void *, void *, struct uni_json_s_binding *,
+                      unsigned, int);
+
+static int ser_value(void *, void *, struct uni_json_s_binding *,
+                     unsigned, int);
 
 /*  variables */
 static serialize_func *serers[] = {
@@ -98,13 +98,13 @@ static uint8_t escs[][8] = {
 
 /*  routines */
 /**  simple types */
-static void ser_null(void *, void *sink, struct uni_json_s_binding *binds,
+static int ser_null(void *, void *sink, struct uni_json_s_binding *binds,
                      unsigned, int)
 {
-    binds->output("null", 4, sink);
+    return binds->output("null", 4, sink);
 }
 
-static void ser_bool(void *val, void *sink, struct uni_json_s_binding *binds,
+static int ser_bool(void *val, void *sink, struct uni_json_s_binding *binds,
                      unsigned, int)
 {
     char *vs;
@@ -120,29 +120,35 @@ static void ser_bool(void *val, void *sink, struct uni_json_s_binding *binds,
         len = 5;
     }
 
-    binds->output(vs, len, sink);
+    return binds->output(vs, len, sink);
 }
 
-static void ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
+static int ser_number(void *val, void *sink, struct uni_json_s_binding *binds,
                        unsigned, int)
 {
     struct uj_num_data ndata;
+    int rc;
 
-    binds->get_num_data(val, &ndata);
-    binds->output(ndata.rep.s, ndata.rep.len, sink);
+    rc = binds->get_num_data(val, &ndata);
+    if (rc == -1) return -1;
+
+    rc = binds->output(ndata.rep.s, ndata.rep.len, sink);
     if (binds->free_num_data) binds->free_num_data(&ndata);
+    return rc;
 }
 
 /**  strings */
-static void ser_string_data(uint8_t *s, size_t len, void *sink,
-                            struct uni_json_s_binding *binds)
+static int ser_string_data(uint8_t *s, size_t len, void *sink,
+                           struct uni_json_s_binding *binds)
 {
     typeof (binds->output) outp;
     uint8_t *p, *e, *esc;
     unsigned c;
+    int rc;
 
     outp = binds->output;
-    outp("\"", 1, sink);
+    rc = outp("\"", 1, sink);
+    if (rc == -1) return -1;
 
     p = s;
     e = p + len;
@@ -150,11 +156,15 @@ static void ser_string_data(uint8_t *s, size_t len, void *sink,
         c = *p;
 
         if (c < 32 || c == '"' || c == '\\') {
-            if (p > s) outp(s, p - s, sink);
+            if (p > s) {
+                rc = outp(s, p - s, sink);
+                if (rc == -1) return -1;
+            }
 
             esc = escs[c];
             len = esc[1] == 'u' ? 6 : 2;
-            outp(esc, len, sink);
+            rc = outp(esc, len, sink);
+            if (rc == -1) return -1;
 
             s = p + 1;
         }
@@ -162,23 +172,29 @@ static void ser_string_data(uint8_t *s, size_t len, void *sink,
         ++p;
     }
 
-    if (p > s) outp(s, p - s, sink);
-    outp("\"", 1, sink);
+    rc = 0;
+    if (p > s) rc = outp(s, p - s, sink);
+    if (rc != -1) rc = outp("\"", 1, sink);
+    return rc;
 }
 
-static void ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
-                       unsigned, int)
+static int ser_string(void *val, void *sink, struct uni_json_s_binding *binds,
+                      unsigned, int)
 {
     struct uj_str_data sdata;
+    int rc;
 
-    binds->get_string_data(val, &sdata);
-    ser_string_data(sdata.s, sdata.len, sink, binds);
+    rc = binds->get_string_data(val, &sdata);
+    if (rc == -1) return -1;
+
+    rc = ser_string_data(sdata.s, sdata.len, sink, binds);
     if (binds->free_string_data) binds->free_string_data(&sdata);
+    return rc;
 }
 
 /**  arrays */
-static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
-                      unsigned level, int fmt)
+static int ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
+                     unsigned level, int fmt)
 {
     struct uj_ary_info ainfo;
     size_t ndx;
@@ -186,12 +202,14 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
     unsigned sep_len;
     typeof (binds->output) outp;
     typeof (binds->array_at) array_at;
+    int rc;
 
     ++level;
     outp = binds->output;
     binds->get_array_info(ary, &ainfo);
 
-    outp("[", 1, sink);
+    rc = outp("[", 1, sink);
+    if (rc == -1) goto out;
 
     if (ainfo.len) {
         if (fmt == UJ_FMT_PRETTY) {
@@ -201,48 +219,61 @@ static void ser_array(void *ary, void *sink, struct uni_json_s_binding *binds,
             sep_len = 2;
             do sep[sep_len] = '\t'; while (++sep_len < level + 2);
 
-            outp(sep + 1, sep_len - 1, sink);
+            rc = outp(sep + 1, sep_len - 1, sink);
+            if (rc == -1) goto out;
         } else {
             sep = ",";
             sep_len = 1;
         }
 
         array_at = binds->array_at;
-        ser_value(array_at(ainfo.p, 0), sink, binds, level, fmt);
+        rc = ser_value(array_at(ainfo.p, 0), sink, binds, level, fmt);
+        if (rc == -1) goto out;
 
         ndx = 0;
         while (++ndx < ainfo.len) {
-            outp(sep, sep_len, sink);
-            ser_value(array_at(ainfo.p, ndx), sink, binds, level, fmt);
+            rc = outp(sep, sep_len, sink);
+            if (rc == -1) goto out;
+
+            rc = ser_value(array_at(ainfo.p, ndx), sink, binds, level, fmt);
+            if (rc == -1) goto out;
         }
     }
 
-    outp("]", 1, sink);
+    rc = outp("]", 1, sink);
+out:
     if (binds->free_array_info) binds->free_array_info(ainfo.p);
+    return rc;
 }
 
 /**  objects */
-static void ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *binds)
+static int ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *binds)
 {
     typeof (binds->output) outp;
     typeof (binds->next_kv_pair) next_kv_pair;
     struct uj_kv_pair kvp;
+    int rc;
 
     next_kv_pair = binds->next_kv_pair;
     if (!next_kv_pair(oiter, &kvp)) return;
     outp = binds->output;
 
-    ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
-    outp(":", 1, sink);
-    ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
+    rc = ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
+    if (rc != -1) rc = outp(":", 1, sink);
+    if (rc != -1) rc = ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
+    if (rc == -1) return -1;
 
     while (next_kv_pair(oiter, &kvp)) {
-        outp(",", 1, sink);
+        rc = outp(",", 1, sink);
+        if (rc == -1) return -1;
 
-        ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
-        outp(":", 1, sink);
-        ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
+        rc = ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
+        if (rc != -1) rc = outp(":", 1, sink);
+        if (rc != -1) rc = ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
+        if (rc == -1) return -1;
     }
+
+    return 0;
 }
 
 static int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
@@ -308,20 +339,22 @@ static int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
   insertion and removal are O(log₂(n)).
 */
 
-static void build_kvph(void *oiter,
-                       size_t max_kvps,
-                       struct kvp_heap *kvph,
-                       struct uni_json_s_binding *binds)
+static int build_kvph(void *oiter,
+                      size_t max_kvps,
+                      struct kvp_heap *kvph,
+                      struct uni_json_s_binding *binds)
 {
     typeof (binds->next_kv_pair) next_kv_pair;
     struct uj_kv_pair *kvps, kvp;
     size_t last, at, pre;
 
-    next_kv_pair = binds->next_kv_pair;
     kvps = kvph->h = binds->alloc(sizeof(*kvps) * (max_kvps + 1));
+    if (!kvps) return -1;
+
+    next_kv_pair = binds->next_kv_pair;
     if (!next_kv_pair(oiter, kvps + 1)) {
         binds->dealloc(kvps);
-        return;
+        return 0;
     }
 
     last = 1;
@@ -340,6 +373,7 @@ static void build_kvph(void *oiter,
     }
 
     kvph->last = last;
+    return 0;
 }
 
 static void rm_kvph_root(struct kvp_heap *kvph)
@@ -364,17 +398,19 @@ static void rm_kvph_root(struct kvp_heap *kvph)
     kvph->last = last - 1;
 }
 
-static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
-                           struct uni_json_s_binding *binds,
-                           unsigned level, int fmt)
+static int ser_object_det(void *oiter, size_t max_kvps, void *sink,
+                          struct uni_json_s_binding *binds,
+                          unsigned level, int fmt)
 {
     typeof (binds->output) outp;
     struct kvp_heap kvph;
     uint8_t *kv_sep, *kvp_sep;
     size_t kv_sep_len, kvp_sep_len;
+    int rc;
 
-    build_kvph(oiter, max_kvps, &kvph, binds);
-    if (!kvph.last) return;
+    rc = build_kvph(oiter, max_kvps, &kvph, binds);
+    if (rc == -1) return -1;
+    if (!kvph.last) return 0;
 
     outp = binds->output;
     if (fmt == UJ_FMT_PRETTY) {
@@ -386,7 +422,8 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
         kvp_sep[1] = '\n';
         kvp_sep_len = 2;
         do kvp_sep[kvp_sep_len] = '\t'; while (++kvp_sep_len < level + 2);
-        outp(kvp_sep + 1, kvp_sep_len -1, sink);
+        rc = outp(kvp_sep + 1, kvp_sep_len -1, sink);
+        if (rc == -1) goto out;
     } else {
         kv_sep = ":";
         kv_sep_len = 1;
@@ -395,56 +432,70 @@ static void ser_object_det(void *oiter, size_t max_kvps, void *sink,
         kvp_sep_len = 1;
     }
 
-    ser_string_data(kvph.h[1].key.s, kvph.h[1].key.len, sink, binds);
-    outp(kv_sep, kv_sep_len, sink);
-    ser_value(kvph.h[1].val, sink, binds, level, fmt);
+    rc = ser_string_data(kvph.h[1].key.s, kvph.h[1].key.len, sink, binds);
+    if (rc != -1) rc = outp(kv_sep, kv_sep_len, sink);
+    if (rc != -1) rc = ser_value(kvph.h[1].val, sink, binds, level, fmt);
+    if (rc == -1) goto out;
 
     while (rm_kvph_root(&kvph), kvph.last) {
-        outp(kvp_sep, kvp_sep_len, sink);
+        rc = outp(kvp_sep, kvp_sep_len, sink);
+        if (rc == -1) goto out;
 
-        ser_string_data(kvph.h[1].key.s, kvph.h[1].key.len, sink, binds);
-        outp(kv_sep, kv_sep_len, sink);
-        ser_value(kvph.h[1].val, sink, binds, level, fmt);
+        rc = ser_string_data(kvph.h[1].key.s, kvph.h[1].key.len, sink, binds);
+        if (rc != -1) rc = outp(kv_sep, kv_sep_len, sink);
+        if (rc != -1) rc = ser_value(kvph.h[1].val, sink, binds, level, fmt);
+        if (rc == -1) goto out;
     }
 
+out:
     binds->dealloc(kvph.h);
+    return rc;
 }
 
-static void ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
-                       unsigned level, int fmt)
+static int ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
+                      unsigned level, int fmt)
 {
     void *oiter;
     size_t max_kvps;
+    int rc;
 
     max_kvps = binds->max_kv_pairs(val);
 
-    binds->output("{", 1, sink);
+    rc = binds->output("{", 1, sink);
+    if (rc == -1) return rc;
+
     oiter = binds->start_object_traversal(val);
 
     switch (fmt) {
     case UJ_FMT_FAST:
-        ser_object_fast(oiter, sink, binds);
+        rc = ser_object_fast(oiter, sink, binds);
+        if (rc == -1) goto out;
         break;
 
     case UJ_FMT_DET:
     case UJ_FMT_PRETTY:
-        if (max_kvps)
-            ser_object_det(oiter, max_kvps, sink, binds, level + 1, fmt);
+        if (max_kvps) {
+            rc = ser_object_det(oiter, max_kvps, sink, binds, level + 1, fmt);
+            if (rc == -1) goto out;
+        }
     }
 
-    binds->output("}", 1, sink);
+    rc = binds->output("}", 1, sink);
+
+out:
     if (binds->end_object_traversal) binds->end_object_traversal(oiter);
+    return rc;
 }
 
 /**  top-level */
-static void ser_value(void *val, void *sink, struct uni_json_s_binding *binds,
+static int ser_value(void *val, void *sink, struct uni_json_s_binding *binds,
                             unsigned level, int fmt)
 {
-    serers[binds->type_of(val)](val, sink, binds, level, fmt);
+    return serers[binds->type_of(val)](val, sink, binds, level, fmt);
 }
 
-void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
+int uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
                         int fmt)
 {
-    ser_value(val, sink, binds, 0, fmt);
+    return ser_value(val, sink, binds, 0, fmt);
 }
