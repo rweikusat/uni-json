@@ -23,7 +23,7 @@ enum {
 struct uni_json_s_binding;
 
 /*  routines */
-void uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
-                        int fmt);
+int uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
+                       int fmt);
 
 #endif
