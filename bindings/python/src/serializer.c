@@ -29,7 +29,7 @@ struct oiter {
 };
 
 /*  prototypes */
-static void output(uint8_t *, size_t, void *);
+static int output(uint8_t *, size_t, void *);
 static int type_of(void *);
 
 static void *start_object_traversal(void *);
@@ -40,10 +40,10 @@ static int next_kv_pair(void *oiter, struct uj_kv_pair *);
 static void get_array_info(void *ary, struct uj_ary_info *);
 static void *array_at(void *, size_t);
 
-static void get_num_data(void *, struct uj_num_data *);
+static int get_num_data(void *, struct uj_num_data *);
 static void free_num_data(struct uj_num_data *);
 
-static void get_string_data(void *, struct uj_str_data *);
+static int get_string_data(void *, struct uj_str_data *);
 static int get_bool_value(void *);
 
 /*  variables */
@@ -69,9 +69,10 @@ static struct uni_json_s_binding binds = {
 };
 
 /*  routines */
-static void output(uint8_t *data, size_t len, void *sink)
+static int output(uint8_t *data, size_t len, void *sink)
 {
     add_2_work_string(data, len, sink);
+    return 0;
 }
 
 static int type_of(void *obj)
@@ -174,7 +175,7 @@ static void *array_at(void *p, size_t ndx)
     return PyList_GET_ITEM(p, ndx);
 }
 
-static void get_num_data(void *num, struct uj_num_data *ndata)
+static int get_num_data(void *num, struct uj_num_data *ndata)
 {
     PyObject *str;
     Py_ssize_t len;
@@ -186,6 +187,8 @@ static void get_num_data(void *num, struct uj_num_data *ndata)
     ndata->rep.s = (uint8_t *)s;
     ndata->rep.len = len;
     ndata->p = str;
+
+    return 0;
 }
 
 static void free_num_data(struct uj_num_data *ndata)
@@ -193,12 +196,14 @@ static void free_num_data(struct uj_num_data *ndata)
     Py_DECREF(ndata->p);
 }
 
-static void get_string_data(void *str, struct uj_str_data *sdata)
+static int get_string_data(void *str, struct uj_str_data *sdata)
 {
     Py_ssize_t len;
 
     sdata->s = (uint8_t *)PyUnicode_AsUTF8AndSize(str, &len);
     sdata->len = len;
+
+    return 0;
 }
 
 static int get_bool_value(void *boolean)
