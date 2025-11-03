@@ -16,6 +16,14 @@
 #include "uni_json_types.h"
 #include "work_string.h"
 
+/*  constants */
+enum {
+    PY_UJ_UNK_ERR =		4,
+    PY_UJ_NSK_ERR =		8,
+    PY_UJ_NSK_STR =		16,
+    PY_UJ_ALL =			PY_UJ_UNK_ERR | PY_UJ_NSK_ERR | PY_UJ_NSK_STR
+};
+
 /*  types */
 struct key_string {
     struct key_string *p;
@@ -30,7 +38,8 @@ struct oiter {
 
 /*  prototypes */
 static int output(uint8_t *, size_t, void *);
-static int type_of(void *);
+static int type_of_unk_null(void *);
+static int type_of_unk_err(void *);
 
 static void *start_object_traversal(void *);
 static void end_object_traversal(void *);
@@ -49,7 +58,7 @@ static int get_bool_value(void *);
 /*  variables */
 static struct uni_json_s_binding binds = {
     .output =			output,
-    .type_of =			type_of,
+    .type_of =			type_of_unk_null,
     .alloc =			malloc,
     .dealloc =			free,
 
@@ -75,7 +84,7 @@ static int output(uint8_t *data, size_t len, void *sink)
     return 0;
 }
 
-static int type_of(void *obj)
+static int type_of_unk_null(void *obj)
 {
     PyTypeObject *tp;
     double d;
@@ -101,6 +110,19 @@ static int type_of(void *obj)
     }
 
     return UJ_T_UNK;
+}
+
+static int type_of_unk_err(void *obj)
+{
+    int tp;
+
+    tp = type_of_unk_null(obj);
+    if (tp == UJ_T_UNK) {
+        PyErr_SetString(PyExc_ValueError, "unsupported value type");
+        return -1;
+    }
+
+    return tp;
 }
 
 static void *start_object_traversal(void *obj)
@@ -149,7 +171,7 @@ static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
     rc = PyDict_Next(oi->dict, &oi->pos, &k, &v);
     if (!rc) return 0;
 
-    if (type_of(k) != UJ_T_STR) {
+    if (type_of_unk_null(k) != UJ_T_STR) {
         k_str = malloc(sizeof(*k_str));
         k_str->p = oi->k_strs;
         oi->k_strs = k_str;
@@ -213,6 +235,7 @@ static int get_bool_value(void *boolean)
 
 PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
 {
+    struct uni_json_s_binding my_binds, *the_binds;
     PyObject *obj;
     struct work_string *ws;
     int fmt, rc;
@@ -220,16 +243,17 @@ PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
     fmt = UJ_FMT_FAST;
     rc = PyArg_ParseTuple(args, "O|i", &obj, &fmt);
     if (!rc) return NULL;
-    switch (fmt) {
-    case UJ_FMT_FAST:
-    case UJ_FMT_DET:
-    case UJ_FMT_PRETTY:
-        break;
 
-    default:
-        PyErr_SetString(PyExc_ValueError, "wrong value for format argument");
-        return NULL;
-    }
+    if (fmt & PY_UJ_ALL) {
+        my_binds = binds;
+        the_binds = &my_binds;
+
+        if (fmt & PY_UJ_UNK_ERR)
+            my_binds.type_of = type_of_unk_err;
+
+        fmt &= ~PY_UJ_ALL;
+    } else
+        the_binds = &binds;
 
     ws = make_work_string();
     if (!ws) {
@@ -237,9 +261,10 @@ PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
         return NULL;
     }
 
-    uni_json_serialize(obj, ws, &binds, fmt);
-    obj = PyUnicode_FromStringAndSize((char *)ws->s, ws->p - ws->s);
-    free_work_string(ws);
+    rc = uni_json_serialize(obj, ws, the_binds, fmt);
+    if (rc != -1) obj = PyUnicode_FromStringAndSize((char *)ws->s, ws->p - ws->s);
+    else obj = NULL;
 
+    free_work_string(ws);
     return obj;
 }
