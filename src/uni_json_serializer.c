@@ -491,7 +491,12 @@ out:
 static int ser_value(void *val, void *sink, struct uni_json_s_binding *binds,
                             unsigned level, int fmt)
 {
-    return serers[binds->type_of(val)](val, sink, binds, level, fmt);
+    int tp;
+
+    tp = binds->type_of(val);
+    if (tp == -1) return -1;
+
+    return serers[tp](val, sink, binds, level, fmt);
 }
 
 int uni_json_serialize(void *val, void *sink, struct uni_json_s_binding *binds,
