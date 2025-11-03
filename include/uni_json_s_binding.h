@@ -37,7 +37,7 @@ struct uj_kv_pair {
 /**  serializer bindings */
 struct uni_json_s_binding {
     /*  general */
-    void (*output)(uint8_t *data, size_t len, void *sink);
+    int (*output)(uint8_t *data, size_t len, void *sink);
     int (*type_of)(void *p);
     void *(*alloc)(size_t);
     void (*dealloc)(void *);
@@ -54,10 +54,10 @@ struct uni_json_s_binding {
     void *(*array_at)(void *p, size_t ndx);
 
     /*  "string data" types */
-    void (*get_num_data)(void *num, struct uj_num_data *ndata);
+    int (*get_num_data)(void *num, struct uj_num_data *ndata);
     void (*free_num_data)(struct uj_num_data *ndata);
 
-    void (*get_string_data)(void *str, struct uj_str_data *sdata);
+    int (*get_string_data)(void *str, struct uj_str_data *sdata);
     void (*free_string_data)(struct uj_str_data *sdata);
 
     /*  bool */
