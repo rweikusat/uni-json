@@ -21,7 +21,7 @@ enum {
 };
 
 /*  prototypes */
-static void output(uint8_t *data, size_t len, void *sink);
+static int output(uint8_t *data, size_t len, void *sink);
 static int type_of(void *p);
 
 static void *start_object_traversal(void *);
@@ -31,8 +31,8 @@ static int next_kv_pair(void *, struct uj_kv_pair *);
 static void get_array_info(void *, struct uj_ary_info *);
 static void *array_at(void *, size_t);
 
-static void get_num_data(void *num, struct uj_num_data *data);
-static void get_string_data(void *str, struct uj_str_data *data);
+static int get_num_data(void *num, struct uj_num_data *data);
+static int get_string_data(void *str, struct uj_str_data *data);
 static int get_bool_value(void *boolean);
 
 /*  variables */
@@ -55,10 +55,12 @@ struct uni_json_s_binding default_perl_uj_serializer_bindings = {
 };
 
 /*  routines */
-static void output(uint8_t *data, size_t len, void *sink)
+static int output(uint8_t *data, size_t len, void *sink)
 {
     dTHX;
+
     sv_catpvn_nomg(sink, data, len);
+    return 0;
 }
 
 static int type_of(void *p)
@@ -167,7 +169,7 @@ static void *array_at(void *p, size_t ndx)
     return ((SV **)p)[ndx];
 }
 
-static void get_num_data(void *num, struct uj_num_data *ndata)
+static int get_num_data(void *num, struct uj_num_data *ndata)
 {
     dTHX;
     char *pv;
@@ -176,9 +178,11 @@ static void get_num_data(void *num, struct uj_num_data *ndata)
     pv = SvPV((SV *)num, len);
     ndata->rep.s = pv;
     ndata->rep.len = len;
+
+    return 0;
 }
 
-static void get_string_data(void *str, struct uj_str_data *sdata)
+static int get_string_data(void *str, struct uj_str_data *sdata)
 {
     dTHX;
     char *pv;
@@ -187,6 +191,8 @@ static void get_string_data(void *str, struct uj_str_data *sdata)
     pv = SvPVutf8((SV *)str, len);
     sdata->s = pv;
     sdata->len = len;
+
+    return 0;
 }
 
 static int get_bool_value(void *boolean)
