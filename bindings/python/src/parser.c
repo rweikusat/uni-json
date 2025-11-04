@@ -24,6 +24,7 @@ static void *make_bool(int);
 static void *make_number(uint8_t *, size_t, unsigned);
 
 static void *do_make_work_string(void);
+static int do_add_2_work_string
 static void *finalize_string(void *, uint8_t *, size_t);
 
 static void *make_array(void);
