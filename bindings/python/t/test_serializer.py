@@ -49,5 +49,9 @@ class TestSerializerBindings(unittest.TestCase):
         s = uj.json_serialize([1, (1,2), 3])
         self.assertEqual(s, '[1,null,3]')
 
+    def test_unk_err(self):
+        with self.assertRaises(ValueError):
+            uj.json_serialize([1, (1,2), 3], 4)
+
 if __name__ == '__main__':
     unittest.main()
