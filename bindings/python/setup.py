@@ -17,5 +17,9 @@ setup(
                              include_dirs = ['../../include', 'src'],
                              library_dirs = ['../../bin'],
                              libraries = ['uni-json']
-                             )]
+                             )],
+#    package_dir = {
+#        'UniJson' : 'SM'
+#    },
+#    packages = ['UniJson']
 )
