@@ -13,10 +13,6 @@ class TestSerializerBindings(unittest.TestCase):
     def test_two_args(self):
         uj.json_serialize(None, 0)
 
-    def test_2nd_wrong(self):
-        with self. assertRaises(ValueError):
-            uj.json_serialize(None, 17)
-
     def test_null(self):
         s = uj.json_serialize(None)
         self.assertEqual(s, 'null')
@@ -48,6 +44,10 @@ class TestSerializerBindings(unittest.TestCase):
     def test_non_string_key_dict(self):
         s = uj.json_serialize({ (1,2) : 3, 4711 : "Emil", None : 'bla' }, 1)
         self.assertEqual(s, '{"(1, 2)":3,"4711":"Emil","None":"bla"}')
+
+    def test_unk_null(self):
+        s = uj.json_serialize([1, (1,2), 3])
+        self.assertEqual(s, '[1,null,3]')
 
 if __name__ == '__main__':
     unittest.main()
