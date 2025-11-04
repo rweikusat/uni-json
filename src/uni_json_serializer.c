@@ -255,7 +255,8 @@ static int ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *b
     int rc;
 
     next_kv_pair = binds->next_kv_pair;
-    if (!next_kv_pair(oiter, &kvp)) return 0;
+    rc = next_kv_pair(oiter, &kvp);
+    if (rc <= 0) return rc;
     outp = binds->output;
 
     rc = ser_string_data(kvp.key.s, kvp.key.len, sink, binds);
@@ -263,7 +264,7 @@ static int ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *b
     if (rc != -1) rc = ser_value(kvp.val, sink, binds, 0, UJ_FMT_FAST);
     if (rc == -1) return -1;
 
-    while (next_kv_pair(oiter, &kvp)) {
+    while (rc = next_kv_pair(oiter, &kvp), rc > 0) {
         rc = outp(",", 1, sink);
         if (rc == -1) return -1;
 
@@ -273,7 +274,7 @@ static int ser_object_fast(void *oiter, void *sink, struct uni_json_s_binding *b
         if (rc == -1) return -1;
     }
 
-    return 0;
+    return rc;
 }
 
 static int key_cmp(struct uj_kv_pair const *kvp0, struct uj_kv_pair *kvp1)
@@ -347,18 +348,20 @@ static int build_kvph(void *oiter,
     typeof (binds->next_kv_pair) next_kv_pair;
     struct uj_kv_pair *kvps, kvp;
     size_t last, at, pre;
+    int rc;
 
     kvps = kvph->h = binds->alloc(sizeof(*kvps) * (max_kvps + 1));
     if (!kvps) return -1;
 
     next_kv_pair = binds->next_kv_pair;
-    if (!next_kv_pair(oiter, kvps + 1)) {
+    rc = next_kv_pair(oiter, kvps + 1);
+    if (rc <= 0) {
         binds->dealloc(kvps);
-        return 0;
+        return rc;
     }
 
     last = 1;
-    while (next_kv_pair(oiter, &kvp)) {
+    while (rc = next_kv_pair(oiter, &kvp), rc > 0) {
         at = ++last;
 
         do {
@@ -370,6 +373,11 @@ static int build_kvph(void *oiter,
         } while (at > 1);
 
         kvps[at] = kvp;
+    }
+
+    if (rc < 0) {
+        binds->dealloc(kvps);
+        return -1;
     }
 
     kvph->last = last;
