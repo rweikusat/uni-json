@@ -53,7 +53,7 @@ int _hidden_ add_2_work_string(uint8_t *data, size_t len, void *str)
         }
 
         tmp = realloc(ws->s, want);
-        if (!tmp) return 0;
+        if (!tmp) return -1;
         ws->s = tmp;
         ws->p = tmp + in_ws;
         ws->e = tmp + want;
@@ -61,7 +61,7 @@ int _hidden_ add_2_work_string(uint8_t *data, size_t len, void *str)
 
     memcpy(ws->p, data, len);
     ws->p += len;
-    return 1;
+    return 0;
 }
 
 void _hidden_ free_work_string(void *str)
