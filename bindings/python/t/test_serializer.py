@@ -4,6 +4,15 @@
 
 import UniJson as uj
 import unittest
+from enum import IntFlag
+
+class SerModes(IntFlag):
+    UJ_FMT_FAST = 0
+    UJ_FMT_DET = 1
+    UJ_FMT_PRETTY = 2,
+    PY_UJ_UNK_ERR = 4
+    PY_UJ_NSK_ERR = 8
+    PY_UJ_NSK_STR = 16
 
 class TestSerializerBindings(unittest.TestCase):
     def test_no_args(self):
@@ -43,26 +52,26 @@ class TestSerializerBindings(unittest.TestCase):
 
     def test_unk_err(self):
         with self.assertRaises(ValueError):
-            uj.json_serialize([1, (1,2), 3], 4)
+            uj.json_serialize([1, (1,2), 3], SerModes.PY_UJ_UNK_ERR)
 
     def test_string_key_dict(self):
         x = uj.json_serialize({ "a" : 1, "b" : 2 })
         self.assertTrue(x == '{"b":1,"a":2}' or x == '{"a":1,"b":2}')
 
     def test_nsk_dict_skip_some(self):
-        x = uj.json_serialize({ 12 : 14, "emil" : "jannings", (1,2) : 11, "johnny" : "potato"}, 1)
+        x = uj.json_serialize({ 12 : 14, "emil" : "jannings", (1,2) : 11, "johnny" : "potato"}, SerModes.UJ_FMT_DET)
         self.assertEqual(x, '{"emil":"jannings","johnny":"potato"}')
 
     def test_nsk_dict_skip_all(self):
-        x = uj.json_serialize({ 12 : 14, (1,2) : 11}, 1)
+        x = uj.json_serialize({ 12 : 14, (1,2) : 11}, SerModes.UJ_FMT_DET)
         self.assertEqual(x, '{}')
 
     def test_nsk_dict_err(self):
         with self.assertRaises(ValueError):
-            uj.json_serialize({ "a" : 3, (8,9) : 1 }, 8)
+            uj.json_serialize({ "a" : 3, (8,9) : 1 }, SerModes.PY_UJ_NSK_ERR)
 
     def test_nsk_dict_str(self):
-        x = uj.json_serialize({"a" : "b", (8,9) : 12, 13: "alpha"}, 17)
+        x = uj.json_serialize({"a" : "b", (8,9) : 12, 13: "alpha"}, SerModes.UJ_FMT_DET | SerModes.PY_UJ_NSK_STR)
         self.assertEqual(x, '{"(8, 9)":12,"13":"alpha","a":"b"}')
 
 if __name__ == '__main__':
