@@ -352,6 +352,7 @@ static int build_kvph(void *oiter,
 
     kvps = kvph->h = binds->alloc(sizeof(*kvps) * (max_kvps + 1));
     if (!kvps) return -1;
+    kvph->last = 0;
 
     next_kv_pair = binds->next_kv_pair;
     rc = next_kv_pair(oiter, kvps + 1);
