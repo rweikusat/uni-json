@@ -465,6 +465,7 @@ static int ser_object(void *val, void *sink, struct uni_json_s_binding *binds,
     if (rc == -1) return rc;
 
     oiter = binds->start_object_traversal(val);
+    if (!oiter) return -1;
 
     switch (fmt) {
     case UJ_FMT_FAST:
