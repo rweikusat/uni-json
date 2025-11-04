@@ -23,6 +23,7 @@ static void *make_null(void);
 static void *make_bool(int);
 static void *make_number(uint8_t *, size_t, unsigned);
 
+static void *do_make_work_string(void);
 static void *finalize_string(void *, uint8_t *, size_t);
 
 static void *make_array(void);
@@ -43,7 +44,7 @@ static struct uni_json_p_binding binds = {
     .free_array =	free_obj,
     .add_2_array =	add_2_array,
 
-    .make_work_string =	make_work_string,
+    .make_work_string =	do_make_work_string,
     .free_work_string =	free_work_string,
     .free_string =	free_obj,
     .add_2_string =	add_2_work_string,
@@ -113,6 +114,15 @@ static void *make_number(uint8_t *data, size_t len, unsigned flags)
 }
 
 /**  string */
+static void *do_make_work_string(void)
+{
+    void *p;
+
+    p = make_work_string();
+    if (!p) PyErr_SetString(PyExc_MemoryError, "failed to create work string");
+    return p;
+}
+
 static void *finalize_string(void *str, uint8_t *data, size_t len)
 {
     struct work_string *ws;
@@ -124,7 +134,10 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
     if (ws->s) {
         if (len) {
             rc = add_2_work_string(data, len, ws);
-            if (rc == -1) return goto out;
+            if (rc == -1) {
+                PyErr_SetString(PyExc_MemoryError, "failed to expand work string");
+                goto out;
+            }
         }
 
         data = ws->s;

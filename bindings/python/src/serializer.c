@@ -38,6 +38,7 @@ struct oiter {
 
 /*  prototypes */
 static int output(uint8_t *, size_t, void *);
+static void *alloc(size_t);
 static int type_of_unk_null(void *);
 static int type_of_unk_err(void *);
 
@@ -59,7 +60,7 @@ static int get_bool_value(void *);
 static struct uni_json_s_binding binds = {
     .output =			output,
     .type_of =			type_of_unk_null,
-    .alloc =			malloc,
+    .alloc =			alloc,
     .dealloc =			free,
 
     .start_object_traversal =	start_object_traversal,
@@ -80,7 +81,20 @@ static struct uni_json_s_binding binds = {
 /*  routines */
 static int output(uint8_t *data, size_t len, void *sink)
 {
-    return add_2_work_string(data, len, sink);
+    int rc;
+
+    rc = add_2_work_string(data, len, sink);
+    if (rc == -1) PyErr_SetString(PyExc_MemoryError, "failed to expand work string");
+    return rc;
+}
+
+static void *alloc(size_t size)
+{
+    void *p;
+
+    p = malloc(size);
+    if (!p) PyErr_SetString(PyExc_MemoryError, "memory allocation failed");
+    return p;
 }
 
 static int type_of_unk_null(void *obj)
@@ -129,7 +143,10 @@ static void *start_object_traversal(void *obj)
     struct oiter *oi;
 
     oi = malloc(sizeof(*oi));
-    if (!oi) return NULL;
+    if (!oi) {
+        PyErr_SetString(PyExc_MemoryError, "failed to allocate dict iterator");
+        return NULL;
+    }
 
     oi->dict = obj;
     oi->pos = 0;
@@ -174,7 +191,10 @@ static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
 
     if (type_of_unk_null(k) != UJ_T_STR) {
         k_str = malloc(sizeof(*k_str));
-        if (!k_str) return -1;
+        if (!k_str) {
+            PyErr_SetSting(PyExc_MemoryError, "failed to allocate string list item");
+            return -1;
+        }
 
         k_str->p = oi->k_strs;
         oi->k_strs = k_str;
