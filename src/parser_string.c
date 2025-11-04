@@ -390,7 +390,7 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
 
     rc = utf8_encode(chr, utf);
     rc = binds->add_2_string(utf, rc, str);
-    if (!rc) {
+    if (rc == -1) {
         pstate->err.code = UJ_E_ADD;
         pstate->err.pos = pstate->p - 1;
         return -1;
@@ -414,7 +414,7 @@ static void *parse_string_content(struct pstate *pstate, struct uni_json_p_bindi
         if (c == '\\') {
             if (p > s) {
                 rc = binds->add_2_string(s, p - s, str);
-                if (!rc) {
+                if (rc == -1) {
                     pstate->err.code = UJ_E_ADD;
                     pstate->err.pos = p;
                     return NULL;
