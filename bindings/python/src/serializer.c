@@ -196,6 +196,7 @@ static int next_kv_pair_err(void *oiter, struct uj_kv_pair *kvp)
     }
 
     kvp->key.s = (uint8_t *)PyUnicode_AsUTF8AndSize(k, &k_len);
+    if (!kvp->key.s) return -1;
     kvp->key.len = k_len;
     kvp->val = v;
 
@@ -216,6 +217,7 @@ static int next_kv_pair_skip(void *oiter, struct uj_kv_pair *kvp)
     if (!rc) return 0;
 
     kvp->key.s = (uint8_t *)PyUnicode_AsUTF8AndSize(k, &k_len);
+    if (!kvp->key.s) return -1;
     kvp->key.len = k_len;
     kvp->val = v;
 
@@ -245,9 +247,11 @@ static int next_kv_pair_str(void *oiter, struct uj_kv_pair *kvp)
         oi->k_strs = k_str;
 
         k = k_str->s = PyObject_Str(k);
+        if (!k) return -1;
     }
 
     kvp->key.s = (uint8_t *)PyUnicode_AsUTF8AndSize(k, &k_len);
+    if (!kvp->key.s) return -1;
     kvp->key.len = k_len;
     kvp->val = v;
 
@@ -273,6 +277,7 @@ static int get_num_data(void *num, struct uj_num_data *ndata)
 
     str = PyObject_Str(num);
     s = PyUnicode_AsUTF8AndSize(str, &len);
+    if (!s) return -1;
 
     ndata->rep.s = (uint8_t *)s;
     ndata->rep.len = len;
@@ -291,6 +296,7 @@ static int get_string_data(void *str, struct uj_str_data *sdata)
     Py_ssize_t len;
 
     sdata->s = (uint8_t *)PyUnicode_AsUTF8AndSize(str, &len);
+    if (!sdata->s) return -1;
     sdata->len = len;
 
     return 0;
