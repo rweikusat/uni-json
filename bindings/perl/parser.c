@@ -64,7 +64,6 @@ static void on_error(unsigned code, size_t pos, void *)
     croak_nocontext("%s (%u) at %zu", uni_json_ec_2_msg(code), code, pos);
 }
 
-
 static void *make_null(void)
 {
     dTHX;
