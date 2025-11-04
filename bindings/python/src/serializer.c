@@ -45,7 +45,9 @@ static int type_of_unk_err(void *);
 static void *start_object_traversal(void *);
 static void end_object_traversal(void *);
 static size_t max_kv_pairs(void *);
-static int next_kv_pair(void *oiter, struct uj_kv_pair *);
+static int next_kv_pair_err(void *oiter, struct uj_kv_pair *);
+static int next_kv_pair_skip(void *oiter, struct uj_kv_pair *);
+static int next_kv_pair_str(void *oiter, struct uj_kv_pair *);
 
 static void get_array_info(void *ary, struct uj_ary_info *);
 static void *array_at(void *, size_t);
@@ -66,7 +68,7 @@ static struct uni_json_s_binding binds = {
     .start_object_traversal =	start_object_traversal,
     .end_object_traversal =	end_object_traversal,
     .max_kv_pairs =		max_kv_pairs,
-    .next_kv_pair =		next_kv_pair,
+    .next_kv_pair =		next_kv_pair_skip,
 
     .get_array_info =		get_array_info,
     .array_at =			array_at,
@@ -177,7 +179,50 @@ static size_t max_kv_pairs(void *obj)
     return PyDict_Size(obj);
 }
 
-static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
+static int next_kv_pair_err(void *oiter, struct uj_kv_pair *kvp)
+{
+    struct oiter *oi;
+    PyObject *k, *v;
+    Py_ssize_t k_len;
+    int rc;
+
+    oi = oiter;
+    rc = PyDict_Next(oi->dict, &oi->pos, &k, &v);
+    if (!rc) return 0;
+
+    if (type_of_unk_null(k) != UJ_T_STR) {
+        PyErr_SetString(PyExc_ValueError, "non-string key in dict");
+        return -1;
+    }
+
+    kvp->key.s = (uint8_t *)PyUnicode_AsUTF8AndSize(k, &k_len);
+    kvp->key.len = k_len;
+    kvp->val = v;
+
+    return 1;
+}
+
+static int next_kv_pair_skip(void *oiter, struct uj_kv_pair *kvp)
+{
+    struct oiter *oi;
+    PyObject *k, *v;
+    Py_ssize_t k_len;
+    int rc;
+
+    oi = oiter;
+    do
+        rc = PyDict_Next(oi->dict, &oi->pos, &k, &v);
+    while (rc && type_of_unk_null(k) != UJ_T_STR);
+    if (!rc) return 0;
+
+    kvp->key.s = (uint8_t *)PyUnicode_AsUTF8AndSize(k, &k_len);
+    kvp->key.len = k_len;
+    kvp->val = v;
+
+    return 1;
+}
+
+static int next_kv_pair_str(void *oiter, struct uj_kv_pair *kvp)
 {
     struct oiter *oi;
     struct key_string *k_str;
@@ -273,6 +318,12 @@ PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
 
         if (fmt & PY_UJ_UNK_ERR)
             my_binds.type_of = type_of_unk_err;
+
+        if (fmt & PY_UJ_NSK_ERR)
+            my_binds.next_kv_pair = next_kv_pair_err;
+
+        if (fmt & PY_UJ_NSK_STR)
+            my_binds.next_kv_pair = next_kv_pair_str;
 
         fmt &= ~PY_UJ_ALL;
     } else
