@@ -21,7 +21,7 @@ MANS :=		$(addprefix doc/, uni-json.3 uni-json-parser-bindings.3 \
 
 #**  library
 #
-V_MAJ :=	0
+V_MAJ :=	1
 V_MIN :=	1
 
 L_BASE :=	libuni-json.so
