@@ -174,6 +174,8 @@ static int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)
 
     if (type_of_unk_null(k) != UJ_T_STR) {
         k_str = malloc(sizeof(*k_str));
+        if (!k_str) return -1;
+
         k_str->p = oi->k_strs;
         oi->k_strs = k_str;
 
