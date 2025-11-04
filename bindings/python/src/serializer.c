@@ -80,8 +80,7 @@ static struct uni_json_s_binding binds = {
 /*  routines */
 static int output(uint8_t *data, size_t len, void *sink)
 {
-    add_2_work_string(data, len, sink);
-    return 0;
+    return add_2_work_string(data, len, sink);
 }
 
 static int type_of_unk_null(void *obj)
