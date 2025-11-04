@@ -153,7 +153,7 @@ static int add_2_hv(void *key, void *value, void *obj)
     HE *he;
 
     he = hv_store_ent((HV *)SvRV((SV *)obj), key, value, 0);
-    if (!he) return 0;
+    if (!he) return -1;
 
     free_obj(key);
     return 1;

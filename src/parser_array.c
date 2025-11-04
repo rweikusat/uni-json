@@ -34,7 +34,7 @@ static int parse_array_content(struct pstate *pstate, struct uni_json_p_binding 
     } else
         do {
             rc = binds->add_2_array(v, ary);
-            if (!rc) {
+            if (rc == -1) {
                 free_obj(pstate->last_type, v, binds);
 
                 pstate->err.code = UJ_E_ADD;

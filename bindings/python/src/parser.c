@@ -164,7 +164,7 @@ static int add_2_array(void *obj, void *ary)
     rc = PyList_Append(ary, obj);
     if (rc == -1) {
         PyErr_Clear();
-        return 0;
+        return -1;
     }
 
     return 1;
@@ -181,7 +181,7 @@ static int add_2_object(void *k, void *v, void *obj)
     int rc;
 
     rc = PyDict_SetItem(obj, k, v);
-    if (rc == -1) return 0;
+    if (rc == -1) return -1;
 
     Py_DECREF(k);
     Py_DECREF(v);

@@ -62,7 +62,7 @@ static int parse_object_content(struct pstate *pstate, struct uni_json_p_binding
             }
 
             rc = binds->add_2_object(k, v, obj);
-            if (!rc) {
+            if (rc == -1) {
                 binds->free_string(k);
                 free_obj(pstate->last_type, v, binds);
 
