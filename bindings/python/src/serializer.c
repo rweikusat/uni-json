@@ -129,6 +129,8 @@ static void *start_object_traversal(void *obj)
     struct oiter *oi;
 
     oi = malloc(sizeof(*oi));
+    if (!oi) return NULL;
+
     oi->dict = obj;
     oi->pos = 0;
     oi->k_strs = NULL;
