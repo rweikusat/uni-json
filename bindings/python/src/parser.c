@@ -119,11 +119,12 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
     void *obj;
     int rc;
 
+    obj = NULL;
     ws = str;
     if (ws->s) {
         if (len) {
             rc = add_2_work_string(data, len, ws);
-            if (!rc) return NULL;
+            if (rc == -1) return goto out;
         }
 
         data = ws->s;
@@ -132,10 +133,10 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
 
     obj = PyUnicode_FromStringAndSize((char *)data, len);
 
+out:
     free_work_string(ws);
     return obj;
 }
-
 
 /**  array */
 static void *make_array(void)
