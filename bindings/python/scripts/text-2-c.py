@@ -7,13 +7,22 @@
 #
 import sys
 
+#*  variables
+#
+xlates = [
+    ['\n', '\\n'],
+    ['\t', '\\t'],
+    ['"', '\\"']]
+
 #*  functions
 #
-def to_C(line):
-    return str.format('"{}"', line.replace('\n', '\\n').replace('\t', '\\t').replace('"', '\\"'))
+def xlate(s):
+    for xl in xlates:
+        s = s.replace(xl[0], xl[1])
+    return str.format('"{}"', s)
 
 def pr_C_no_nl(line):
-    print(to_C(line), end='')
+    print(xlate(line), end='')
 
 #*  main
 #
