@@ -12,6 +12,12 @@
 
 #include "uni_json_serializer.h"
 
+/*  types */
+struct a_const {
+    char *n;
+    int v;
+};
+
 /*  prototypes */
 PyObject *parse_json(PyObject *, PyObject *);
 PyObject *json_serialize(PyObject *, PyObject *);
@@ -19,6 +25,17 @@ PyObject *json_serialize(PyObject *, PyObject *);
 static int add_consts(PyObject *);
 
 /*  variables */
+static struct a_const consts[] = {
+#define ac_(x) { .n = #x, .v = x }
+
+    ac_(Uj_FMT_FAST),
+    ac_(UJ_FMT_DET),
+    ac_(UJ_FMT_PRETTY),
+    {0}
+
+#undef ac_
+};
+
 PyDoc_STRVAR(mod_doc, "uni-json JSON parser/ serializer");
 
 static PyMethodDef meths[] = {
@@ -29,7 +46,7 @@ static PyMethodDef meths[] = {
 
 static PyModuleDef_Slot slots[] = {
     {Py_mod_exec, add_consts},
-    {0, NULL}
+    {0}
 };
 
 static PyModuleDef module = {
@@ -43,7 +60,25 @@ static PyModuleDef module = {
 /*  routines */
 static int add_consts(PyObject *module)
 {
-    PyModule_AddObject(module, "UJ_FMT_FAST", PyLong_FromLong(UJ_FMT_FAST));
+    struct a_const *ac;
+    PyObject *obj;
+    int rc;
+
+    ac = consts;
+    while (ac->n) {
+        obj = PyLong_FromLong(ac->v);
+        if (!obj) {
+            PyErr_SetString(PyExc_MemoryError, "failed to create Long");
+            return -1;
+        }
+
+        rc = PyModule_AddObjectRef(module, ac->n, obj);
+        Py_DECREF(obj);
+        if (rc) return rc;
+
+        ++ac;
+    }
+
     return 0;
 }
 
