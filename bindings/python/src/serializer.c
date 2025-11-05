@@ -14,15 +14,8 @@
 #include "uni_json_s_binding.h"
 #include "uni_json_serializer.h"
 #include "uni_json_types.h"
+#include "serializer.h"
 #include "work_string.h"
-
-/*  constants */
-enum {
-    PY_UJ_UNK_ERR =		4,
-    PY_UJ_NSK_ERR =		8,
-    PY_UJ_NSK_STR =		16,
-    PY_UJ_ALL =			PY_UJ_UNK_ERR | PY_UJ_NSK_ERR | PY_UJ_NSK_STR
-};
 
 /*  types */
 struct key_string {
@@ -318,20 +311,20 @@ PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
     rc = PyArg_ParseTuple(args, "O|i", &obj, &fmt);
     if (!rc) return NULL;
 
-    if (fmt & PY_UJ_ALL) {
+    if (fmt & ALL) {
         my_binds = binds;
         the_binds = &my_binds;
 
-        if (fmt & PY_UJ_UNK_ERR)
+        if (fmt & UNK_TYPE_ERR)
             my_binds.type_of = type_of_unk_err;
 
-        if (fmt & PY_UJ_NSK_ERR)
+        if (fmt & NONSTR_KEY_ERR)
             my_binds.next_kv_pair = next_kv_pair_err;
 
-        if (fmt & PY_UJ_NSK_STR)
+        if (fmt & STRINGIFY_NONSTR_KEYS)
             my_binds.next_kv_pair = next_kv_pair_str;
 
-        fmt &= ~PY_UJ_ALL;
+        fmt &= ~ALL;
     } else
         the_binds = &binds;
 
