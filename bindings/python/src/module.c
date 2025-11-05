@@ -28,7 +28,7 @@ static int add_consts(PyObject *);
 static struct a_const consts[] = {
 #define ac_(x) { .n = #x, .v = x }
 
-    ac_(Uj_FMT_FAST),
+    ac_(UJ_FMT_FAST),
     ac_(UJ_FMT_DET),
     ac_(UJ_FMT_PRETTY),
     {0}
