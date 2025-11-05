@@ -9,10 +9,10 @@
 #define uj_python_serializer_h
 
 enum {
-    PY_UJ_UNK_ERR =		4,
-    PY_UJ_NSK_ERR =		8,
-    PY_UJ_NSK_STR =		16,
-    PY_UJ_ALL =			PY_UJ_UNK_ERR | PY_UJ_NSK_ERR | PY_UJ_NSK_STR
+    UNK_TYPE_ERR =		4,
+    NONSTR_KEY_ERR =		8,
+    STRINGIFY_NONSTR_KEYS =	16,
+    ALL = 			UNK_TP_ERR | NONSTR_KEY_ERR | STRINGIFY_NONSTR_KEYS
 };
 
 #endif
