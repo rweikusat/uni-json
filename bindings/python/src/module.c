@@ -11,6 +11,7 @@
 #include <Python.h>
 
 #include "uni_json_serializer.h"
+#include "serializer.h"
 
 /*  types */
 struct a_const {
@@ -31,6 +32,11 @@ static struct a_const consts[] = {
     ac_(UJ_FMT_FAST),
     ac_(UJ_FMT_DET),
     ac_(UJ_FMT_PRETTY),
+
+    ac_(UNK_TYPE_ERR),
+    ac_(NONSTR_KEY_ERR),
+    ac_(STRINGIFY_NONSTR_KEYS),
+
     {0}
 
 #undef ac_
