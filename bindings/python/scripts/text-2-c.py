@@ -1,36 +1,39 @@
 #!/usr/bin/python
 #
-# convert a text file to a C macrp definition
+# convert stdin to a C macro definition
 #
 
 #*  imports
 #
-import sys
+from sys import argv, stdin
 
 #*  variables
 #
-xlates = [
-    ['\n', '\\n'],
-    ['\t', '\\t'],
-    ['"', '\\"']]
+xlates = (
+    ('\n', '\\n'),
+    ('\t', '\\t'),
+    ('"', '\\"'))
 
 #*  functions
 #
 def xlate(s):
     for xl in xlates:
         s = s.replace(xl[0], xl[1])
-    return str.format('"{}"', s)
+    return f'"{s}"'
 
-def pr_C_no_nl(line):
-    print(xlate(line), end='')
+def pr_def(name):
+    print(f'#define {name} \\')
+
+def pr_xlate(s):
+    print(xlate(s), end='')
 
 #*  main
 #
-print(str.format('#define {} \\', sys.argv[1]))
+pr_def(argv[1])
 
-pr_C_no_nl(sys.stdin.readline())
-for line in sys.stdin:
+pr_xlate(stdin.readline())
+for line in stdin:
     print('\\')
-    pr_C_no_nl(line)
+    pr_xlate(line)
 
 print('')
