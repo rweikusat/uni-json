@@ -10,6 +10,7 @@ from sys import argv, stdin
 #*  variables
 #
 xlates = (
+    ('\\', '\\\\'),
     ('\n', '\\n'),
     ('\t', '\\t'),
     ('"', '\\"'))
