@@ -1,8 +1,8 @@
 Python language bindigs for uni-json JSON parser/ serializer.
 
 Provides functions for parsing a JSON string to turn it into a Python data structure
-and for serialzing a Python data structure into a JSON string. Based on the following
-mapping of Python types to JSON types:
+and for serializing a Python data structure into a JSON string. Based on the
+following mapping of Python types to JSON types:
 
 	Python		JSON
         ----------------------
