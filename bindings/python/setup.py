@@ -18,8 +18,4 @@ setup(
                              library_dirs = ['../../bin'],
                              libraries = ['uni-json']
                              )],
-#    package_dir = {
-#        'UniJson' : 'SM'
-#    },
-#    packages = ['UniJson']
 )
