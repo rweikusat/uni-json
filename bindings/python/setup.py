@@ -16,6 +16,7 @@ setup(
                                          'src/serializer.c', 'src/work_string.c'],
                              include_dirs = ['../../include', 'src'],
                              library_dirs = ['../../bin'],
-                             libraries = ['uni-json']
+                             libraries = ['uni-json'],
+                             depends = ['tmp/*.d']
                              )],
 )
