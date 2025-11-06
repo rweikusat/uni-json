@@ -10,39 +10,35 @@ import re
 
 #*  variables
 #
-xlates = {
+XLATES = {
     '\\' : '\\\\',
     '\n' : '\\n',
     '\t' : '\\t',
     '"' : '\\"'}
 
+XLATE_PAT = re.compile('(\\\\|\n|\t|")')
+
 #*  functions
 #
-def xlate_map(m):
-    return xlates[m.group(1)]
+def xlate(s):
+    return re.sub(XLATE_PAT, lambda m: XLATES[m.group(1)], s)
 
-def xlate(pat, s):
-    return re.sub(pat, xlate_map, s)
+#def xlate(s):
+#    return s.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\t', '\\t')
 
 def pr_def(name):
     print(f'#define {name} \\')
 
-def pr_xlate(pat, s):
-    print(xlate(pat, s), end='')
-
-def double_bs(s):
-    if s == '\\':
-        return '\\\\'
-    return s
+def pr_xlate(s):
+    print(xlate(s), end='')
 
 #*  main
 #
-pat=re.compile(f'({str.join("|", [double_bs(x) for x in xlates.keys()])})')
 pr_def(argv[1])
 
-pr_xlate(pat, stdin.readline())
+pr_xlate(stdin.readline())
 for line in stdin:
     print('\\')
-    pr_xlate(pat, line)
+    pr_xlate(line)
 
 print('')
