@@ -38,4 +38,4 @@ for line in stdin:
     print('\\')
     pr_xlate(line)
 
-print('')
+print()
