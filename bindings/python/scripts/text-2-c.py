@@ -21,10 +21,7 @@ XLATE_PAT = re.compile('(\\\\|\n|\t|")')
 #*  functions
 #
 def xlate(s):
-    return re.sub(XLATE_PAT, lambda m: XLATES[m.group(1)], s)
-
-#def xlate(s):
-#    return s.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\t', '\\t')
+    return f'"{re.sub(XLATE_PAT, lambda m: XLATES[m.group(1)], s)}"'
 
 def pr_def(name):
     print(f'#define {name} \\')
