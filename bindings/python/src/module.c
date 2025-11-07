@@ -14,6 +14,7 @@
 #include "serializer.h"
 #include "MODULE.h"
 #include "PARSE_JSON.h"
+#include "JSON_SER.h"
 
 /*  types */
 struct a_const {
@@ -48,7 +49,7 @@ PyDoc_STRVAR(mod_doc, MODULE);
 
 static PyMethodDef meths[] = {
     {"parse_json", parse_json, METH_VARARGS, PARSE_JSON},
-    {"json_serialize", json_serialize, METH_VARARGS, "Serialize an object to a JSON string."},
+    {"json_serialize", json_serialize, METH_VARARGS, JSON_SER},
     {0}
 };
 

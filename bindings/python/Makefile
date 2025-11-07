@@ -8,7 +8,7 @@ SO_PATH :=	$(dir $(shell find build -name '*.so'))
 
 SRCS :=		$(shell ls src/*.c)
 DEPS :=		$(addprefix tmp/, $(notdir $(SRCS:.c=.d)))
-DOCS :=		$(addprefix src/, MODULE.h PARSE_JSON.h)
+DOCS :=		$(addprefix src/, MODULE.h PARSE_JSON.h JSON_SER.h)
 
 T2C :=		scripts/text-2-c.py
 
