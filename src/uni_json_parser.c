@@ -93,12 +93,6 @@ static char *ec_msg_map[] = {
 /* parse_value returns &no_value if no value was found */
 int no_value _hidden_;
 
-/*
-  Maximum depth the parser will descend to before aborting with an
-  error.
-*/
-unsigned uni_json_max_nesting = -1;
-
 /*  routines */
 static void *whitespace(struct pstate *, struct uni_json_p_binding *)
 {
@@ -161,7 +155,7 @@ char *uni_json_ec_2_msg(unsigned ec)
     return "not implemented";
 }
 
-void *uni_json_parse(uint8_t *data, size_t len,
+void *uni_json_parse(uint8_t *data, size_t len, unsigned max_nesting,
                      struct uni_json_p_binding *binds, void *err_p)
 {
     struct pstate pstate;
@@ -175,6 +169,7 @@ void *uni_json_parse(uint8_t *data, size_t len,
     pstate.p = data;
     pstate.e = data + len;
     pstate.level = 0;
+    pstate.max_nesting = max_nesting;
 
     v = parse_value(&pstate, binds);
 

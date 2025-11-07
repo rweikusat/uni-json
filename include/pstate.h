@@ -15,7 +15,7 @@
 struct pstate {
     uint8_t *p, *e;
     int last_type;
-    unsigned level;
+    unsigned level, max_nesting;
 
     struct {
         unsigned code;
