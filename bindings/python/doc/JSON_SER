@@ -8,7 +8,7 @@ Parameters
 obj
 	A Python object.
 flags : int, optional
-	A set of integer flags which can be used to select an ouput form and to
+	A set of integer flags which can be used to select an ouput format and to
         modify the handling of unsupported types and non-string dictionary keys.
 
 	The following output formats are supported:
