@@ -1,3 +1,21 @@
-parse_json(str) -> object
+parse_json(json)
 
-Parse a JSON string to turn it into a python data structure.
+Parse a JSON string to turn it into a Python object.
+
+Parameters
+----------
+json : str
+	A string in JSON syntax.
+
+Returns
+-------
+object
+	A Python object corresponding to the content of the string.
+
+Raises
+------
+MemoryError
+	A memory allocation failed during parsing.
+ValueError
+	A syntax error was encountered or the maximum structure
+        nesting level was exceeded.
