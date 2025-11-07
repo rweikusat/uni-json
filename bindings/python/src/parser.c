@@ -77,6 +77,14 @@ static void free_obj(void *obj)
     Py_DECREF(obj);
 }
 
+static void invoke_error_handler(unsigned code, size_t pos, void *on_error)
+{
+    PyObject *ret;
+
+    ret = PyObject_CallFunction(on_error, "IK", code, (unsigned long long)pos);
+    if (ret) Py_DECREF(ret);
+}
+
 /**  simple types */
 static void *make_null(void)
 {
@@ -192,12 +200,24 @@ static int add_2_object(void *k, void *v, void *obj)
 /**  entry point */
 PyObject _hidden_ *parse_json(PyObject *, PyObject *args)
 {
+    struct uni_json_p_binding my_binds, *the_binds;
+    PyObject *on_error;
     uint8_t *data;
     Py_ssize_t len;
+    unsigned max_nesting;
     int rc;
 
-    rc = PyArg_ParseTuple(args, "s#", &data, &len);
+    max_nesting = -1;
+    on_error = NULL;
+    rc = PyArg_ParseTuple(args, "s#|Oi", &data, &len, &on_error, &max_nesting);
     if (!rc) NULL;
 
-    return uni_json_parse(data, len, &binds, NULL);
+    the_binds = &binds;
+    if (on_error && on_error != Py_None) {
+        my_binds = binds;
+        my_binds.on_error = invoke_error_handler;
+        the_binds = &my_binds;
+    }
+
+    return uni_json_parse(data, len, max_nesting, the_binds, on_error);
 }
