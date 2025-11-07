@@ -311,6 +311,7 @@ PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
     rc = PyArg_ParseTuple(args, "O|i", &obj, &fmt);
     if (!rc) return NULL;
 
+    the_binds = &binds;
     if (fmt & ALL) {
         my_binds = binds;
         the_binds = &my_binds;
@@ -325,8 +326,7 @@ PyObject _hidden_ *json_serialize(PyObject *, PyObject *args)
             my_binds.next_kv_pair = next_kv_pair_str;
 
         fmt &= ~ALL;
-    } else
-        the_binds = &binds;
+    }
 
     ws = make_work_string();
     if (!ws) {
