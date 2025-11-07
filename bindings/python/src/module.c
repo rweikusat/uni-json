@@ -12,6 +12,8 @@
 
 #include "uni_json_serializer.h"
 #include "serializer.h"
+#include "MODULE.h"
+#include "PARSE_JSON.h"
 
 /*  types */
 struct a_const {
@@ -42,10 +44,10 @@ static struct a_const consts[] = {
 #undef ac_
 };
 
-PyDoc_STRVAR(mod_doc, "uni-json JSON parser/ serializer");
+PyDoc_STRVAR(mod_doc, MODULE);
 
 static PyMethodDef meths[] = {
-    {"parse_json", parse_json, METH_VARARGS, "Parse a JSON string."},
+    {"parse_json", parse_json, METH_VARARGS, PARSE_JSON},
     {"json_serialize", json_serialize, METH_VARARGS, "Serialize an object to a JSON string."},
     {0}
 };
