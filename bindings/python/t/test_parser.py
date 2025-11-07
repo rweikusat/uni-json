@@ -4,6 +4,14 @@
 
 import UniJson as uj
 import unittest
+from sys import stderr
+
+class MyExcept(BaseException):
+    pass
+
+def my_on_error(code, pos):
+    print(f'error {code} at {pos}', file=stderr)
+    raise MyExcept("bla")
 
 class TestParserBindings(unittest.TestCase):
     def test_error(self):
@@ -49,6 +57,10 @@ class TestParserBindings(unittest.TestCase):
     def test_max_nesting(self):
         with self.assertRaises(ValueError):
             uj.parse_json('[1,2,[3,4,[5]]]', None, 2)
+
+    def test_my_error(self):
+        with self.assertRaises(MyExcept):
+            uj.parse_json('[', my_on_error)
 
 if __name__ == '__main__':
     unittest.main()
