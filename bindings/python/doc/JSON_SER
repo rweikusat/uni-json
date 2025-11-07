@@ -63,7 +63,3 @@ ValueError
         and raising an error for this situation had been requested
         by passing the corresponding flag value as part of the
         second argument.
-        
-                
-                
-	
