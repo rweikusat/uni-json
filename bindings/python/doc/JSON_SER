@@ -28,6 +28,41 @@ flags : int, optional
                 extremely huge strings mostly composed of space characters for
                 large and complex input objects, indentation is done with sequences
                 of TAB (ASCII 09) characters.
+
+	Flags which can be ored into the value to modify the behaviour of the
+        algorithm:
+
+	UNK_TYPE_ERR (4)
+        	Instead of serializing unsupported types as `null`, raise a
+                ValueError upon encountering one.
+
+	NONSTR_KEY_ERR (8)
+        	Raise a ValueError when encountering a dict key which isn't
+                a string.
+
+	STRINGIFY_NONSTR_KEYS (16)
+        	Serialize dict key - value pairs whose keys aren't strings
+                by stringifying them via `PyObject_Str`.
+
+	The last two are mutually exclusive but the code doesn't check for
+        this. If both are specified, the latter will take precedence but
+        this is an implementation detail not to be relied upon.
+
+Returns
+-------
+string
+	A JSON string corresponding to the object passed as first argument.
+
+Raises
+------
+MemoryError
+	A memory allocation failed while serializing.
+ValueError
+	An unsupported type or non-string dict key were encountered
+        and raising an error for this situation had been requested
+        by passing the corresponding flag value as part of the
+        second argument.
+        
                 
                 
 	
