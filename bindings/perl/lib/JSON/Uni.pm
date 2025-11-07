@@ -27,7 +27,7 @@ BEGIN {
 }
 
 use Exporter	'import';
-our @EXPORT_OK = qw(parse_json max_nesting set_max_nesting json_serialize json_ec_2_msg
+our @EXPORT_OK = qw(parse_json json_serialize json_ec_2_msg
 
                     UJ_E_INV UJ_E_NO_VAL UJ_E_INV_LIT
                     UJ_E_GARBAGE UJ_E_EOS UJ_E_INV_IN
@@ -59,10 +59,7 @@ JSON::Uni - Perl interface to uni-json parser and serializer
 
                    UJ_FMT_FAST UJ_FMT_DET UJ_FMT_PRETTY);
 
- my $obj = parse_json(<JSON string>[, <error handler>]);
-
- my $nesting = max_nesting();
- set_max_nesting(<max nesting level);
+ my $obj = parse_json(<JSON string>[, <error handler> [, <max_nesting>]]);
 
  my $str = json_serialize(<perl object>[, <format spec>]);
 
@@ -93,6 +90,10 @@ is in L<uni-json(3)>.
 It's safe to call C<die> or an equivalent from this handler as all
 memory allocated during parsing will have been free before it's
 invoked.
+
+The optional I<max_nesting> argument can be used to specify how deep
+the parser should descent into nested structures before aborting with
+an error. Default is "no limit".
 
 =item * C<max_nesting>
 

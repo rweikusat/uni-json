@@ -101,9 +101,10 @@ OUTPUT:
 	RETVAL
 
 SV *
-parse_json(data, on_error = &PL_sv_undef)
+parse_json(data, on_error = &PL_sv_undef, max_nesting = -1)
 	SV * data
         SV * on_error
+        UV max_nesting
 PREINIT:
 	struct uni_json_p_binding ours, *binds;
         void *err_p;
@@ -123,7 +124,7 @@ CODE:
                 binds = &default_perl_uj_parser_bindings;
 	}
 
-        RETVAL = uni_json_parse(d, len, binds, err_p);
+        RETVAL = uni_json_parse(d, len, max_nesting, binds, err_p);
 OUTPUT:
 	RETVAL
 
@@ -134,19 +135,6 @@ CODE:
 	RETVAL = uni_json_ec_2_msg(ec);
 OUTPUT:
 	RETVAL
-
-unsigned
-max_nesting()
-CODE:
-	RETVAL = uni_json_max_nesting;
-OUTPUT:
-	RETVAL
-
-void
-set_max_nesting(max)
-	unsigned max
-CODE:
-	uni_json_max_nesting = max;
 
 SV *
 json_serialize(val, fmt = UJ_FMT_FAST)
