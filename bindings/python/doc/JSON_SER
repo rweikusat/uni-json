@@ -20,7 +20,8 @@ flags : int, optional
 
 	UJ_FMT_DET (1)
         	Serialize dict key-value pairs in deterministic order. Dict keys
-                will be sorted based on Unicode codepoint comparisons.
+                will be sorted based on Unicode codepoint comparisons prior to
+                serialization.
 
 	UJ_FMT_PRETTY (2)
         	Like UJ_FMT_DET but include redundant whiteapce in the generated
