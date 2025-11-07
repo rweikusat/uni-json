@@ -1,0 +1,34 @@
+json_serialize(obj, flags = 0)
+
+Serialize a Pyton object into a JSON string. By default, unsupported types are
+serialized as `null` and dict keys which aren't strings are skipped.
+
+Parameters
+----------
+obj
+	A Python object.
+
+flags : int, optional
+	A set of integer flags which can be used to select an ouput form and to
+        modify the handling of unsupported types and non-string dictionary keys.
+
+	The following output formats are supported:
+
+	UJ_FMT_FAST (0)
+        	Serialize dict key-value pairs in the order they're returned by
+                `PyDict_Next` and don't include any redundant whitespace in the
+                output.
+
+	UJ_FMT_DET (1)
+        	Serialize dict key-value pairs in deterministic order. Dict keys
+                will be sorted based on Unicode codepoint comparisons.
+
+	UJ_FMT_PRETTY (2)
+        	Like UJ_FMT_DET but include redundant whiteapce in the generated
+                string to make it easier to read for humans. To avoid creating
+                extremely huge strings mostly composed of space characters for
+                large and complex input objects, indentation is done with sequences
+                of TAB (ASCII 09) characters.
+                
+                
+	
