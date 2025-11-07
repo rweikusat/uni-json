@@ -46,5 +46,9 @@ class TestParserBindings(unittest.TestCase):
         x = uj.parse_json('{"a" : 1, "b" : 2 }')
         self.assertEqual(x, {'a' : 1, 'b' : 2})
 
+    def test_max_nesting(self):
+        with self.assertRaises(ValueError):
+            uj.parse_json('[1,2,[3,4,[5]]]', None, 2)
+
 if __name__ == '__main__':
     unittest.main()
