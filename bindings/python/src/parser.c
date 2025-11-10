@@ -201,7 +201,6 @@ static int add_2_object(void *k, void *v, void *obj)
 PyObject _hidden_ *ec_2_msg(PyObject *, PyObject *args)
 {
     unsigned ec;
-    char *msg;
     int rc;
 
     rc = PyArg_ParseTuple(args, "I", &ec);
