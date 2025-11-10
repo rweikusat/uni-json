@@ -1,4 +1,4 @@
-json_serialize(obj, flags = 0)
+json_serialize(obj, flags = 0, /)
 
 Serialize a Pyton object into a JSON string. By default, unsupported types are
 serialized as `null` and dict keys which aren't strings are skipped.
