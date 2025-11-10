@@ -10,6 +10,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#include "uni_json_parser.h"
 #include "uni_json_serializer.h"
 #include "serializer.h"
 #include "MODULE.h"
@@ -32,6 +33,23 @@ static int add_consts(PyObject *);
 /*  variables */
 static struct a_const consts[] = {
 #define ac_(x) { .n = #x, .v = x }
+
+    ac_(UJ_E_INV),
+    ac_(UJ_E_NO_VAL),
+    ac_(UJ_E_INV_LIT),
+    ac_(UJ_E_GARBAGE),
+    ac_(UJ_E_EOS),
+    ac_(UJ_E_INV_IN),
+    ac_(UJ_E_ADD),
+    ac_(UJ_E_LEADZ),
+    ac_(UJ_E_NO_DGS),
+    ac_(UJ_E_INV_CHAR),
+    ac_(UJ_E_INV_UTF8),
+    ac_(UJ_E_INV_ESC),
+    ac_(UJ_E_INV_KEY),
+    ac_(UJ_E_NO_KEY),
+    ac_(UJ_E_TOO_DEEP),
+    ac_(UJ_E_MAKE),
 
     ac_(UJ_FMT_FAST),
     ac_(UJ_FMT_DET),
