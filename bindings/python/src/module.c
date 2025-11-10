@@ -23,6 +23,7 @@ struct a_const {
 };
 
 /*  prototypes */
+PyObject *ec_2_msg(PyObject *, PyObject *);
 PyObject *parse_json(PyObject *, PyObject *);
 PyObject *json_serialize(PyObject *, PyObject *);
 
@@ -48,6 +49,7 @@ static struct a_const consts[] = {
 PyDoc_STRVAR(mod_doc, MODULE);
 
 static PyMethodDef meths[] = {
+    {"ec_2_msg", ec_2_msg, METH_VARARGS, "Map a parser error code to a standard text message."},
     {"parse_json", parse_json, METH_VARARGS, PARSE_JSON},
     {"json_serialize", json_serialize, METH_VARARGS, JSON_SER},
     {0}
