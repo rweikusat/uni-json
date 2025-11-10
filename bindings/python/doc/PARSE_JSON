@@ -1,4 +1,4 @@
-parse_json(json)
+parse_json(json, on_error = None, max_nesting = -1, /)
 
 Parse a JSON string to turn it into a Python object.
 
@@ -6,6 +6,17 @@ Parameters
 ----------
 json : str
 	A string in JSON syntax.
+on_error : callable, optional
+	Error handler. Will be invoked with the error code (see uni-json(3)) and
+        error position in case of a parsing or resource usage related error. When
+        not specified (None), a default handler raising a ValueError with a
+        message containing the error code, the standard message associated with
+        the error code and the position in the input string where the error occured
+        will be called instead.
+max_nesting : int, optional
+	Maximum nested structure depth the parser is allowed to descent to. The parser
+        will abort with an error if the maximum allowed nesting depth is exceeded. Defaults
+        to -1 which means 'unlimited.
 
 Returns
 -------
