@@ -197,7 +197,19 @@ static int add_2_object(void *k, void *v, void *obj)
     return 1;
 }
 
-/**  entry point */
+/**  entry points */
+PyObject _hidden_ *ec_2_msg(PyObject *, PyObject *args)
+{
+    unsigned ec;
+    char *msg;
+    int rc;
+
+    rc = PyArg_ParseTuple(args, "I", &ec);
+    if (!rc) return NULL;
+
+    return PyUnicode_FromString(uni_json_ec_2_msg(rc));
+}
+
 PyObject _hidden_ *parse_json(PyObject *, PyObject *args)
 {
     struct uni_json_p_binding my_binds, *the_binds;
