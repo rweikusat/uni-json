@@ -222,7 +222,6 @@ PyObject _hidden_ *parse_json(PyObject *, PyObject *args)
     max_nesting = -1;
     on_error = NULL;
     rc = PyArg_ParseTuple(args, "s#|OI", &data, &len, &on_error, &max_nesting);
-
     if (!rc) NULL;
 
     the_binds = &binds;
