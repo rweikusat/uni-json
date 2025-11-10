@@ -207,7 +207,7 @@ PyObject _hidden_ *ec_2_msg(PyObject *, PyObject *args)
     rc = PyArg_ParseTuple(args, "I", &ec);
     if (!rc) return NULL;
 
-    return PyUnicode_FromString(uni_json_ec_2_msg(rc));
+    return PyUnicode_FromString(uni_json_ec_2_msg(ec));
 }
 
 PyObject _hidden_ *parse_json(PyObject *, PyObject *args)
