@@ -1,7 +1,10 @@
+# -*- sh -*-
 # installation prefix
 #
-# This file will be sourced by a shell and must
-# define a PREFIX variables
+# This file will be sourced by a shell and must define a PREFIX variable. A "make
+# install" will install all compiled code and auxiliary files below
+# $(DESTDIR)$(PREFIX) (usual convention for Debian packages, DESTDIR
+# may be unset).
 #
 
 PREFIX=/usr/local
