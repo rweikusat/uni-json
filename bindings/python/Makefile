@@ -14,12 +14,16 @@ T2C :=		scripts/text-2-c.py
 
 #*  targets
 #
-.PHONY: all clean test
+.PHONY: all clean install test
 
 all: .built
 
 clean:
 	git clean -dfx
+
+install: all
+	pip install --root install *.whl
+	cd install/usr/local && find | cpio -dp $(DESTDIR)$(PREFIX)
 
 .built: $(DEPS)
 	pip wheel -v --no-build-isolation . && touch $@
