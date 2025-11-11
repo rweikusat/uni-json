@@ -14,6 +14,7 @@ all: perl python
 
 install: all
 	$(MAKE) -C perl install
+	$(MAKE) install-python
 
 clean: clean-perl clean-python
 
@@ -34,4 +35,4 @@ python:
 	$(MAKE) -C python
 
 %-python:
-	$(MAKE) -C python $*
+	$(MAKE) -C python $* PREFIX=$(PREFIX)
