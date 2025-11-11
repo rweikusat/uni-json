@@ -12,7 +12,7 @@ PREFIX :=	$(shell ../scripts/read-prefix $(PRE_FILE))
 
 all: perl python
 
-install: perl
+install: all
 	$(MAKE) -C perl install
 
 clean: clean-perl clean-python
