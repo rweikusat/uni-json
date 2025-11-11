@@ -6,11 +6,9 @@ uni-json - A C JSON parser and serializer designed to be usable in any runtime e
 
  #include <uni_json_paser.h>
 
- extern unsigned uni_json_max_nesting;
-
  char *uni_json_ec_2_msg(unsigned ec);
- void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds,
-                      void *err_p);
+ void *uni_json_parse(uint8_t *data, size_t len, unsigned max_nesting,
+                      struct uni_json_p_binding *binds, void *err_p);
 
  #include <uni_json_serializer.h>
 
@@ -34,14 +32,17 @@ indirectly.
 
 =over
 
-=item * C<void *uni_json_parse(uint8_t *data, size_t len, struct uni_json_p_binding *binds, void *err_p)>
+=item * C<void *uni_json_parse(uint8_t *data, size_t len, unsigned max_nesting, struct uni_json_p_binding *binds, void *err_p)>
 
 Parse C<len> bytes of JSON text starting at C<data> using the parser bindings passed
 via C<binds> for object creation and management. Returns a pointer to a data object
 representing the JSON value found in the text or C<NULL> on error. For the latter case,
 the C<on_error> handler passed via C<binds> will be invoked with an error code and the
 position of the error in the input text. The C<err_p> argument is passed through to
-error handling routine.
+error handling routine. The parser will descent at most C<max_nesting> levels deep into
+nested structures before aborting with an error. This is intended to limit the amount
+of stack space used by it when dealing with data from untrusted sources. Use -1 (aka UINT_MAX)
+to disable this check.
 
 B<The text pointed to by C<data> is not expected to be a valid C string. Embedded null bytes
 will be handled correctly, that is, flagged as JSON syntax errors.>
@@ -63,19 +64,6 @@ always be serialized in the same order regardless of the order they were returne
 by the object traversal callback. The C<UJ_FMT_PRETTY> format adds redundant whitespace
 when serializing object and arrays to make the resulting text easier to read for
 humans.
-
-=back
-
-=head2 Variables
-
-=over
-
-=item * C<extern unsigned uni_json_max_nesting>
-
-Maximum depth the parser will descend to in nested structures before aborting
-with an error. Defaults to B<0xffffffff>, ie, no effective limit. Can be set
-to a smaller value to avoid DoS-attacks when dealing with data from
-untrusted sources.
 
 =back
 
