@@ -8,7 +8,7 @@ PREFIX :=	$(shell ../scripts/read-prefix $(PRE_FILE))
 
 #*  targets
 #
-.PHONY: all perl python install clean
+.PHONY: all perl python install clean test
 
 all: perl python
 
@@ -17,6 +17,10 @@ install: all
 	$(MAKE) install-python
 
 clean: clean-perl clean-python
+
+test:
+	$(MAKE) -C perl test
+	$(MAKE) test-python
 
 #*  Perl bindings
 #
