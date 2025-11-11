@@ -1,8 +1,13 @@
 # uni-json bindings Makefile
 #
 
+#*  macros
+#
 PRE_FILE :=	../PREFIX
+PREFIX :=	$(shell ../scripts/read-prefix $(PRE_FILE))
 
+#*  targets
+#
 .PHONY: all perl python install clean
 
 all: perl python
@@ -18,7 +23,7 @@ perl: perl/Makefile
 	$(MAKE) -C perl
 
 perl/Makefile: perl/Makefile.PL $(PRE_FILE)
-	cd perl && perl Makefile.PL PREFIX=$(shell ../scripts/read-prefix $(PRE_FILE))
+	cd perl && perl Makefile.PL PREFIX=$(PREFIX)
 
 clean-perl:
 	test -f perl/Makefile && $(MAKE) -C perl clean || true
