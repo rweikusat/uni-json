@@ -53,7 +53,7 @@ TARGET_MAN3 :=	$(TARGET_MAN)/man3
 
 #*  targets
 #
-.PHONY: all clean install deb
+.PHONY: all clean install deb test
 
 all: bin/$(L_MAJ) bin/$(L_BASE) $(MANS)
 	$(MAKE) -C bindings
@@ -74,6 +74,9 @@ clean:
 	-rm bin/*
 	-rm doc/*.3
 	$(MAKE) -C bindings clean
+
+test: all
+	$(MAKE) -C bindings test
 
 bin/$(LIB): $(OBJS)
 
