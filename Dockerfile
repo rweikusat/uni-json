@@ -3,7 +3,7 @@
 
 #*  basic
 #
-from debian
+from debian:12
 run apt-get update
 
 #*  install build-depends
