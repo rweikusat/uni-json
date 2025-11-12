@@ -3,4 +3,4 @@
 
 from debian
 run apt-get update
-run apt-get install git
+run apt-get install -y git
