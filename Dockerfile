@@ -11,7 +11,5 @@ run apt-get update
 run apt-get install -y git
 run apt-get install -y make
 run apt-get install -y gcc
-run apt-get install -y python3
 run apt-get install -y pip
 run apt-get install -y python3-setuptools
-
