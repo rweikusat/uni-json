@@ -29,7 +29,7 @@ install: all
 	pip wheel -v --no-build-isolation . && touch $@
 
 test: all
-	LD_LIBRARY_PATH=../../bin PYTHONPATH=$(SO_PATH) python -m unittest discover -s t -v
+	LD_LIBRARY_PATH=../../bin PYTHONPATH=$(SO_PATH) python3 -m unittest discover -s t -v
 
 $(DEPS): $(DOCS)
 
