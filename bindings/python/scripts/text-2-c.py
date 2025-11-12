@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pythonr3
 #
 # convert stdin to a C macro definition
 #
