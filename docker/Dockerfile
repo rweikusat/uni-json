@@ -21,5 +21,4 @@ run \
 
 #*  copy source
 #
-run mkdir /tmp/uni-json
-copy . /tmp/uni-json
+copy . /tmp/uni-json/
