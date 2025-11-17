@@ -5,18 +5,20 @@
 #
 arg debver=12
 from debian:$debver
-run apt-get update
 
 #*  install build-depends
 #
-run apt-get install -y \
+run <<EOF
+apt-get update
+apt-get install -y \
 	apt-utils \
 	make \
 	gcc \
 	pip \
 	debhelper \
 	cpio
-run dpkg -s python3-setuptools || apt-get install -y python3-setuptools
+dpkg -s python3-setuptools || apt-get install -y python3-setuptools
+EOF
 
 #*  copy source
 #
