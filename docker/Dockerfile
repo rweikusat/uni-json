@@ -10,7 +10,6 @@ run apt-get update
 #*  install build-depends
 #
 run apt-get install apt-utils
-run apt-get install -y git
 run apt-get install -y make
 run apt-get install -y gcc
 run apt-get install -y pip
