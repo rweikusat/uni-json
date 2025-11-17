@@ -3,7 +3,8 @@
 
 #*  basic
 #
-from debian
+arg debver=12
+from debian:$debver
 run apt-get update
 
 #*  install build-depends
