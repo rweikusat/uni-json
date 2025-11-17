@@ -9,12 +9,13 @@ run apt-get update
 
 #*  install build-depends
 #
-run apt-get install apt-utils
-run apt-get install -y make
-run apt-get install -y gcc
-run apt-get install -y pip
-run apt-get install -y debhelper
-run apt-get install -y cpio
+run apt-get install -y \
+	apt-utils \
+	make \
+	gcc \
+	pip \
+	debhelper \
+	cpio
 run dpkg -s python3-setuptools || apt-get install -y python3-setuptools
 
 #*  copy source
