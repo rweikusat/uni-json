@@ -9,7 +9,7 @@ from debian:$debver
 #*  install build-depends
 #
 run \
-	echo 'APT::Install-Recommends "0";' >/etc/apt/apt.conf;d/01norec \
+	{ echo 'APT::Install-Recommends "0";' | dd of=/etc/apt/apt.conf.d/01norec; } \
 	&& apt-get update \
         && apt-get install -y \
 		apt-utils \
