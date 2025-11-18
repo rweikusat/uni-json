@@ -18,6 +18,7 @@ run \
 		pip \
 		debhelper \
 		cpio \
+                libpython3-dev \
 	&& { dpkg -s python3-setuptools || apt-get install -y python3-setuptools; }
 
 #*  copy source
