@@ -13,14 +13,14 @@ run \
 	&& apt-get update \
         && apt-get install -y apt-utils \
         && apt-get install -y \
-		make \
-		gcc \
-		pip \
-		debhelper \
 		cpio \
-                libpython3-dev \
-                git \
+		debhelper \
+		gcc \
+		make \
+		pip \
                 fakeroot \
+                git \
+                libpython3-dev \
 	&& { dpkg -s python3-setuptools || apt-get install -y python3-setuptools; }
 
 #*  copy source
