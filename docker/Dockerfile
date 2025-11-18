@@ -11,7 +11,7 @@ from debian:$debver
 run \
 	{ echo 'APT::Install-Recommends "0";' | dd of=/etc/apt/apt.conf.d/01norec; } \
 	&& apt-get update \
-        && apt-get install -y apt-utils
+        && apt-get install -y apt-utils \
         && apt-get install -y \
 		make \
 		gcc \
