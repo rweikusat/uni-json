@@ -1,3 +1,9 @@
+uni-json (0.3) experimental; urgency=medium
+
+  * 
+
+ --
+
 uni-json (0.2) experimental; urgency=medium
 
   * support for serializing objects to JSON
