@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# build the package in a docker image
+#
+
+#*  parameters
+#
+PATH=/usr/local/bin:/bin:/usr/bin
+export PATH
+
+BASE=uni-json-base
+BUILD=uni-json
+
+#*  functions
+#
+have_img()
+{
+    docker image ls "$1" --format a | grep -q .
+}
+
+#*  main
+#
