@@ -18,6 +18,7 @@
 %:
 	dh $@
 
+override_dh_autotest:
 override_dh_usrlocal:
 
 # dh_make generated override targets.
