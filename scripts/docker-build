@@ -20,3 +20,5 @@ have_img()
 
 #*  main
 #
+have_img "$BASE" || \
+    docker image build -t "$BASE" - <docker/$BASE.dockerfile
