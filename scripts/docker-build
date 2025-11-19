@@ -24,3 +24,13 @@ have_img()
 #
 have_img "$BASE" || \
     docker image build -t "$BASE" - <docker/$BASE.dockerfile
+
+have_img "$BUILD" && {
+    for x in `docker container ls -aqf ancestor=$BUILD`;
+    do
+        printf 'removing %s\n' "$x" >&2
+        docker container rm $x
+    done
+
+    docker image rm "$BUILD"
+}
