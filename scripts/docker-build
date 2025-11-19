@@ -8,6 +8,8 @@
 PATH=/usr/local/bin:/bin:/usr/bin
 export PATH
 
+test "$TRACE" && set -x
+
 BASE=uni-json-base
 BUILD=uni-json
 
