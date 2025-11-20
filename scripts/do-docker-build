@@ -9,3 +9,5 @@ set -x
 cd /tmp/uni-json
 make
 make deb
+cd ..
+cp *.deb out
