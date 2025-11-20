@@ -4,5 +4,5 @@
 arg img
 from $img
 
-copy . /tmp/uni-json
+copy --exclude .git . /tmp/uni-json
 
