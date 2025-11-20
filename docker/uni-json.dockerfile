@@ -6,5 +6,5 @@ from $img
 
 copy . /tmp/uni-json
 
-entrypoint ["/tmp/uni-json/scripts/do-docker-build"]
+CMD ["/tmp/uni-json/scripts/do-docker-build"]
 
