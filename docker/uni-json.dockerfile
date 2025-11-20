@@ -3,4 +3,7 @@
 
 arg img
 from $img
+
 copy . /tmp/uni-json
+
+entrypoint cd /tmp/uni-json && make && make deb
