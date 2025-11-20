@@ -6,5 +6,3 @@ from $img
 
 copy . /tmp/uni-json
 
-CMD ["/tmp/uni-json/scripts/do-docker-build"]
-
