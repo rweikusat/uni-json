@@ -1,5 +1,6 @@
 # build a docker image which can be used to build the project
 #
 
-from uni-json-base
+arg img
+from $img
 copy . /tmp/uni-json
