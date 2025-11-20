@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# execute the actual commands for a docker build
+#
+
+set -e
+set -x
+
+cd /tmp/uni-json
+make
+make deb
