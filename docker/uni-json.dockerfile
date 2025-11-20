@@ -6,4 +6,5 @@ from $img
 
 copy . /tmp/uni-json
 
-entrypoint cd /tmp/uni-json && make && make deb
+entrypoint ["/tmp/uni-json/scripts/do-docker-build"]
+
