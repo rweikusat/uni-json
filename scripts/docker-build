@@ -40,4 +40,4 @@ have_img "$BUILD_IMG" && {
 }
 
 docker build -t "$BUILD_IMG" -f docker/$BUILD.dockerfile --build-arg "img=$BASE_IMG" .
-docket container run -v `pwd`/tmp:/tmp/out "$BUILD_IMG" /tmp/uni-json/scripts/do-docker-build
+docker container run -v `pwd`/tmp:/tmp/out "$BUILD_IMG" /tmp/uni-json/scripts/do-docker-build
