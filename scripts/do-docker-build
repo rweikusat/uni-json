@@ -9,5 +9,11 @@ set -x
 cd /tmp/uni-json
 make
 make deb
+
+(
+    . ./PREFIX
+    cd debian/uni-json/$PREFIX
+    tar czvf /tmp/out/uni-json.tar.gz . )
+
 cd ..
 cp *.deb out
