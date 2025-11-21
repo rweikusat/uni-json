@@ -1,7 +1,6 @@
 # uni-json Python bindings Makefile
 #
 
-
 #*  macros
 #
 SO_PATH :=	$(dir $(shell find build -name '*.so'))
