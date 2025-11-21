@@ -6,37 +6,42 @@
 PRE_FILE :=	../PREFIX
 PREFIX :=	$(shell ../scripts/read-prefix $(PRE_FILE))
 
+BINDINGS :=	perl python
+
+BUILDS :=	$(addprefix build., $(BINDINGS))
+CLEANS :=	$(addprefix clean., $(BINDINGS))
+INSTALLS :=	$(addprefix install., $(BINDINGS))
+TESTS :=	$(addprefix test., $(BINDINGS))
+
 #*  targets
 #
-.PHONY: all perl python install clean test
+.PHONY: all clean install test
 
-all: perl python
+all: $(BUILDS)
+clean: $(CLEANS)
 
-install: all
-	$(MAKE) -C perl install
-	$(MAKE) install-python
+install: all $(INSTALLS)
 
-clean: clean-perl clean-python
-
-test:
-	$(MAKE) -C perl test
-	$(MAKE) test-python
+test: all $(TESTS)
 
 #*  Perl bindings
 #
-perl: perl/Makefile
+build.perl: perl/Makefile
 	$(MAKE) -C perl
 
 perl/Makefile: perl/Makefile.PL $(PRE_FILE)
 	cd perl && perl Makefile.PL PREFIX=$(PREFIX)
 
-clean-perl:
+clean.perl:
 	test -f perl/Makefile && $(MAKE) -C perl clean || true
+
+%.perl:
+	$(MAKE) -C perl $*
 
 #*  Python bindings
 #
-python:
+build.python:
 	$(MAKE) -C python
 
-%-python:
+%.python:
 	$(MAKE) -C python $* PREFIX=$(PREFIX)
