@@ -19,7 +19,10 @@ T2C :=		scripts/text-2-c.py
 all: .built
 
 clean:
-	git clean -dfx
+	rm -rf build
+	rm -f *.whl
+	rm -rf *.egg-info
+	rm -f .built
 
 install: all
 	pip install --root install *.whl
