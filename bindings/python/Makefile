@@ -22,6 +22,8 @@ clean:
 	rm -f *.whl
 	rm -rf *.egg-info
 	rm -f .built
+	rm -f tmp/*.d
+	rm -f $(DOCS)
 
 install: all
 	pip install --root install *.whl
