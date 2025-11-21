@@ -6,9 +6,7 @@
 PRE_FILE :=	../PREFIX
 PREFIX :=	$(shell ../scripts/read-prefix $(PRE_FILE))
 
-# bindings to build by defaults
-#
-BINDINGS :=	perl python
+BINDINGS :=	perl python	# bindings to build
 
 BUILDS :=	$(addprefix build., $(BINDINGS))
 CLEANS :=	$(addprefix clean., $(BINDINGS))
