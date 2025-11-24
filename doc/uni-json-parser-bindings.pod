@@ -125,26 +125,41 @@ responsible for its eventual disposal.
 
 =head3 String Creation/ Management
 
+To accomodate languages/ environments where strings are read-only, eg, Python, creating
+a string is a 2-stage procedure. Upon encountering a JSON string, the parser will first
+create a I<work string> object. It will then incrementally add UTF-8 data to it until
+all of the input string has been processed. A call to the string finalization routine
+is then supposed to create an actual string object from the collected data in the
+work string and disposed of that (insofar necessary).
+
 =over
 
-=item * C<void *make_string(void)>
+=item * C<void *make_work_string(void)>
 
-Called by the parser when it needs to create a I<string>. A string must be capable of
-holding any valid UTF-8 string, possibly including bytes with value 0 or other
-control characters.
+Create a I<work string> object.
 
-=item * C<void free_string(void *str)>
+=item * C<void free_work_string(void *str)>
 
-Will be called by the parser when it wants to dispose of a string created
-with C<make_string>. Should free all memory associated with the string.
+Called when the parser wants to disposed of a I<work string> object.
 
 =item * C<int add_2_string(uint8_t *data, size_t len, void *str>)
 
-Add the sequence of bytes starting at B<data> of length B<len> to the string pointed to
+Add the sequence of bytes starting at B<data> of length B<len> to the I<work string> pointed to
 by B<str>. The byte sequence will be a valid UTF-8 string.
 
 Supposed to return a true value when the data was successfully stored and 0
 otherwise.
+
+=item * C<void *(*finalize_string)(void *str, uint8_t *data, size_t len)>
+
+Called to combine the content of the I<work string> object pointed to by B<str> with
+a final chunk of UTF-8 data of length B<len> pointed to by B<data> into an actual string
+object. The I<work string> may be empty. Must dispose of the object pointed to by
+B<str> if creation of the actual string succeeded.
+
+=item * C<void (*free_string)(void *str)>
+
+Called when the parser wants to dispose of a string object.
 
 =back
 
