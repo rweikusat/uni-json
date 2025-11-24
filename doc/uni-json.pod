@@ -145,6 +145,10 @@ should have appeared.
 
 The parser exceeded the nesting limit set via C<uni_json_max_nesting>.
 
+=item * C<UJ_E_MAKE>
+
+The parser failed to create an object to store a value about to be parsed.
+
 =back
 
 =head1 SEE ALSO
