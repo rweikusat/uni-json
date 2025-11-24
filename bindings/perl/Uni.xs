@@ -35,33 +35,33 @@ SV *serialize(SV *, int);
 extern struct uni_json_p_binding default_perl_uj_parser_bindings;
 extern struct uni_json_s_binding default_perl_uj_serializer_bindings;
 
-#define n_(x) { .n = #x, .v = x }
+#define ac_(x) { .n = #x, .v = x }
 
 static struct a_const err_consts[] = {
-    n_(UJ_E_INV),
-    n_(UJ_E_NO_VAL),
-    n_(UJ_E_INV_LIT),
-    n_(UJ_E_GARBAGE),
-    n_(UJ_E_EOS),
-    n_(UJ_E_INV_IN),
-    n_(UJ_E_ADD),
-    n_(UJ_E_LEADZ),
-    n_(UJ_E_NO_DGS),
-    n_(UJ_E_INV_CHAR),
-    n_(UJ_E_INV_UTF8),
-    n_(UJ_E_INV_ESC),
-    n_(UJ_E_INV_KEY),
-    n_(UJ_E_NO_KEY),
-    n_(UJ_E_TOO_DEEP)
+    ac_(UJ_E_INV),
+    ac_(UJ_E_NO_VAL),
+    ac_(UJ_E_INV_LIT),
+    ac_(UJ_E_GARBAGE),
+    ac_(UJ_E_EOS),
+    ac_(UJ_E_INV_IN),
+    ac_(UJ_E_ADD),
+    ac_(UJ_E_LEADZ),
+    ac_(UJ_E_NO_DGS),
+    ac_(UJ_E_INV_CHAR),
+    ac_(UJ_E_INV_UTF8),
+    ac_(UJ_E_INV_ESC),
+    ac_(UJ_E_INV_KEY),
+    ac_(UJ_E_NO_KEY),
+    ac_(UJ_E_TOO_DEEP)
 };
 
 static struct a_const fmt_consts[] = {
-    n_(UJ_FMT_FAST),
-    n_(UJ_FMT_DET),
-    n_(UJ_FMT_PRETTY)
+    ac_(UJ_FMT_FAST),
+    ac_(UJ_FMT_DET),
+    ac_(UJ_FMT_PRETTY)
 };
 
-#undef n_
+#undef ac_
 
 static void invoke_error_handler(unsigned code, size_t pos, void *p)
 {
