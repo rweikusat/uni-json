@@ -130,7 +130,7 @@ a string is a 2-stage procedure. Upon encountering a JSON string, the parser wil
 create a I<work string> object. It will then incrementally add UTF-8 data to it until
 all of the input string has been processed. A call to the string finalization routine
 is then supposed to create an actual string object from the collected data in the
-work string and disposed of that (insofar necessary).
+I<work string> and disposed of that (insofar necessary).
 
 =over
 
