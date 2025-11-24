@@ -26,9 +26,11 @@ uni-json-parser-bindings - object creation and management functions for uni-json
      int (*add_2_array)(void *value, void *ary);
 
      /*  strings */
-     void *(*make_string)(void);
-     void (*free_string)(void *str);
+     void *(*make_work_string)(void);
+     void (*free_work_string)(void *str);
      int (*add_2_string)(uint8_t *data, size_t len, void *str);
+     void *(*finalize_string)(void *str, uint8_t *data, size_t len);
+     void (*free_string)(void *str);
 
      /*  simple types */
      void *(*make_null)(void);
@@ -67,14 +69,15 @@ function C<croak>, can thus safely be called from C<on_error>.
 
 =head3 Object Creation/ Management
 
+All functions supposed to create some kind of data object must either return
+a pointer to suitable object or NULL to indicate that it couldn't be created.
+
 =over
 
 =item * C<void *make_object(void)>
 
 Will be called when the parser wants to create an I<object>, something containing an unordered set
 of key-value pairs.
-
-Must return a pointer to an object.
 
 =item * C<void free_object(void *obj)>
 
@@ -103,8 +106,6 @@ eventual disposal.
 
 Called by the parser when it wants to create an I<array>, an ordered set of values.
 
-Must return a pointer to an array.
-
 =item * C<void free_array(void *ary)>
 
 Will be called when the parser needs to dispose of an array previously
@@ -132,8 +133,6 @@ Called by the parser when it needs to create a I<string>. A string must be capab
 holding any valid UTF-8 string, possibly including bytes with value 0 or other
 control characters.
 
-Must return a pointer to a string.
-
 =item * C<void free_string(void *str)>
 
 Will be called by the parser when it wants to dispose of a string created
@@ -155,7 +154,7 @@ otherwise.
 
 =item * C<void *make_null(void)>
 
-Called by the parser to create a I<null> value. Must return a pointer to one.
+Called by the parser to create a I<null> value.
 
 =item * C(void free_null(void *null)>
 
