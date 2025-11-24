@@ -52,7 +52,8 @@ static struct a_const err_consts[] = {
     ac_(UJ_E_INV_ESC),
     ac_(UJ_E_INV_KEY),
     ac_(UJ_E_NO_KEY),
-    ac_(UJ_E_TOO_DEEP)
+    ac_(UJ_E_TOO_DEEP),
+    ac_(UJ_E_MAKE)
 };
 
 static struct a_const fmt_consts[] = {
