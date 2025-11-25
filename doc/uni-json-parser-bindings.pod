@@ -151,10 +151,11 @@ otherwise.
 
 =item * C<void *(*finalize_string)(void *str, uint8_t *data, size_t len)>
 
-Called to combine the content of the I<work string> object pointed to by B<str> with
-a final chunk of UTF-8 data of length B<len> pointed to by B<data> into an actual string
-object. The I<work string> may be empty. Must dispose of the object pointed to by
-B<str> if creation of the actual string succeeded.
+Called to combine the content of the I<work string> object pointed to
+by B<str> with a final chunk of UTF-8 data of length B<len> pointed to
+by B<data> into an actual string object. The I<work string> may be
+NULL or empty. Must dispose of the object pointed to by B<str> if
+creation of the actual string succeeded.
 
 =item * C<void (*free_string)(void *str)>
 
