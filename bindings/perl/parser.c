@@ -124,6 +124,8 @@ static int add_2_string(uint8_t *data, size_t len, void *str)
 static void *finalize_string(void *str, uint8_t *data, size_t len)
 {
     dTHX;
+
+    if (!str) str = newSVpvn_utf8("", 0, 1);
     if (len) sv_catpvn_nomg(str, data, len);
     return str;
 }

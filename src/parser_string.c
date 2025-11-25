@@ -401,19 +401,30 @@ static int parse_esc(struct pstate *pstate, struct uni_json_p_binding *binds,
 
 /**  string handling proper */
 static void *parse_string_content(struct pstate *pstate, struct uni_json_p_binding *binds,
-                                  void *str)
+                                  void **w_str)
 {
     uint8_t *p, *pp, *e, *s;
+    void *ws, *str;
     unsigned c;
     int rc;
 
     s = p = pstate->p;
     e = pstate->e;
+    ws = NULL;
 
     while (p < e && (c = *p, c != '"')) {
         if (c == '\\') {
+            if (!ws) {
+                *w_str = ws = binds->make_work_string();
+                if (!ws) {
+                    pstate->err.code = UJ_E_MAKE;
+                    pstate->err.pos = p;
+                    return NULL;
+                }
+            }
+
             if (p > s) {
-                rc = binds->add_2_string(s, p - s, str);
+                rc = binds->add_2_string(s, p - s, ws);
                 if (rc == -1) {
                     pstate->err.code = UJ_E_ADD;
                     pstate->err.pos = p;
@@ -422,7 +433,7 @@ static void *parse_string_content(struct pstate *pstate, struct uni_json_p_bindi
             }
 
             pstate->p = p + 1;
-            rc = parse_esc(pstate, binds, str);
+            rc = parse_esc(pstate, binds, ws);
             if (rc == -1) return NULL;
 
             s = p = pstate->p;
@@ -454,7 +465,7 @@ static void *parse_string_content(struct pstate *pstate, struct uni_json_p_bindi
         return NULL;
     }
 
-    str = binds->finalize_string(str, s, p - s);
+    str = binds->finalize_string(ws, s, p - s);
     if (!str) {
             pstate->err.code = UJ_E_MAKE;
             pstate->err.pos = p;
@@ -466,18 +477,13 @@ static void *parse_string_content(struct pstate *pstate, struct uni_json_p_bindi
 
 void *parse_string(struct pstate *pstate, struct uni_json_p_binding *binds)
 {
-    void *str, *obj;
+    void *w_str, *obj;
 
-    str = binds->make_work_string();
-    if (!str) {
-        pstate->err.code = UJ_E_MAKE;
-        pstate->err.pos = pstate->p;
-        return NULL;
-    }
 
+    w_str = NULL;
     ++pstate->p;
-    obj = parse_string_content(pstate, binds, str);
-    if (!obj) binds->free_work_string(str);
+    obj = parse_string_content(pstate, binds, &w_str);
+    if (!obj && w_str) binds->free_work_string(w_str);
 
     pstate->last_type = UJ_T_STR;
     return obj;

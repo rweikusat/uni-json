@@ -139,7 +139,7 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
 
     obj = NULL;
     ws = str;
-    if (ws->s) {
+    if (ws && ws->s) {
         if (len) {
             rc = add_2_work_string(data, len, ws);
             if (rc == -1) {
@@ -155,7 +155,7 @@ static void *finalize_string(void *str, uint8_t *data, size_t len)
     obj = PyUnicode_FromStringAndSize((char *)data, len);
 
 out:
-    free_work_string(ws);
+    if (ws) free_work_string(ws);
     return obj;
 }
 
