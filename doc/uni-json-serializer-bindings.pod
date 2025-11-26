@@ -73,15 +73,22 @@ serializer to use it in a particular runtime environment.
 
 =head2 Binding Functions
 
+Functions with a return type of C<int> are expected to return 0 on success and
+-1 otherwise. Functions with a return type of C<void *> should must either
+return a pointer to whatever they were asked to create or NULL to indicate
+an error.
+
 =head3 General
 
 =over
 
-=item * C<void output(uint8_t *data, size_t len, void *sink)>
+=item * C<int output(uint8_t *data, size_t len, void *sink)>
 
 Will be called by the serializer to output a JSON text fragment of C<len> bytes
 starting at C<data>. The third argumment will be the C<sink> pointer provided
 to C<uni_json_serialize>.
+
+
 
 =item * C<int type_of(void *p)>
 
