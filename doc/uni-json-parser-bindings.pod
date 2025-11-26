@@ -131,6 +131,10 @@ create a I<work string> object. It will then incrementally add UTF-8 data to it 
 all of the input string has been processed. A call to the string finalization routine
 is then supposed to create an actual string object from the collected data.
 
+This facility will only be used for JSON strings containing escape sequences the
+parser needs to convert into the corresponding UTF-8 data. Input strings without
+them will be construced with a single call to C<finalize_string>.
+
 =over
 
 =item * C<void *make_work_string(void)>
@@ -153,9 +157,11 @@ otherwise.
 
 Called to combine the content of the I<work string> object pointed to
 by B<str> with a final chunk of UTF-8 data of length B<len> pointed to
-by B<data> into an actual string object. The I<work string> may be
-NULL or empty. Must dispose of the object pointed to by B<str> if
-creation of the actual string succeeded.
+by B<data> into an actual string object. The B<str> argument will NULL if
+a I<work string> object wasn't need to handle a particular input string.
+
+Must dispose of the object pointed to by B<str> if creation of the actual
+string object succeeded.
 
 =item * C<void (*free_string)(void *str)>
 
