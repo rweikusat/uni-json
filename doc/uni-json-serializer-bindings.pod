@@ -17,22 +17,32 @@ uni-json-serializer-bindings - object management and helper functions for uni-js
      UJ_T_UNK
  };
 
- struct uj_data {
+ struct uj_ary_info {
+     void *p;
+     size_t len;
+ };
+
+ struct uj_str_data {
      uint8_t *s;
      size_t len;
  };
 
+ struct uj_num_data {
+     struct uj_str_data rep;
+     void *p;
+ };
+
  struct uj_kv_pair {
-     struct uj_data key;
+     struct uj_str_data key;
      void *val;
  };
 
  struct uni_json_s_binding {
      /*  general */
-     void (*output)(uint8_t *data, size_t len, void *sink);
+     int (*output)(uint8_t *data, size_t len, void *sink);
      int (*type_of)(void *p);
-     void *(*alloc)(size_t len);
-     void (*dealloc)(void *p);
+     void *(*alloc)(size_t);
+     void (*dealloc)(void *);
 
      /*  objects */
      void *(*start_object_traversal)(void *obj);
@@ -41,16 +51,16 @@ uni-json-serializer-bindings - object management and helper functions for uni-js
      int (*next_kv_pair)(void *oiter, struct uj_kv_pair *kvp);
 
      /*  arrays */
-     void *(*start_array_traversal)(void *ary);
-     void (*end_array_traversal)(void *aiter);
-     void *(*next_value)(void *aiter);
+     void (*get_array_info)(void *ary, struct uj_ary_info *ainfo);
+     void (*free_array_info)(void *p);
+     void *(*array_at)(void *p, size_t ndx);
 
      /*  "string data" types */
-     void (*get_num_data)(void *num, struct uj_data *ndata);
-     void (*free_num_data)(struct uj_data *ndata);
+     int (*get_num_data)(void *num, struct uj_num_data *ndata);
+     void (*free_num_data)(struct uj_num_data *ndata);
 
-     void (*get_string_data)(void *str, struct uj_data *sdata);
-     void (*free_string_data)(struct uj_data *sdata);
+     int (*get_string_data)(void *str, struct uj_str_data *sdata);
+     void (*free_string_data)(struct uj_str_data *sdata);
 
      /*  bool */
      int (*get_bool_value)(void *boolean);
