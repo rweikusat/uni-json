@@ -172,15 +172,14 @@ wants to serialize. The C<struct uj_ary_info> is defined as:
      size_t len;
  };
 
-The function must set B<len> to the size of the array and B<p> to the
-address of some kind of state information structure the language binding
-code itself needs to enable the serializer to access the elements of
-the array.
+The function must set B<len> to the number of elements in the array. The
+value returned via B<p> will be passed to all future array function calls
+referring to this particular array.
 
 =item * C<void (*free_array_info)(void *p)>
 
 If provided, the serializer will call this function after it's done
-with handling this array and pass the B<p> pointer returned in the
+with handling an array and pass the B<p> pointer returned in the
 C<struct uj_ary_info> structure to it.
 
 =item * C<void *(*array_at)(void *p, size_t ndx)>
@@ -188,9 +187,9 @@ C<struct uj_ary_info> structure to it.
 Must return a pointer to the array element at position B<ndx>. The
 serializer will use indices from 0 to B<len> - 1 to access array
 elements. The B<p> argument will be the pointer from the C<struct
-uj_ary_info> for this array. The returned pointer must remain valid
-until the next call to C<array_at> using the same B<p> or the final
-call to C<free_array_info> for it.
+uj_ary_info> for the array in question. The returned pointer must
+remain valid until the next call to C<array_at> using the same B<p> or
+the final call to C<free_array_info> for it.
 
 =back
 
