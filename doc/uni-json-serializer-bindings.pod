@@ -88,8 +88,6 @@ Will be called by the serializer to output a JSON text fragment of C<len> bytes
 starting at C<data>. The third argumment will be the C<sink> pointer provided
 to C<uni_json_serialize>.
 
-
-
 =item * C<int type_of(void *p)>
 
 Called to determine the JSON type to be used for serializing the value pointed to
@@ -164,26 +162,35 @@ returned 0 for it once.
 
 =over
 
-=item * C<void start_array_traversal(void *ary)>
+=item * C<void (*get_array_info)(void *ary, struct uj_ary_info *ainfo)>
 
-Called when the serializer wants to start traversing the array C<ary>. The argument will
-be a pointer an earlier C<type_of> call returned C<UJ_T_ARY> for. The return value
-must be some kind of iterator for this array. It must remain valid until passed to
-C<end_array_traversal> regardess of calls to other binding routines in between.
+Called by the serializer to determine meta-information about an array it
+wants to serialize. The C<struct uj_ary_info> is defined as:
 
-=item * C<void end_arry_traversal(void *aiter)>
+ struct uj_ary_info {
+     void *p;
+     size_t len;
+ };
 
-Called when the array C<aiter> refers to has been completely serialized. The argument
-will be a pointer returned by an earlier C<start_array_traversal> call.
+The function must set B<len> to the size of the array and B<p> to the
+address of some kind of state information structure the language binding
+code itself needs to enable the serializer to access the elements of
+the array.
 
-=item * C<void *next_value(void *aiter)>
+=item * C<void (*free_array_info)(void *p)>
 
-Called to determine the next value of the array identified by C<aiter>. Should return a pointer
-to this value or C<NULL> to signal that all values have been processed. A returned value pointer
-must remain valid until the next call to C<next_value> for this C<aiter> argument.
+If provided, the serializer will call this function after it's done
+with handling this array and pass the B<p> pointer returned in the
+C<struct uj_ary_info> structure to it.
 
-The function won't be called again for a specific C<aiter> after it returned C<NULL>
-for it once.
+=item * C<void *(*array_at)(void *p, size_t ndx)>
+
+Must return a pointer to the array element at position B<ndx>. The
+serializer will use indices from 0 to B<len> - 1 to access array
+elements. The B<p> argument will be the pointer from the C<struct
+uj_ary_info> for this array. The returned pointer must remain valid
+until the next call to C<array_at> using the same B<p> or the final
+call to C<free_array_info> for it.
 
 =back
 
