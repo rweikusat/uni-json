@@ -84,33 +84,32 @@ an error.
 
 =item * C<int output(uint8_t *data, size_t len, void *sink)>
 
-Will be called by the serializer to output a JSON text fragment of C<len> bytes
-starting at C<data>. The third argumment will be the C<sink> pointer provided
-to C<uni_json_serialize>.
+Will be called by the serializer to output a JSON text fragment of B<len> bytes
+starting at B<data>. The third argumment will be the B<sink> pointer provided
+to B<uni_json_serialize>.
 
 =item * C<int type_of(void *p)>
 
 Called to determine the JSON type to be used for serializing the value pointed to
-by C<p>. Must return one of the C<UJ_T...> constants. The effect of returning C<UJ_T_UNK>
-(for I<unknown>) is identical to returning C<UJ_T_NULL>.
+by B<p>. Must return one of the B<UJ_T...> constants.
 
-B<The return value is used to determine the type-specific serializer function to
-use for C<p> via table lookup and its validity is not checked. Returning a value outside of
-C<UJ_T_NULL> - C<UJ_T_UNK> will likely cause a crash or other memory corruption.>
+I<The return value is used to determine the type-specific serializer function to
+use for B<p> via table lookup and its validity is not checked. Returning a value outside of
+B<UJ_T_NULL> - B<UJ_T_UNK> will likely cause a crash or other memory corruption.>
 
 =item * C<void *alloc(size_t len)>
 
-Allocate a memory area of size C<len> for use by the serializer. This is only
+Allocate a memory area of size B<len> for use by the serializer. This is only
 used for I<deterministc> or I<pretty-printed> (see L<uni-json-serializer(3)>) output
-of objects. Only one such area will be needed at any given time. C<dealloc> will
-be called with the returned pointer as argument before C<alloc> will be called
+of objects. Only one such area will be needed at any given time. B<dealloc> will
+be called with the returned pointer as argument before B<alloc> will be called
 for another time.
 
 =item * C<void dealloc(void *p)>
 
 Called by the serializer to communicate that the memory area pointed to by
-C<p> won't be used anymore. The argument will be a pointer returned by an earlier
-C<alloc> call.
+B<p> won't be used anymore. The argument will be a pointer returned by an earlier
+B<alloc> call.
 
 =back
 
@@ -121,39 +120,39 @@ C<alloc> call.
 =item * C<void *start_object_traversal(void *obj)>
 
 Called by the serializer to communicate that it wants to serialize
-the object C<obj> next. The return value should be some kind of iterator
+the object B<obj> next. The return value should be some kind of iterator
 for this object. The argument will be a pointer a prior call to
-C<type_of> return a value of C<UJ_T_BJ> for. The iterator must remain
+B<type_of> return a value of B<UJ_T_OBJ> for. The iterator must remain
 valid until passed to C<end_object_traversal> regardless of any
 calls to other binding routines in between.
 
 =item * C<size_t max_kv_pairs(void *obj)>
 
 Called to determine an upper bound for the number of key-value pairs
-stored in the object C<obj>. The argument will be a pointer C<type_of>
-returned C<UJ_T_OBJ> for earlier. The return value must be E<gt>= the actual
+stored in the object B<obj>. The argument will be a pointer B<type_of>
+returned B<UJ_T_OBJ> for earlier. The return value must be E<gt>= the actual
 number of key-value pairs in the object. It'll be used to calculated
-the C<len> argument to pass to a future call to C<alloc> when serializing
+the B<len> argument to pass to a future call to B<alloc> when serializing
 objects in I<deterministic> or I<pretty-printed> format (see L<uni-json-serializer(3)>).
 
 =item * C(void end_object_traversal(void *oiter)>
 
 Called by the serializer when it's done with serializing an object. The argument will be
-a pointer returned by an earlier C<start_object_traversal> call.
+a pointer returned by an earlier B<start_object_traversal> call.
 
 =item * C<int next_kv_pair(void *oiter, struct uj_kv_pair *kvp)>
 
 Called to determine information about the next key-value pair from some object
-identified by the object iterator C<oiter>. The value will be a pointer returned
-by an earlier C<start_object_traversal> call. Should return 0 if all key-value
-pairs for this object were already returned, otherwise 1 and set C<kvp> suitably.
+identified by the object iterator B<oiter>. The value will be a pointer returned
+by an earlier B<start_object_traversal> call. Should return 0 if all key-value
+pairs for this object were already returned, otherwise 1 and set B<kvp> suitably.
 C<< kvp->key.s >> must be an UTF8-string representing the key text, C<< kvp->key.len >>
 the length of this string in bytes. The pointer C<< kvp->val >> must point to the corresponding
-value. All key and value pointers returned by calls to C<next_kv_pair> for a certain
-C<oiter> must remain valid until C<end_object_traversal> has been called for the
-same C<oiter> pointer.
+value. All key and value pointers returned by calls to B<next_kv_pair> for a certain
+B<oiter> must remain valid until B<end_object_traversal> has been called for the
+same B<oiter> pointer.
 
-The function won't be called again with a specific C<oiter> argument after it
+The function won't be called again with a specific B<oiter> argument after it
 returned 0 for it once.
 
 =back
@@ -188,8 +187,8 @@ Must return a pointer to the array element at position B<ndx>. The
 serializer will use indices from 0 to B<len> - 1 to access array
 elements. The B<p> argument will be the pointer from the C<struct
 uj_ary_info> for the array in question. The returned pointer must
-remain valid until the next call to C<array_at> using the same B<p> or
-the final call to C<free_array_info> for it.
+remain valid until the next call to B<array_at> using the same B<p> or
+the final call to B<free_array_info> for it.
 
 =back
 
@@ -197,35 +196,38 @@ the final call to C<free_array_info> for it.
 
 =over
 
-=item * C<void get_num_data(void *num, struct uj_data *ndata)>
+=item * C<void (*get_num_data)(void *num, struct uj_num_data *ndata)>
 
-Called to convert the number object pointed-to by C<num> to a string. Must set
-C<< data->s >> to the start of a string conforming to JSON number syntax
-(see L<RFC8259|https://datatracker.ietf.org/doc/html/rfc8259>) of length C<< data->len >>.
+Called to convert the number object pointed-to by B<num> to a string.
+Must set the B<s> and B<len> members of C<< ndata->rep >> to the address
+and length of a string conforming to JSON number syntax
+(see L<RFC8259|https://datatracker.ietf.org/doc/html/rfc8259>). C<< ndata->p >>
+can be used to store a pointer to some kind of object needed to provide
+the string representation of B<num>.
 
 No other serializer binding routines will be called until the returned string
 has again been released via C<free_num_data>.
 
-B<The returned string will be copied literally into the output.>
+I<The returned string will be copied literally into the output.>
 
-=item * C<void free_num_data(struct uj_data *ndata)>
+=item * C<void free_num_data(struct uj_num_data *ndata)>
 
-Called when the string representation of a number returned by C<get_num_data> won't
-be needed anymore.
+Called when the string representation of a number returned by an earlier call
+to B<get_num_data> isn't needed anymore.
 
-=item * C<void get_string_data(void *str, struct uj_data *sdata)>
+=item * C<void get_string_data(void *str, struct uj_str_data *sdata)>
 
 Called to obtain access to the raw string data of the string object pointed to
 by C<str>. On return, C<< data->s >> must point to a valid UTF-8 representation
-of the string C<str> with a length of C<< data->len >> bytes. The serializer will escape
+of the string B<str> with a length of C<< data->len >> bytes. The serializer will escape
 individual characters as necessary on output to conform to JSON string syntax.
 
 No other serializer binding routines will be called until the returned string
-has again been released via C<free_string_data>.
+has again been released via B<free_string_data>.
 
-=item * C<void free_string_data(struct uj_data *sdata>)
+=item * C<void free_string_data(struct uj_str_data *sdata>)
 
-Called when a string representation returned by a prior call to C<get_string_data>
+Called when a string representation returned by a prior call to b<get_string_data>
 isn't needed anymore.
 
 =back
@@ -236,12 +238,12 @@ isn't needed anymore.
 
 =item * C<int get_bool_value(void *boolean)>
 
-Called to obtain the value of the boolean object pointed to be C<boolean>. The
+Called to obtain the value of the boolean object pointed to by B<boolean>. The
 return value will be interpreted according to the usual C convention for that: C<0> meaning
 I<false> and  anything else I<true>.
 
 =item * Null Values
 
-Objects of type C<UJ_T_NULL> will be serialized as I<null>.
+Objects of type B<UJ_T_NULL> will be serialized as I<null>.
 
 =back
