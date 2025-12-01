@@ -4,10 +4,26 @@ Installation Instructions
 Prerquisites
 ------------
 
+1. Core Library
+
 	- gcc
         - GNU make
-        - perl (for Perl bindings)
-        - debhelper (for building a debian package)
+        - debhelper (when building a Debian package)
+        - fakeroot
+        - pod2man
+
+
+2. Perl Bindings
+
+	- Perl (development package)
+
+
+3. Python Bindings
+
+	- cpio
+	- Python (development package)
+        - pip
+        - setuptools
 
 
 Procedure
@@ -25,3 +41,46 @@ tree that's be installed at installation time.
 make deb
 
 can be used to build a Debian package.
+
+
+Selecting Language Bindings
+---------------------------
+
+The BINDINGS variable in the file bindings/Makefile defines the
+language bindings to build by default.
+
+
+Test Suite
+----------
+
+Running
+
+make test
+
+in the top-level directory will run the test suite. The perl-based
+tests have been written to test all features of the core library as
+well, the Python ones only to test the Python language bindings.
+
+
+Building Via Docker
+-------------------
+
+While this is probably a bit of a gimmick, the package can also be
+built in a Docker container. Provided there's a working docker
+installation on the build host, the script scripts/docker-build
+can be used for this. It'll create a docker image
+
+<username>/uni-json-base
+
+This will be a Debian 12 (see docker/uni-json-base.dockerfile for
+information how to change this) image containing all the software
+necessary for building the package. A second image
+
+<username>/uni-json
+
+will be used to create a container for building the package based
+on the current source, ie, without having to recreate the base
+image for every build. After building completed, the tmp directory
+will contain ready-to-install Debian packages and a tar.gz file
+containing all the files with the PREFIX part of the path
+removed.
