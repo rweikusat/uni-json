@@ -1,8 +1,9 @@
 uni-json (0.3) experimental; urgency=medium
 
-  * 
+  * binding API changed to accomodate both Perl and Python
+  * language bindings for Python
 
- --
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Mon, 01 Dec 2025 14:46:23 +0000
 
 uni-json (0.2) experimental; urgency=medium
 
