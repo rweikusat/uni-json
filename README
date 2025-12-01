@@ -1,11 +1,3 @@
-python branch
-=============
-
-Development branch for Python bindings. Currently, this contains a
-dummy parser routine which prints its s# argument to stderr via
-fprintf.
-
-
 Universal Json
 ==============
 
@@ -39,20 +31,14 @@ structures instead of employing some complicated, explicit stack
 management scheme to "avoid recursion."
 
 
-What's There So Far?
-====================
+Features
+========
 
-A complete parser core, a simple set of bindings for Perl and a test
-suite believed to be complete in the sense that it actually exercised
-all code paths.
+Believed-to-be-complete parser and serializer core written in C.
 
-Serializer core and Perl bindings and test code for that.
+Language bindings for Perl.
 
-After building the code ("make"), the test suite can be run with
-
-make -C bindings/perl test TEST_VERBOSE=1
-
-from the top-level directory.
+Language bindings for Python.
 
 Installation instructions are in the INSTALL file.
 
