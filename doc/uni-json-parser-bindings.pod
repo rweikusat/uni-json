@@ -63,7 +63,7 @@ pointer value passed as final argument to C<uni_json_parse>.
 
 By the time this handler is called, all memory implicitly allocated by earlier invocations of other handlers
 will already have been freed. Functions causing a non-local control transfer, eg, the Perl API
-function C<croak>, can thus safely be called from C<on_error>.
+function B<croak>, can thus safely be called from B<on_error>.
 
 =back
 
@@ -82,14 +82,14 @@ of key-value pairs.
 =item * C<void free_object(void *obj)>
 
 Will be called when the parser needs to free an object previously created via
-C<make_object>. Should free all memory used for the object itself and whatever
+B<make_object>. Should free all memory used for the object itself and whatever
 is being used by the key-value pairs presently stored in it.
 
 =item * C<int add_2_object(void *key, void *value, void *obj)>
 
 Called when a key-value pair is to be added to an object. The B<key> will be a pointer
-to a string created by C<make_string>, B<value> will be pointer to a value created
-by invoking one of the other C<make_...> functions and B<obj> a pointer to the object
+to a string created by B<make_string>, B<value> will be pointer to a value created
+by invoking one of the other B<make_...> functions and B<obj> a pointer to the object
 the key-value pair is supposed to be added to.
 
 Supposed to return a true value when the addition succeeded or 0 in case of an error. If the store
@@ -109,13 +109,13 @@ Called by the parser when it wants to create an I<array>, an ordered set of valu
 =item * C<void free_array(void *ary)>
 
 Will be called when the parser needs to dispose of an array previously
-created via C<make_array>. Should free all memory used for the array
+created via B<make_array>. Should free all memory used for the array
 itself and all values presently stored in it.
 
 =item * <int add_2_array(void *value, void *ary)>
 
 Called by the parser to add a value to the end of the array passed as B<ary>. B<value> will
-be a pointer to another value created by invoking one of the C<make_...> functions.
+be a pointer to another value created by invoking one of the B<make_...> functions.
 
 Supposed to return a true value when the store was successful and 0 otherwise. If the
 store was successful, the value will henceforth be owned by the array which is
@@ -179,7 +179,7 @@ Called by the parser to create a I<null> value.
 
 =item * C(void free_null(void *null)>
 
-Called by the parser to free a null value.
+Called by the parser to free a I<null> value.
 
 =item * C<void *make_bool(int true_false)>
 
